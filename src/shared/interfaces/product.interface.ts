@@ -9,6 +9,6 @@ export interface Product {
     price: number,
     image_url: string,
     subcategory: Subcategory
-    stock: Stock
-    order: Order
+    stock: Stock[]
+    order: Order[]
 }
