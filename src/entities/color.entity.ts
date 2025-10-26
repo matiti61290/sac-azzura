@@ -7,7 +7,6 @@ export class ColorEntity {
     id: number;
 
     @Column({ length: 255, nullable: false, unique: true })
-    @Index()
     name: string;
 
     @OneToMany(()=> StockEntity, (stock)=> stock.color)

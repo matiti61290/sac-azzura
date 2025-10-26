@@ -7,7 +7,6 @@ export class CategoryEntity {
     id: number;
 
     @Column({ length: 255, nullable: false, unique: true })
-    @Index()
     name: string;
 
     @OneToMany(

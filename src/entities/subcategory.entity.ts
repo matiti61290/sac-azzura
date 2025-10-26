@@ -7,8 +7,7 @@ export class SubcategoryEntity {
     @PrimaryGeneratedColumn({ type: 'int' })
     id: number;
 
-    @Column({ length: 255 })
-    @Index()
+    @Column({ length: 255, unique: true })
     name: string;
 
     @OneToMany(()=> ProductEntity, (product)=> product.subcategory)
