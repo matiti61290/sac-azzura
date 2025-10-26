@@ -5,6 +5,12 @@ import { UserEntity } from "./user.entity";
 export class AdressEntity {
     @PrimaryGeneratedColumn({ type: 'int' })
     id: number
+
+    @Column({
+        type: 'enum',
+        enum: ['delivary', 'billing']
+    })
+    type: 'delivary' | 'billing'
     
     @Column({ length: 255 })
     street: string
