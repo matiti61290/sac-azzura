@@ -1,25 +1,42 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne , Index} from "typeorm";
 import { ColorEntity } from "./color.entity";
 import { MaterialEntity } from "./material.entity";
 import { ProductEntity } from "./product.entity";
 
-@Entity()
+@Entity('Stock')
 export class StockEntity {
     @PrimaryGeneratedColumn({ type: 'int' })
     id: number;
 
-    @ManyToOne(()=> ProductEntity, (product)=> product.stock)
-    product: ProductEntity;
+    @ManyToOne(
+        ()=> ProductEntity, 
+        (product)=> product.stocks, 
+        { onDelete: "SET NULL", nullable: true}
+    )
+    product: ProductEntity | null;
 
-    @ManyToOne(()=> MaterialEntity, (material)=> material.stock)
+    @ManyToOne(()=> MaterialEntity, (material)=> material.stocks)
     material: MaterialEntity
 
-    @ManyToOne(()=> ColorEntity, (color)=> color.stock)
+    @ManyToOne(()=> ColorEntity, (color)=> color.stocks)
     color: ColorEntity;
 
     @Column({ type: 'int' })
     quantity: number;
 
-    @Column({ length: 255 })
-    sku: string;
+    @Column({ 
+        type: 'datetime', 
+        default: () => 'CURRENT_TIMESTAMP' 
+    })
+    createdAt: Date;
+
+    @Column({
+        type: 'datetime', 
+        default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP' 
+    })
+    updatedAt: Date;
+
+    @Column({ length: 50, unique: true })
+    @Index()
+    sku: string
 }

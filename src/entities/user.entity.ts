@@ -1,8 +1,8 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from "typeorm";
-import { AdressEntity } from "./adresses.entity";
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany, Index } from "typeorm";
+import { AddressEntity } from "./addresses.entity";
 import { OrderEntity } from "./order.entity";
 
-@Entity()
+@Entity('User')
 export class UserEntity {
     @PrimaryGeneratedColumn({ type: 'int' })
     id: number;
@@ -13,25 +13,26 @@ export class UserEntity {
     @Column({ length: 255})
     lastname: string;
 
-    @Column({ length: 255 })
+    @Column({ length: 255, unique: true })
+    @Index()
     mail: string;
 
-    @Column({ type: 'int' })
-    phone_number: number;
+    @Column({ length: 20 })
+    phoneNumber: string;
 
     @Column({ length: 255 })
     password: string;
 
     @Column()
-    is_verified: boolean;
+    isVerified: boolean;
 
     @OneToMany(
-        ()=> AdressEntity, 
-        (adress)=> adress.user, 
+        ()=> AddressEntity, 
+        (address)=> address.user, 
         { cascade: true, onDelete: "CASCADE" }
     )
-    adress: AdressEntity[];
+    addresses: AddressEntity[];
 
     @OneToMany(()=> OrderEntity, (order)=> order.user)
-    order: OrderEntity;
+    orders: OrderEntity[];
 }

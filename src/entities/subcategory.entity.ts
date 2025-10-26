@@ -1,18 +1,23 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, Index } from "typeorm";
 import { CategoryEntity } from "./categories.entity";
 import { ProductEntity } from "./product.entity";
 
-@Entity()
+@Entity('Subcategory')
 export class SubcategoryEntity {
     @PrimaryGeneratedColumn({ type: 'int' })
     id: number;
 
     @Column({ length: 255 })
-    subcategory: string;
+    @Index()
+    name: string;
 
     @OneToMany(()=> ProductEntity, (product)=> product.subcategory)
-    product: ProductEntity;
+    products: ProductEntity[];
 
-    @ManyToOne(()=> CategoryEntity, (category)=> category.subcategory)
+    @ManyToOne(
+        ()=> CategoryEntity, 
+        (category)=> category.subcategories,
+        {onDelete: "CASCADE"}
+    )
     category: CategoryEntity;
 }
