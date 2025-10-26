@@ -1,14 +1,14 @@
-import { Category } from "src/shared/interfaces/category.interface";
-import { Subcategory } from "src/shared/interfaces/subcategory.interface";
-import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from "typeorm";
+import { SubcategoryEntity } from "./subcategory.entity";
 
 @Entity()
-export class CategoryEntity implements Category {
+export class CategoryEntity {
     @PrimaryGeneratedColumn()
     id: number;
 
     @Column({ length: 255 })
     category: string;
 
-    subcategory: Subcategory;
+    @OneToMany(()=> SubcategoryEntity, (subcategory)=> subcategory.category)
+    subcategory: SubcategoryEntity[];
 }

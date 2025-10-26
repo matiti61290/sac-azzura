@@ -1,11 +1,10 @@
-import { Order } from "src/shared/interfaces/order.interface";
-import { Product } from "src/shared/interfaces/product.interface";
-import { Stock } from "src/shared/interfaces/stock.interface";
-import { Subcategory } from "src/shared/interfaces/subcategory.interface";
-import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany } from "typeorm";
+import { SubcategoryEntity } from "./subcategory.entity";
+import { StockEntity } from "./stock.entity";
+import { OrderEntity } from "./order.entity";
 
 @Entity()
-export class ProductEntity implements Product {
+export class ProductEntity {
     @PrimaryGeneratedColumn({ type: 'int' })
     id: number;
 
@@ -21,9 +20,12 @@ export class ProductEntity implements Product {
     @Column({ length: 255 })
     image_url: string;
 
-    subcategory: Subcategory;
+    @ManyToOne(()=> SubcategoryEntity, (subcategory)=>subcategory.product)
+    subcategory: SubcategoryEntity;
     
-    stock: Stock;
+    @OneToMany(()=> StockEntity, (stock)=> stock.product)
+    stock: StockEntity[]
 
-    order: Order;
+    @OneToMany(()=> OrderEntity, (order)=> order.product)
+    order: OrderEntity[]
 }

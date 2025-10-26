@@ -1,13 +1,14 @@
-import { Color } from "src/shared/interfaces/color.interface";
-import { Stock } from "src/shared/interfaces/stock.interface";
-import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from "typeorm";
+import { StockEntity } from "./stock.entity";
 
 @Entity()
-export class ColorEntity implements Color {
+export class ColorEntity {
     @PrimaryGeneratedColumn({ type: 'int' })
     id: number;
 
+    @Column({ length: 255 })
     color: string;
 
-    stock: Stock;
+    @OneToMany(()=> StockEntity, (stock)=> stock.color)
+    stock: StockEntity[];
 }

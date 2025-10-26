@@ -1,9 +1,8 @@
-import { Adress } from "src/shared/interfaces/address.interface";
-import { User } from "src/shared/interfaces/user.interface";
-import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from "typeorm";
+import { UserEntity } from "./user.entity";
 
 @Entity()
-export class AdressEntity implements Adress {
+export class AdressEntity {
     @PrimaryGeneratedColumn({ type: 'int' })
     id: number
     
@@ -19,5 +18,6 @@ export class AdressEntity implements Adress {
     @Column({ length: 255 })
     city: string;
 
-    user: User;
+    @ManyToOne(()=> UserEntity, (user)=>user.adress)
+    user: UserEntity;
 }

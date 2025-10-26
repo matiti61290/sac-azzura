@@ -1,19 +1,21 @@
-import { Order } from "src/shared/interfaces/order.interface";
-import { Product } from "src/shared/interfaces/product.interface";
-import { Promotion } from "src/shared/interfaces/promotion.interface";
-import { User } from "src/shared/interfaces/user.interface";
-import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from "typeorm";
+import { UserEntity } from "./user.entity";
+import { ProductEntity } from "./product.entity";
+import { PromotionEntity } from "./promotion.entity";
 
 @Entity()
-export class OrderEntity implements Order {
+export class OrderEntity {
     @PrimaryGeneratedColumn({ type: 'int' })
     id: number;
 
-    user: User;
+    @ManyToOne(()=> UserEntity, (user)=> user.order)
+    user: UserEntity;
 
-    product: Product;
+    @ManyToOne(()=> ProductEntity, (product)=> product.order)
+    product: ProductEntity;
 
-    promotion: Promotion;
+    @ManyToOne(()=>PromotionEntity, (promotion)=> promotion.order)
+    promotion: PromotionEntity;
 
     @Column({ length: 255 })
     status: string;

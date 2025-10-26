@@ -1,19 +1,21 @@
-import { Color } from "src/shared/interfaces/color.interface";
-import { Material } from "src/shared/interfaces/material.interface";
-import { Product } from "src/shared/interfaces/product.interface";
-import { Stock } from "src/shared/interfaces/stock.interface";
-import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from "typeorm";
+import { ColorEntity } from "./color.entity";
+import { MaterialEntity } from "./material.entity";
+import { ProductEntity } from "./product.entity";
 
 @Entity()
-export class StockEntity implements Stock {
+export class StockEntity {
     @PrimaryGeneratedColumn({ type: 'int' })
     id: number;
 
-    product: Product;
+    @ManyToOne(()=> ProductEntity, (product)=> product.stock)
+    product: ProductEntity;
 
-    material: Material;
+    @ManyToOne(()=> MaterialEntity, (material)=> material.stock)
+    material: MaterialEntity
 
-    color: Color;
+    @ManyToOne(()=> ColorEntity, (color)=> color.stock)
+    color: ColorEntity;
 
     @Column({ type: 'int' })
     quantity: number;

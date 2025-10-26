@@ -1,12 +1,14 @@
-import { Material } from "src/shared/interfaces/material.interface";
-import { Stock } from "src/shared/interfaces/stock.interface";
-import { Entity, PrimaryGeneratedColumn, Column} from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany} from "typeorm";
+import { StockEntity } from "./stock.entity";
 
 @Entity()
-export class MaterialEntity implements Material {
+export class MaterialEntity {
+    @PrimaryGeneratedColumn({ type: 'int' })
     id: number;
 
+    @Column({ length: 255 })
     material: string;
 
-    stock: Stock;
+    @OneToMany(()=> StockEntity, (stock)=> stock.material)
+    stock: StockEntity[];
 }

@@ -9,6 +9,6 @@ export interface User {
     phone_number: number,
     password: string,
     is_verified: boolean,
-    addresses: Adress,
+    adresses: Adress,
     order:Order
 }

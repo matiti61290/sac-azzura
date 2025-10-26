@@ -1,10 +1,9 @@
-import { Adress } from "src/shared/interfaces/address.interface";
-import { Order } from "src/shared/interfaces/order.interface";
-import { User } from "src/shared/interfaces/user.interface";
-import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from "typeorm";
+import { AdressEntity } from "./adresses.entity";
+import { OrderEntity } from "./order.entity";
 
 @Entity()
-export class UserEntity implements User{
+export class UserEntity {
     @PrimaryGeneratedColumn({ type: 'int' })
     id: number;
 
@@ -26,7 +25,13 @@ export class UserEntity implements User{
     @Column()
     is_verified: boolean;
 
-    addresses: Adress;
+    @OneToMany(
+        ()=> AdressEntity, 
+        (adress)=> adress.user, 
+        { cascade: true, onDelete: "CASCADE" }
+    )
+    adress: AdressEntity[];
 
-    order: Order;
+    @OneToMany(()=> OrderEntity, (order)=> order.user)
+    order: OrderEntity;
 }

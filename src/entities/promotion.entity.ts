@@ -1,9 +1,8 @@
-import { Order } from "src/shared/interfaces/order.interface";
-import { Promotion } from "src/shared/interfaces/promotion.interface";
-import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from "typeorm";
+import { OrderEntity } from "./order.entity";
 
 @Entity()
-export class PromotionEntity implements Promotion {
+export class PromotionEntity {
     @PrimaryGeneratedColumn({ type: "int" })
     id: number;
 
@@ -28,5 +27,6 @@ export class PromotionEntity implements Promotion {
     @Column()
     isActive: boolean;
 
-    order: Order;
+    @OneToMany(()=>OrderEntity, (order)=> order.promotion)
+    order: OrderEntity[]
 }
