@@ -16,6 +16,6 @@ export class AuthController {
 
     @Get('validation')
     async validationUser(){
-        return 'the controller works'
+        
     }
 }

@@ -4,6 +4,7 @@ import { Repository } from "typeorm";
 import { InjectRepository } from "@nestjs/typeorm";
 import { RegisterDto } from "src/shared/dtos/register.dto";
 import { JwtService } from "@nestjs/jwt";
+import { ConfirmMailService } from "./mail.service";
 import * as bcrypt from 'bcrypt'
 
 /**
@@ -15,7 +16,8 @@ export class AuthService {
         @InjectRepository(UserEntity)
         private readonly userRepository: Repository<UserEntity>,
 
-        // private readonly jwtService: JwtService
+        private readonly jwtService: JwtService,
+        private readonly confirmMailService: ConfirmMailService
     ) {}
 
     async registration(registerDto: RegisterDto): Promise<UserEntity> {
@@ -39,8 +41,8 @@ export class AuthService {
 
         await this.userRepository.save(newUser)
 
-        // const token = this.jwtService.sign({ id: newUser.id })
-        // await this.
+        const token = this.jwtService.sign({ id: newUser.id })
+        await this.confirmMailService.sendVerificationMail(newUser.mail, token)
 
         return newUser
     }
