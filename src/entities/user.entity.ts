@@ -34,4 +34,7 @@ export class UserEntity {
 
     @OneToMany(()=> OrderEntity, (order)=> order.user)
     orders: OrderEntity[];
+
+    @Column()
+    isAdmin: boolean
 }
