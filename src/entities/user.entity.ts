@@ -14,7 +14,6 @@ export class UserEntity {
     lastname: string;
 
     @Column({ length: 255, unique: true })
-    @Index()
     mail: string;
 
     @Column({ length: 20 })

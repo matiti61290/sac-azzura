@@ -9,7 +9,6 @@ export class ProductEntity {
     id: number;
 
     @Column({ length: 255, nullable: false, unique: true })
-    @Index()
     name: string;
 
     @Column({ length: 255, nullable: false })

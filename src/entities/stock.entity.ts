@@ -37,6 +37,5 @@ export class StockEntity {
     updatedAt: Date;
 
     @Column({ length: 50, unique: true })
-    @Index()
     sku: string
 }
