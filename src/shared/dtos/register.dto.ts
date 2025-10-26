@@ -15,7 +15,7 @@ export class RegisterDto {
     mail: string
 
     @IsNotEmpty()
-    @IsPhoneNumber()
+    @IsPhoneNumber('FR')
     phoneNumber: string
 
     @IsNotEmpty()

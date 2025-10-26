@@ -15,7 +15,7 @@ export class AuthService {
         @InjectRepository(UserEntity)
         private readonly userRepository: Repository<UserEntity>,
 
-        private jwtService: JwtService
+        // private readonly jwtService: JwtService
     ) {}
 
     async registration(registerDto: RegisterDto): Promise<UserEntity> {
@@ -38,6 +38,9 @@ export class AuthService {
         })
 
         await this.userRepository.save(newUser)
+
+        // const token = this.jwtService.sign({ id: newUser.id })
+        // await this.
 
         return newUser
     }

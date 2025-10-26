@@ -4,10 +4,14 @@ import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { AuthController } from './auth/auth.controller';
 import { AuthService } from './auth/auth.service';
+import { dataSourceOptions } from './database/ormconfig';
+import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
-  imports: [AuthModule],
-  controllers: [AppController, AuthController],
-  providers: [AppService, AuthService],
+  imports: [
+    TypeOrmModule.forRoot(dataSourceOptions), 
+    AuthModule],
+  controllers: [AppController],
+  providers: [AppService],
 })
 export class AppModule {}
