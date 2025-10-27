@@ -7,6 +7,7 @@ import { AuthService } from './auth/auth.service';
 import { dataSourceOptions } from './database/ormconfig';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
+import { UserModule } from './user/user.module';
 
 @Module({
   imports: [
@@ -14,7 +15,8 @@ import { ConfigModule } from '@nestjs/config';
     ConfigModule.forRoot({
       isGlobal: true
     }), 
-    AuthModule],
+    AuthModule,
+    UserModule],
   controllers: [AppController],
   providers: [AppService],
 })

@@ -1,6 +1,10 @@
-import { Body, Controller, Get, Post, Query, UsePipes, ValidationPipe } from "@nestjs/common";
+import { Body, Controller, Get, Post, Query, Req, Res, UseGuards, UsePipes, ValidationPipe } from "@nestjs/common";
 import { AuthService } from "./auth.service";
 import { RegisterDto } from "src/shared/dtos/register.dto";
+import { LocalAuthGuard } from "./guards/local-auth.guard";
+import { JwtAuthGuard } from "./guards/jwt-auth.guard";
+import type { Request, Response, } from "express";
+
 
 @Controller('auth')
 export class AuthController {
@@ -16,7 +20,19 @@ export class AuthController {
 
     @Get('validation-user')
     async validationUser(@Query('token') token: string){
-        await this.authService.validateUser(token)
+        await this.authService.validateAccount(token)
         return { message: 'Utilisateur valide'}
+    }
+
+    @Post('login')
+    @UseGuards(LocalAuthGuard)
+    async login(@Req() req: Request, @Res({ passthrough: true }) response: Response) {
+        return this.authService.login(req.user, response)
+    }
+
+    @Get('profile')
+    @UseGuards(JwtAuthGuard)
+    async getProfile(@Req() req: Request) {
+        return req.user
     }
 }
