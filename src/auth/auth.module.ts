@@ -5,6 +5,9 @@ import { TypeOrmModule } from "@nestjs/typeorm";
 import { UserEntity } from "src/entities/user.entity";
 import { JwtModule } from "@nestjs/jwt";
 import { ConfirmMailService } from "./mail.service";
+import * as dotenv from 'dotenv'
+
+dotenv.config()
 
 @Module({
     imports:[TypeOrmModule.forFeature([UserEntity]),

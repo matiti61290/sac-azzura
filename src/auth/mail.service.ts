@@ -14,7 +14,7 @@ export class ConfirmMailService {
     async sendVerificationMail(mail: string, token: string) {
         const link = `localhost:3000/auth/validation?token=${token}`
         await this.transporter.sendMail({
-            from: 'ichigo61290@gmail.com',
+            from: 'barbeymathieudev@gmail.com',
             to: mail,
             text: `Cliquez ici pour valider l'activation du compte : ${link}`,
             html: `<a href="${link}">Activer mon compte</a>`
