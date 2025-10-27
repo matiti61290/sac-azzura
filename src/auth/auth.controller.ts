@@ -2,6 +2,7 @@ import { Body, Controller, Get, Post, Query, Request, UseGuards, UsePipes, Valid
 import { AuthService } from "./auth.service";
 import { RegisterDto } from "src/shared/dtos/register.dto";
 import { LocalAuthGuard } from "./guards/local-auth.guard";
+import { JwtAuthGuard } from "./guards/jwt-auth.guard";
 
 
 @Controller('auth')
@@ -27,5 +28,11 @@ export class AuthController {
     @UseGuards(LocalAuthGuard)
     async login(@Request() req) {
         return this.authService.login(req.user)
+    }
+
+    @Get('test')
+    @UseGuards(JwtAuthGuard)
+    async test() {
+        return "Guard marche bien"
     }
 }
