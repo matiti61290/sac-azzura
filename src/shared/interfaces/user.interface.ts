@@ -6,9 +6,10 @@ export interface User {
     firstname: string,
     lastname: string,
     mail: string,
-    phone_number: number,
+    phoneNumber: string,
     password: string,
-    is_verified: boolean,
-    adresses: Adress,
-    order:Order
+    isVerified: boolean,
+    addresses: Adress[],
+    orders:Order[],
+    isAdmin: boolean
 }

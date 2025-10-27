@@ -6,7 +6,6 @@ import { RegisterDto } from "src/shared/dtos/register.dto";
 import { JwtService } from "@nestjs/jwt";
 import { ConfirmMailService } from "./mail.service";
 import * as bcrypt from 'bcrypt'
-
 /**
  * Service s'occupant des fonctions liées à l'authentification comme l'inscription ou la connexion d'un utilisateur.
  */
@@ -18,7 +17,9 @@ export class AuthService {
 
         private readonly jwtService: JwtService,
         private readonly confirmMailService: ConfirmMailService
-    ) {}
+    ) {
+        console.log('Authservice instancie')
+    }
 
     async registration(registerDto: RegisterDto): Promise<UserEntity> {
         if (registerDto.password !== registerDto.confirmPassword){
@@ -47,7 +48,7 @@ export class AuthService {
         return newUser
     }
 
-    async validateUser(token: string) {
+    async validateAccount(token: string) {
         const payload = this.jwtService.verify(token)
         const user = await this.userRepository.findOne({ where: { id: payload.id }})
 
@@ -57,5 +58,19 @@ export class AuthService {
 
         user.isVerified = true
         await this.userRepository.save(user)
+    }
+
+    async validateUser(mail: string, password: string): Promise<any> {
+        const user = await this.userRepository.findOne({ where: { mail } })
+        if(user && (await bcrypt.compare(password, user.password))) {
+            const { password, ...result} = user
+            return result
+        }
+        return null
+    }
+
+    async login(user: any) {
+        const payload = { mail: user.mail, sub: user.id}
+        return { access_token: this.jwtService.sign(payload) }
     }
 }
