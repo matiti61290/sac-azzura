@@ -6,6 +6,7 @@ import { RegisterDto } from "src/shared/dtos/register.dto";
 import { JwtService } from "@nestjs/jwt";
 import { ConfirmMailService } from "./mail.service";
 import * as bcrypt from 'bcrypt'
+import { Response } from "express";
 /**
  * Service s'occupant des fonctions liées à l'authentification comme l'inscription ou la connexion d'un utilisateur.
  */
@@ -69,8 +70,18 @@ export class AuthService {
         return null
     }
 
-    async login(user: any) {
+    async login(user: any, response: Response) {
         const payload = { mail: user.mail, sub: user.id}
-        return { access_token: this.jwtService.sign(payload) }
+        const token = this.jwtService.sign(payload, { expiresIn: '1h' })
+        console.log('Token genere:', token)
+
+        response.cookie('jwt', token, {
+            httpOnly: true,
+            secure: false,
+            sameSite: 'strict',
+            maxAge: 60 * 60 * 1000
+        })
+
+        return { message: 'Connexion réussie'}
     }
 }

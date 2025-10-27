@@ -9,6 +9,7 @@ import * as dotenv from 'dotenv'
 import { PassportModule } from "@nestjs/passport";
 import { LocalStrategy } from "./strategies/local.strategy"
 import { JwtStrategy } from "./strategies/jwt.strategy"
+import { JwtAuthGuard } from "./guards/jwt-auth.guard";
 
 dotenv.config()
 
@@ -20,7 +21,7 @@ dotenv.config()
         }),
         PassportModule.register({ defaultStrategy: 'local'})],
     controllers: [AuthController, ],
-    providers: [AuthService, ConfirmMailService, LocalStrategy, JwtStrategy],
+    providers: [AuthService, ConfirmMailService, LocalStrategy, JwtStrategy, JwtAuthGuard],
     exports:[AuthService, JwtModule]
 })
 
