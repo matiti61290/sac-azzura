@@ -1,4 +1,4 @@
-import { BadRequestException, ConflictException, Injectable } from "@nestjs/common";
+import { BadRequestException, ConflictException, Injectable, NotFoundException } from "@nestjs/common";
 import { UserEntity } from "src/entities/user.entity";
 import { Repository } from "typeorm";
 import { InjectRepository } from "@nestjs/typeorm";
@@ -45,5 +45,17 @@ export class AuthService {
         await this.confirmMailService.sendVerificationMail(newUser.mail, token)
 
         return newUser
+    }
+
+    async validateUser(token: string) {
+        const payload = this.jwtService.verify(token)
+        const user = await this.userRepository.findOne({ where: { id: payload.id }})
+
+        if(!user){
+            throw new NotFoundException('Utilisateur introuvable')
+        }
+
+        user.isVerified = true
+        await this.userRepository.save(user)
     }
 }
