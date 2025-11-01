@@ -12,7 +12,7 @@ export class newPasswordMailService {
     })
 
     async sendNewPasswordMail(mail:string, token: string) {
-        const link = `http://localhost:3000/auth/new-password?token=${token}`
+        const link = `http://localhost:3000/auth/forget-password?token=${token}`
         await this.transporter.sendMail({
             from: 'barbeymathieudev@gmail.com',
             to: mail,

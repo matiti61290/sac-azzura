@@ -9,6 +9,7 @@ import * as bcrypt from 'bcrypt'
 import { Response } from "express";
 import { newPasswordMailService } from "./authMail/newPasswordMail.service";
 import { MailDto } from "src/shared/dtos/mail.dtos";
+import { NewPasswordDto } from "src/shared/dtos/newPassword.dtos";
 /**
  * Service s'occupant des fonctions liées à l'authentification comme l'inscription ou la connexion d'un utilisateur.
  */
@@ -33,7 +34,7 @@ export class AuthService {
         const existingUser = await this.userRepository.findOne({ where: {mail: registerDto.mail}})
 
         if(existingUser){
-            throw new ConflictException('et email est deja utilisé.')
+            throw new ConflictException('Cet email est deja utilisé.')
         }
 
         const salt = await bcrypt.genSalt(10)
@@ -93,5 +94,14 @@ export class AuthService {
         const token = this.jwtService.sign(payload, {expiresIn: '1h'})
 
         await this.newPasswordMailService.sendNewPasswordMail(payload.mail, token)
+    }
+
+    async changePassword(newPassword: NewPasswordDto){
+        if (newPassword.password !== newPassword.confirmPassword) {
+            throw new BadRequestException('Les mots de passe ne correspondent pas')
+        }
+        const salt = await bcrypt.genSalt(10)
+        const hashedPassword = await bcrypt.hash(newPassword.password, salt)
+
     }
 }
