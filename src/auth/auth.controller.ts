@@ -4,6 +4,7 @@ import { RegisterDto } from "src/shared/dtos/register.dto";
 import { LocalAuthGuard } from "./guards/local-auth.guard";
 import { JwtAuthGuard } from "./guards/jwt-auth.guard";
 import type { Request, Response, } from "express";
+import { MailDto } from "src/shared/dtos/mail.dtos";
 
 
 @Controller('auth')
@@ -35,4 +36,11 @@ export class AuthController {
     async getProfile(@Req() req: Request) {
         return req.user
     }
+
+    @Post('forget-password')
+    async forgetPassword(@Body() mailDto: MailDto){
+        return this.authService.sendMailForgetPassword(mailDto)
+    }
+
+    
 }

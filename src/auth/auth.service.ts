@@ -4,9 +4,11 @@ import { Repository } from "typeorm";
 import { InjectRepository } from "@nestjs/typeorm";
 import { RegisterDto } from "src/shared/dtos/register.dto";
 import { JwtService } from "@nestjs/jwt";
-import { ConfirmMailService } from "./mail.service";
+import { ConfirmMailService } from "./authMail/corfirmMail.service";
 import * as bcrypt from 'bcrypt'
 import { Response } from "express";
+import { newPasswordMailService } from "./authMail/newPasswordMail.service";
+import { MailDto } from "src/shared/dtos/mail.dtos";
 /**
  * Service s'occupant des fonctions liées à l'authentification comme l'inscription ou la connexion d'un utilisateur.
  */
@@ -17,7 +19,8 @@ export class AuthService {
         private readonly userRepository: Repository<UserEntity>,
 
         private readonly jwtService: JwtService,
-        private readonly confirmMailService: ConfirmMailService
+        private readonly confirmMailService: ConfirmMailService,
+        private readonly newPasswordMailService: newPasswordMailService
     ) {
         console.log('Authservice instancie')
     }
@@ -43,7 +46,7 @@ export class AuthService {
 
         await this.userRepository.save(newUser)
 
-        const token = this.jwtService.sign({ id: newUser.id })
+        const token = this.jwtService.sign({ id: newUser.id, expiresIn: '1h'  })
         await this.confirmMailService.sendVerificationMail(newUser.mail, token)
 
         return newUser
@@ -83,5 +86,12 @@ export class AuthService {
         })
 
         return { message: 'Connexion réussie'}
+    }
+
+    async sendMailForgetPassword(mailDto: MailDto) {
+        const payload = {mail: mailDto.mail}
+        const token = this.jwtService.sign(payload, {expiresIn: '1h'})
+
+        await this.newPasswordMailService.sendNewPasswordMail(payload.mail, token)
     }
 }
