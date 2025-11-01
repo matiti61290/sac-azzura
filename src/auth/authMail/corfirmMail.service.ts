@@ -22,7 +22,7 @@ export class ConfirmMailService {
                 <div>
                     <h1>Merci de votre inscription</h1>
                     <h3>Valider des maintenant votre compte!</h3>
-                    <p>Cliquez sur ce <a href="${link}">lien </a> pour valider votre compte.</p>
+                    <p>Cliquez sur ce <a href="${link}">lien</a> pour valider votre compte.</p>
                 </div>
             `
         })

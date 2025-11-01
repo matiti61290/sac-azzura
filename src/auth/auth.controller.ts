@@ -4,6 +4,8 @@ import { RegisterDto } from "src/shared/dtos/register.dto";
 import { LocalAuthGuard } from "./guards/local-auth.guard";
 import { JwtAuthGuard } from "./guards/jwt-auth.guard";
 import type { Request, Response, } from "express";
+import { MailDto } from "src/shared/dtos/mail.dtos";
+import { NewPasswordDto } from "src/shared/dtos/newPassword.dtos";
 
 
 @Controller('auth')
@@ -34,5 +36,20 @@ export class AuthController {
     @UseGuards(JwtAuthGuard)
     async getProfile(@Req() req: Request) {
         return req.user
+    }
+
+    @Post('mail-forget-password')
+    async mailForgetPassword(@Body() mailDto: MailDto){
+        return this.authService.sendMailForgetPassword(mailDto)
+    }
+
+    @Get('forget-password')
+    async forgetPassword(@Query('token') token: string) {
+        return 'Hello world'
+    }
+
+    @Post('change-password')
+    async changePassword(@Body() newPassword: NewPasswordDto){
+        return this.authService.changePassword
     }
 }
