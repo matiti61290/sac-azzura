@@ -17,11 +17,12 @@ export class ProductDto{
     price: number
 
     @IsNotEmpty()
-    @IsUrl()
+    // @IsUrl()
     imageUrl: string
 
     @IsNotEmpty()
-    subcategory
+    @IsString()
+    subcategoryName: string
 
     @IsNotEmpty()
     @IsBoolean()
