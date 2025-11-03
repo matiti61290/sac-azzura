@@ -22,9 +22,7 @@ export class AuthService {
         private readonly jwtService: JwtService,
         private readonly confirmMailService: ConfirmMailService,
         private readonly newPasswordMailService: newPasswordMailService
-    ) {
-        console.log('Authservice instancie')
-    }
+    ) { }
 
     async registration(registerDto: RegisterDto): Promise<UserEntity> {
         if (registerDto.password !== registerDto.confirmPassword){
