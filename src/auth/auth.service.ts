@@ -96,6 +96,11 @@ export class AuthService {
         await this.newPasswordMailService.sendNewPasswordMail(payload.mail, token)
     }
 
+    async forgetPassword(token: string){
+        const payload = this.jwtService.verify(token)
+        return payload
+    }
+
     async changePassword(newPassword: NewPasswordDto, token: string){
         const payload = this.jwtService.verify(token)
 

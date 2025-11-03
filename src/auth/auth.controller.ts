@@ -6,15 +6,12 @@ import { JwtAuthGuard } from "./guards/jwt-auth.guard";
 import type { Request, Response, } from "express";
 import { MailDto } from "src/shared/dtos/mail.dtos";
 import { NewPasswordDto } from "src/shared/dtos/newPassword.dtos";
-import { JwtService } from "@nestjs/jwt";
 
 
 @Controller('auth')
 export class AuthController {
     constructor(
         private readonly authService: AuthService,
-
-        private readonly jwtService: JwtService
     ){}
 
     @Post('register')
@@ -48,8 +45,7 @@ export class AuthController {
 
     @Get('forget-password')
     async forgetPassword(@Query('token') token: string) {
-        const payload = this.jwtService.verify(token)
-        return payload
+        return this.authService.forgetPassword(token)
     }
 
     //A tester avec un template
