@@ -1,15 +1,15 @@
 import { Body, Controller, Get, Param, ParseIntPipe, Post, Query } from "@nestjs/common";
 import { ProductService } from "./product.service";
-import { AddProductDto } from "src/shared/dtos/addProduct.dto";
-import { UpdateProductDto } from "src/shared/dtos/updateProduct.dto";
+import { AddProductDto } from "src/shared/dtos/product/addProduct.dto";
+import { UpdateProductDto } from "src/shared/dtos/product/updateProduct.dto";
 
-@Controller('product')
+@Controller('products')
 export class ProductController {
     constructor(
         private readonly productService: ProductService
     ) {}
 
-    @Get('products')
+    @Get('')
     async getAllProduct(){
         return this.productService.getAllProducts()
     }

@@ -1,7 +1,23 @@
-import { IsNotEmpty, IsString, Matches } from "class-validator";
-import { Match } from "../decorators/password_match.decorator";
+import { IsEmail, IsNotEmpty, IsPhoneNumber, IsString, Matches } from "class-validator";
+import { Match } from "../../decorators/password_match.decorator";
 
-export class NewPasswordDto {
+export class RegisterDto {
+    @IsNotEmpty()
+    @IsString()
+    firstname: string
+
+    @IsNotEmpty()
+    @IsString()
+    lastname: string
+
+    @IsNotEmpty()
+    @IsEmail()
+    mail: string
+
+    @IsNotEmpty()
+    @IsPhoneNumber('FR')
+    phoneNumber: string
+
     @IsNotEmpty()
     @IsString()
     @Matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/, {
