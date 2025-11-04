@@ -64,4 +64,14 @@ export class ProductService {
 
         return this.productRepository.save(product)
     }
+
+    async deleteProduct(productId: number) {
+        const product = await this.productRepository.findOne({ where: {id: productId}})
+
+        if(!product) {
+            throw new NotFoundException
+        }
+
+        return this.productRepository.remove(product)
+    }
 }

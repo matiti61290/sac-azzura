@@ -33,4 +33,12 @@ export class ProductController {
     ){
         return this.productService.updateProduct(productId, updateProductDto)
     }
+
+    @Post('delete-product/:productId')
+    async deleteProduct(
+        @Param('productId', ParseIntPipe) productId: number
+    ) {
+        this.productService.deleteProduct(productId)
+        return "Produit supprime"
+    }
 }
