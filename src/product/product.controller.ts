@@ -3,13 +3,13 @@ import { ProductService } from "./product.service";
 import { AddProductDto } from "src/shared/dtos/product/addProduct.dto";
 import { UpdateProductDto } from "src/shared/dtos/product/updateProduct.dto";
 
-@Controller('product')
+@Controller('products')
 export class ProductController {
     constructor(
         private readonly productService: ProductService
     ) {}
 
-    @Get('products')
+    @Get('')
     async getAllProduct(){
         return this.productService.getAllProducts()
     }
