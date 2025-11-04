@@ -8,6 +8,7 @@ import { dataSourceOptions } from './database/ormconfig';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { UserModule } from './user/user.module';
+import { ProductModule } from './product/product.module';
 
 @Module({
   imports: [
@@ -16,7 +17,9 @@ import { UserModule } from './user/user.module';
       isGlobal: true
     }), 
     AuthModule,
-    UserModule],
+    UserModule,
+    ProductModule  
+  ],
   controllers: [AppController],
   providers: [AppService],
 })

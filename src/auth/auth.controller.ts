@@ -11,7 +11,7 @@ import { NewPasswordDto } from "src/shared/dtos/newPassword.dtos";
 @Controller('auth')
 export class AuthController {
     constructor(
-        private readonly authService: AuthService
+        private readonly authService: AuthService,
     ){}
 
     @Post('register')
@@ -45,11 +45,13 @@ export class AuthController {
 
     @Get('forget-password')
     async forgetPassword(@Query('token') token: string) {
-        return 'Hello world'
+        return this.authService.forgetPassword(token)
     }
 
+    //A tester avec un template
     @Post('change-password')
-    async changePassword(@Body() newPassword: NewPasswordDto){
-        return this.authService.changePassword
+    async changePassword(@Query('token') token: string ,
+    @Body() newPasswordDto: NewPasswordDto){
+        return this.authService.changePassword(newPasswordDto, token)
     }
 }

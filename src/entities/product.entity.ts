@@ -11,7 +11,7 @@ export class ProductEntity {
     @Column({ length: 255, nullable: false, unique: true })
     name: string;
 
-    @Column({ length: 255, nullable: false })
+    @Column({ length: 512, nullable: false })
     description: string;
 
     @Column({ type: "decimal", precision: 10, scale: 2, nullable: false })

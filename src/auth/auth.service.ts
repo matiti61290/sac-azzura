@@ -22,9 +22,7 @@ export class AuthService {
         private readonly jwtService: JwtService,
         private readonly confirmMailService: ConfirmMailService,
         private readonly newPasswordMailService: newPasswordMailService
-    ) {
-        console.log('Authservice instancie')
-    }
+    ) { }
 
     async registration(registerDto: RegisterDto): Promise<UserEntity> {
         if (registerDto.password !== registerDto.confirmPassword){
@@ -96,12 +94,34 @@ export class AuthService {
         await this.newPasswordMailService.sendNewPasswordMail(payload.mail, token)
     }
 
-    async changePassword(newPassword: NewPasswordDto){
+    async forgetPassword(token: string){
+        const payload = this.jwtService.verify(token)
+        return payload
+    }
+
+    async changePassword(newPassword: NewPasswordDto, token: string){
+        const payload = this.jwtService.verify(token)
+
+        if(!payload.mail){
+            throw new NotFoundException
+        }
+
+        const user = await this.userRepository.findOne( { where: { mail: payload.mail }})
+
+        if(!user) {
+            throw new NotFoundException
+        }
+
         if (newPassword.password !== newPassword.confirmPassword) {
             throw new BadRequestException('Les mots de passe ne correspondent pas')
         }
         const salt = await bcrypt.genSalt(10)
         const hashedPassword = await bcrypt.hash(newPassword.password, salt)
 
+        user.password = hashedPassword
+
+        await this.userRepository.save(user)
+
+        return
     }
 }
