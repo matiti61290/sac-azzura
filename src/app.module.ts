@@ -1,16 +1,16 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { AuthModule } from './auth/auth.module';
-import { AuthController } from './auth/auth.controller';
-import { AuthService } from './auth/auth.service';
+import { AuthModule } from './feature/auth/auth.module';
+import { AuthController } from './feature/auth/auth.controller';
+import { AuthService } from './feature/auth/auth.service';
 import { dataSourceOptions } from './database/ormconfig';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
-import { UserModule } from './user/user.module';
-import { ProductModule } from './product/product.module';
-import { CategoryModule } from './category/category.module';
-import { SubcategoryModule } from './subcategory/subcategory.module';
+import { UserModule } from './feature/user/user.module';
+import { ProductModule } from './feature/product/product.module';
+import { CategoryModule } from './feature/category/category.module';
+import { SubcategoryModule } from './feature/subcategory/subcategory.module';
 
 @Module({
   imports: [
