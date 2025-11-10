@@ -22,7 +22,7 @@ export class SubcategoryController{
     }
 
     @Post('add-subcategory')
-    async(
+    async addSubcategory(
         @Body() addSubcategoryDto: AddSubcategoryDto
     ) {
         return this.subcategoryService.createSubcategory(addSubcategoryDto)
