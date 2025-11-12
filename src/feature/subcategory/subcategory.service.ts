@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
+import { CategoryEntity } from "src/entities/categories.entity";
 import { SubcategoryEntity } from "src/entities/subcategory.entity";
 import { AddSubcategoryDto } from "src/shared/dtos/subcategory/addSubcategory.dto";
 import { UpdateSubcategoryDto } from "src/shared/dtos/subcategory/updateSubcategory.dto";
@@ -9,11 +10,14 @@ import { Repository } from "typeorm";
 export class SubcategoryService {
     constructor(
         @InjectRepository(SubcategoryEntity)
-        private readonly subcategoryRepository: Repository<SubcategoryEntity>
+        private readonly subcategoryRepository: Repository<SubcategoryEntity>,
+
+        @InjectRepository(CategoryEntity)
+        private readonly categoryRepository: Repository<CategoryEntity>
     ) {}
 
     async getAllSubcategories(){
-        const subcategories = this.subcategoryRepository.find()
+        const subcategories = await this.subcategoryRepository.find()
 
         if(!subcategories) {
             throw new NotFoundException
@@ -23,7 +27,7 @@ export class SubcategoryService {
     }
 
     async FindSubcategoryById(subcategoryId: number) {
-        const subcategory = this.subcategoryRepository.findOne({ where: {id: subcategoryId}})
+        const subcategory = await this.subcategoryRepository.findOne({ where: {id: subcategoryId}, relations: ['category']})
 
         if(!subcategory){
             throw new NotFoundException
@@ -33,8 +37,18 @@ export class SubcategoryService {
     }
 
     async createSubcategory(addSubcategoryDto: AddSubcategoryDto){
+        const categoryId = addSubcategoryDto.categoryId
+        const category = await this.categoryRepository.findOne({ where:{ id: categoryId}})
+
+        console.log(category)
+
+        if(!category){
+            throw new NotFoundException
+        }
+
         const newSubcategory = this.subcategoryRepository.create({
-            ...addSubcategoryDto
+            ...addSubcategoryDto,
+            category: category
         })
 
         await this.subcategoryRepository.save(newSubcategory)
@@ -43,10 +57,20 @@ export class SubcategoryService {
     }
 
     async updateSubcategory(subcategoryId: number, updateSubcategoryDto: UpdateSubcategoryDto){
-        const subcategory = await this.subcategoryRepository.findOne({ where: {id: subcategoryId}})
+        const subcategory = await this.subcategoryRepository.findOne({ where: {id: subcategoryId}, relations: ['category']})
 
         if(!subcategory){
             throw new NotFoundException
+        }
+
+        if (updateSubcategoryDto.categoryId) {
+            const newCategory = await this.categoryRepository.findOne({ where: { id: updateSubcategoryDto.categoryId}})
+
+            if(!newCategory) {
+                throw new NotFoundException
+            }
+
+            subcategory.category = newCategory
         }
 
         Object.assign(subcategory, updateSubcategoryDto)

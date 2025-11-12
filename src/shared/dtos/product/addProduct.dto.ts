@@ -1,4 +1,4 @@
-import { IsBoolean, IsNotEmpty, IsPositive, IsString, IsUrl, Matches } from "class-validator";
+import { IsBoolean, IsInt, IsNotEmpty, IsPositive, IsString, IsUrl, Matches } from "class-validator";
 
 export class AddProductDto{
     @IsNotEmpty()
@@ -21,8 +21,8 @@ export class AddProductDto{
     imageUrl: string
 
     @IsNotEmpty()
-    @IsString()
-    subcategoryName: string
+    @IsInt()
+    subcategoryId: number
 
     @IsNotEmpty()
     @IsBoolean()
