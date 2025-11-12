@@ -53,4 +53,14 @@ export class ColorService {
         
         return this.colorRepository.save(color)
     }
+
+    async deleteColor(colorId: number) {
+        const color = await this.colorRepository.findOne({ where: {id: colorId}})
+
+        if(!color){
+            throw new NotFoundException
+        }
+
+        return this.colorRepository.remove(color)
+    }
 }

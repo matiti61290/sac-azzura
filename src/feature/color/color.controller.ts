@@ -35,4 +35,12 @@ export class ColorController {
     ) {
         return this.colorService.updateColor(colorId, updateColorDto)
     }
+
+    @Post('delete-color/:colorId')
+    async MissingDeleteDateColumnError(
+        @Param('colorId', ParseIntPipe) colorId: number
+    ) {
+        this.colorService.deleteColor(colorId)
+        return "Couleur supprimee"
+    }
 }
