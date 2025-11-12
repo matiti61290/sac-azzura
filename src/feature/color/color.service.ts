@@ -19,4 +19,14 @@ export class ColorService {
 
         return colors
     }
+
+    async getColorById(colorId: number){
+        const color = await this.colorRepository.findOne({ where: {id: colorId} })
+
+        if(!color) {
+            throw new NotFoundException
+        }
+
+        return color
+    }
 }
