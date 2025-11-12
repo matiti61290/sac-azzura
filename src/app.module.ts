@@ -11,6 +11,8 @@ import { UserModule } from './feature/user/user.module';
 import { ProductModule } from './feature/product/product.module';
 import { CategoryModule } from './feature/category/category.module';
 import { SubcategoryModule } from './feature/subcategory/subcategory.module';
+import { ColorModule } from './feature/color/color.module';
+import { MaterialModule } from './feature/material/material.module';
 
 @Module({
   imports: [
@@ -22,7 +24,9 @@ import { SubcategoryModule } from './feature/subcategory/subcategory.module';
     UserModule,
     ProductModule,
     CategoryModule,
-    SubcategoryModule
+    SubcategoryModule,
+    ColorModule,
+    MaterialModule
   ],
   controllers: [AppController],
   providers: [AppService],

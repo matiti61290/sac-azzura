@@ -3,7 +3,7 @@ import { ColorService } from "./color.service";
 import { AddColorDto } from "src/shared/dtos/color/addColor.dto";
 import { UpdateColorDto } from "src/shared/dtos/color/updateColor.dto";
 
-@Controller('color')
+@Controller('colors')
 export class ColorController {
     constructor(
         private readonly colorService : ColorService
