@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { ColorEntity } from "src/entities/color.entity";
 import { AddColorDto } from "src/shared/dtos/color/addColor.dto";
+import { UpdateColorDto } from "src/shared/dtos/color/updateColor.dto";
 import { Repository } from "typeorm";
 
 @Injectable()
@@ -39,5 +40,17 @@ export class ColorService {
         await this.colorRepository.save(newColor)
 
         return newColor
+    }
+
+    async updateColor(colorId: number, updateColorDto: UpdateColorDto) {
+        const color = await this.colorRepository.findOne({ where: {id: colorId}})
+
+        if (!color) {
+            throw new NotFoundException
+        }
+
+        Object.assign(color, updateColorDto)
+        
+        return this.colorRepository.save(color)
     }
 }
