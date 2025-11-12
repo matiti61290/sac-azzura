@@ -37,7 +37,7 @@ export class ProductService {
     }
 
     async createProduct(addProductDto: AddProductDto){
-        const subcategory = await this.subCategoryRepository.findOne({ where:{ name: addProductDto.subcategoryName}})
+        const subcategory = await this.subCategoryRepository.findOne({ where:{ id: addProductDto.subcategoryId}})
 
         if(!subcategory) {
             throw new NotFoundException()
@@ -58,6 +58,16 @@ export class ProductService {
 
         if(!product){
             throw new NotFoundException
+        }
+
+        if (updateProductDto.subcategoryId) {
+            const newSubcategory = await this.subCategoryRepository.findOne({where: {id: updateProductDto.subcategoryId}})
+
+            if(!newSubcategory) {
+                throw new NotFoundException
+            }
+
+            product.subcategory = newSubcategory
         }
 
         Object.assign(product, updateProductDto)
