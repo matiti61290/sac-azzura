@@ -57,10 +57,20 @@ export class SubcategoryService {
     }
 
     async updateSubcategory(subcategoryId: number, updateSubcategoryDto: UpdateSubcategoryDto){
-        const subcategory = await this.subcategoryRepository.findOne({ where: {id: subcategoryId}})
+        const subcategory = await this.subcategoryRepository.findOne({ where: {id: subcategoryId}, relations: ['category']})
 
         if(!subcategory){
             throw new NotFoundException
+        }
+
+        if (updateSubcategoryDto.categoryId) {
+            const newCategory = await this.categoryRepository.findOne({ where: { id: updateSubcategoryDto.categoryId}})
+
+            if(!newCategory) {
+                throw new NotFoundException
+            }
+
+            subcategory.category = newCategory
         }
 
         Object.assign(subcategory, updateSubcategoryDto)
