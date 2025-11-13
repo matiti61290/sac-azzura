@@ -1,7 +1,9 @@
-import { Controller, Get, Post, Param, Body, ParseIntPipe } from "@nestjs/common";
+import { Controller, Get, Post, Param, Body, ParseIntPipe, UseGuards } from "@nestjs/common";
 import { ColorService } from "./color.service";
 import { AddColorDto } from "src/shared/dtos/color/addColor.dto";
 import { UpdateColorDto } from "src/shared/dtos/color/updateColor.dto";
+import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
+import { AdminGuard } from "../auth/guards/admin.guard";
 
 @Controller('colors')
 export class ColorController {
@@ -22,6 +24,7 @@ export class ColorController {
     }
 
     @Post('add-color')
+    @UseGuards(JwtAuthGuard, AdminGuard)
     async addColor (
         @Body() addColorDto: AddColorDto
     ) {
@@ -29,6 +32,7 @@ export class ColorController {
     }
 
     @Post('update-color/:colorId')
+    @UseGuards(JwtAuthGuard, AdminGuard)
     async updateColor(
         @Param('colorId', ParseIntPipe) colorId: number,
         @Body() updateColorDto: UpdateColorDto
@@ -37,6 +41,7 @@ export class ColorController {
     }
 
     @Post('delete-color/:colorId')
+    @UseGuards(JwtAuthGuard, AdminGuard)
     async MissingDeleteDateColumnError(
         @Param('colorId', ParseIntPipe) colorId: number
     ) {
