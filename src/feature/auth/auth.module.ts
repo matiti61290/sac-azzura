@@ -11,6 +11,9 @@ import { LocalStrategy } from "./strategies/local.strategy"
 import { JwtStrategy } from "./strategies/jwt.strategy"
 import { JwtAuthGuard } from "./guards/jwt-auth.guard";
 import { newPasswordMailService } from "./authMail/newPasswordMail.service";
+import { UsersService } from "../user/user.service";
+import { APP_GUARD } from "@nestjs/core";
+import { AdminGuard } from "./guards/admin.guard";
 
 dotenv.config()
 
@@ -22,7 +25,7 @@ dotenv.config()
         }),
         PassportModule.register({ defaultStrategy: 'local'})],
     controllers: [AuthController, ],
-    providers: [AuthService, ConfirmMailService, LocalStrategy, JwtStrategy, JwtAuthGuard, newPasswordMailService],
+    providers: [AuthService, UsersService, ConfirmMailService, LocalStrategy, JwtStrategy, JwtAuthGuard, newPasswordMailService],
     exports:[AuthService, JwtModule]
 })
 

@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, ParseIntPipe, Post } from "@nestjs/common";
+import { Body, Controller, Get, Param, ParseIntPipe, Post, UseGuards } from "@nestjs/common";
 import { SubcategoryService } from "./subcategory.service";
 import { AddSubcategoryDto } from "src/shared/dtos/subcategory/addSubcategory.dto";
 import { UpdateSubcategoryDto } from "src/shared/dtos/subcategory/updateSubcategory.dto";
@@ -22,6 +22,7 @@ export class SubcategoryController{
     }
 
     @Post('add-subcategory')
+
     async addSubcategory(
         @Body() addSubcategoryDto: AddSubcategoryDto
     ) {
