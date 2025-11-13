@@ -1,7 +1,9 @@
-import { Controller, Get, Param, ParseIntPipe, Post, Body } from "@nestjs/common";
+import { Controller, Get, Param, ParseIntPipe, Post, Body, UseGuards } from "@nestjs/common";
 import { CategoryService } from "./category.service";
 import { AddCategoryDto } from "src/shared/dtos/category/addCategory.dto";
 import { UpdateCategoryDto } from "src/shared/dtos/category/updateCategory.dto";
+import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
+import { AdminGuard } from "../auth/guards/admin.guard";
 
 @Controller('category')
 export class CategoryController{
@@ -22,6 +24,7 @@ export class CategoryController{
     }
 
     @Post('add-category')
+    @UseGuards(JwtAuthGuard, AdminGuard)
     async addCategory(
         @Body() addCategoryDto: AddCategoryDto
     ){
@@ -29,6 +32,7 @@ export class CategoryController{
     }
 
     @Post('update-category/:categoryId')
+    @UseGuards(JwtAuthGuard, AdminGuard)
     async updateCategory(
         @Param('categoryId', ParseIntPipe) categoryId: number,
         @Body() updateCategoryDto: UpdateCategoryDto
@@ -37,6 +41,7 @@ export class CategoryController{
     }
 
     @Post('delete-category/:categoryId')
+    @UseGuards(JwtAuthGuard, AdminGuard)
     async deleteCategory(
         @Param('categoryId', ParseIntPipe) categoryId: number
     ) {

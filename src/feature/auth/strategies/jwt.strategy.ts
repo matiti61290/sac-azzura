@@ -1,11 +1,14 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, NotFoundException } from "@nestjs/common";
 import { PassportStrategy } from "@nestjs/passport";
 import { Strategy } from "passport-jwt";
 import { Request } from "express";
+import { UsersService } from "src/feature/user/user.service";
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
-    constructor() {
+    constructor(
+        private readonly userService: UsersService
+    ) {
         super({
             jwtFromRequest: (request:Request) => {
                 console.log('Cookies:', request.cookies)
@@ -17,6 +20,11 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     }
 
     async validate(payload: any) {
-        return { userId: payload.sub, mail: payload.mail }
+        const user = await this.userService.findUserById(payload.sub)
+        if (!user) {
+            throw new NotFoundException
+        }
+
+        return user
     }
 }
