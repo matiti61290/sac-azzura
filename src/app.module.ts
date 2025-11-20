@@ -13,6 +13,8 @@ import { CategoryModule } from './feature/category/category.module';
 import { SubcategoryModule } from './feature/subcategory/subcategory.module';
 import { ColorModule } from './feature/color/color.module';
 import { MaterialModule } from './feature/material/material.module';
+import { AwsS3Service } from './feature/aws-s3/aws-s3.service';
+import { AdminGuard } from './feature/auth/guards/admin.guard';
 
 @Module({
   imports: [
@@ -29,6 +31,6 @@ import { MaterialModule } from './feature/material/material.module';
     MaterialModule
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, AwsS3Service],
 })
 export class AppModule {}
