@@ -17,8 +17,8 @@ export class AddProductDto{
     price: number
 
     @IsNotEmpty()
-    // @IsUrl()
-    imageUrl: string
+    @IsUrl()
+    imageUrl: string[]
 
     @IsNotEmpty()
     @IsInt()

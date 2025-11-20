@@ -13,7 +13,7 @@ export class ProductService {
         private readonly productRepository: Repository<ProductEntity>,
 
         @InjectRepository(SubcategoryEntity)
-        private readonly subCategoryRepository: Repository<SubcategoryEntity>
+        private readonly subCategoryRepository: Repository<SubcategoryEntity>,
     ) {}
 
     async getAllProducts(){

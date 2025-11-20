@@ -17,8 +17,8 @@ export class ProductEntity {
     @Column({ type: "decimal", precision: 10, scale: 2, nullable: false })
     price: number;
 
-    @Column({ length: 512 })
-    imageUrl: string;
+    @Column('text', { array: true, default:[] })
+    imageUrl: string[];
 
     @ManyToOne(()=> SubcategoryEntity, (subcategory)=>subcategory.products)
     subcategory: SubcategoryEntity;
