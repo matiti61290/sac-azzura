@@ -1,9 +1,10 @@
-import { Body, Controller, Get, Param, ParseIntPipe, Post, Query, UseGuards } from "@nestjs/common";
+import { Body, Controller, Get, Param, ParseIntPipe, Post, Query, UploadedFiles, UseGuards, UseInterceptors } from "@nestjs/common";
 import { ProductService } from "./product.service";
 import { AddProductDto } from "src/shared/dtos/product/addProduct.dto";
 import { UpdateProductDto } from "src/shared/dtos/product/updateProduct.dto";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 import { AdminGuard } from "../auth/guards/admin.guard";
+import { FilesInterceptor } from "@nestjs/platform-express";
 
 @Controller('products')
 export class ProductController {
@@ -25,7 +26,12 @@ export class ProductController {
 
     @Post('add-product')
     @UseGuards(JwtAuthGuard, AdminGuard)
-    async addProduct(@Body() addProductDto: AddProductDto) {
+    @UseInterceptors(FilesInterceptor('files'))
+    async addProduct(
+        @Body() addProductDto: AddProductDto,
+        @UploadedFiles() files: Express.Multer.File[]
+    ) {
+        addProductDto.files = files
         return this.productService.createProduct(addProductDto)
     }
 
