@@ -50,20 +50,11 @@ export class ProductService {
             throw new NotFoundException()
         }
 
-        // const newProduct = this.productRepository.create({
-        //     ...addProductDto,
-        //     subcategory: subcategory
-        // })
-
-        // await this.productRepository.save(newProduct)
-
-        // return newProduct
-
         const product = this.productRepository.create({
             name: addProductDto.name,
             description: addProductDto.description,
             price: addProductDto.price,
-            isActive: addProductDto.isActive,
+            isActive: true,
             subcategory: subcategory,
             images: []
         })
