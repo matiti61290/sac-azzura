@@ -1,4 +1,4 @@
-import { IsBoolean, IsInt, IsNotEmpty, IsPositive, IsString, IsUrl, Matches } from "class-validator";
+import { isArray, IsBoolean, IsInt, IsNotEmpty, IsPositive, IsString, IsArray, Matches } from "class-validator";
 
 export class AddProductDto{
     @IsNotEmpty()
@@ -17,8 +17,8 @@ export class AddProductDto{
     price: number
 
     @IsNotEmpty()
-    // @IsUrl()
-    imageUrl: string
+    @IsArray()
+    files: Express.Multer.File[]
 
     @IsNotEmpty()
     @IsInt()

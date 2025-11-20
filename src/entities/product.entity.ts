@@ -2,6 +2,7 @@ import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, Index } f
 import { SubcategoryEntity } from "./subcategory.entity";
 import { StockEntity } from "./stock.entity";
 import { OrderEntity } from "./order.entity";
+import { ImageEntity } from "./image.entity";
 
 @Entity('Product')
 export class ProductEntity {
@@ -17,8 +18,8 @@ export class ProductEntity {
     @Column({ type: "decimal", precision: 10, scale: 2, nullable: false })
     price: number;
 
-    @Column({ length: 512 })
-    imageUrl: string;
+    @OneToMany(()=> ImageEntity, (image) => image.product, {cascade: true})
+    images: ImageEntity[]
 
     @ManyToOne(()=> SubcategoryEntity, (subcategory)=>subcategory.products)
     subcategory: SubcategoryEntity;
