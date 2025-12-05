@@ -24,23 +24,37 @@ export class ProductService {
     ) {}
 
     async getAllProducts(){
-        const products = this.productRepository.find()
+        const products = await this.productRepository.find({ relations: ["images"]})
 
         if(!products){
             throw new NotFoundException
         }
 
-        return products
+        return Promise.all(products.map( async (product) => {
+            const imageWithUrls = await Promise.all(
+                product.images.map(async (image) => {
+                    const signedUrl = await this.awsS3Service.getFileUrl(image.key)
+                    return { ...image, url: signedUrl}
+                })
+            )
+            return {...product, images: imageWithUrls}
+        }))
     }
 
     async findProduct(productId: number){
-        const product = this.productRepository.findOne({ where: {id: productId}})
+        const product = await this.productRepository.findOne({ where: {id: productId}, relations: ["images"]})
 
         if(!product){
             throw new NotFoundException
         }
 
-        return product
+        const imagesWithUrls = await Promise.all(
+            product.images.map(async (image) => {
+                const signedUrl = await this.awsS3Service.getFileUrl(image.key)
+                return { ...image, url: signedUrl}
+            })
+        )
+        return { ...product, images: imagesWithUrls}
     }
 
     async createProduct(addProductDto: AddProductDto){
@@ -64,46 +78,54 @@ export class ProductService {
         const images: ImageEntity[] = []
         for (const file of addProductDto.files) {
             const key = `products/${Date.now()}_${file.originalname}`
-            const url = await this.awsS3Service.uploadFile(file, key)
-            const image = this.imageRepository.create({ url, product: savedProduct })
+            await this.awsS3Service.uploadFile(file, key)
+            const image = this.imageRepository.create({ key, product: savedProduct })
             images.push(image)
         }
 
         await this.imageRepository.save(images)
 
-        return this.productRepository.findOne({ where: {id: savedProduct.id}, relations: ['images']})
+        return this.findProduct(savedProduct.id)
     }
 
-    async updateProduct(productId: number, updateProductDto: UpdateProductDto){
+    async updateProduct(productId: number, updateProductDto: UpdateProductDto, files?: Express.Multer.File[]){
         const product = await this.productRepository.findOne({ where: {id: productId} })
 
         if(!product){
             throw new NotFoundException
 
         }
-
-        if (updateProductDto.subcategoryId) {
-            const newSubcategory = await this.subCategoryRepository.findOne({where: {id: updateProductDto.subcategoryId}})
-
-            if(!newSubcategory) {
-                throw new NotFoundException
-            }
-
-            product.subcategory = newSubcategory
-        }
-
+        
         Object.assign(product, updateProductDto)
+        const updatedProduct = await this.productRepository.save(product)
 
-        return this.productRepository.save(product)
+        if(files && files.length>0) {
+            const newImages : ImageEntity[] = []
+            for (const file of files) {
+                const key = `products/${Date.now()}_${file.originalname}`;
+                await this.awsS3Service.uploadFile(file, key);
+                const image = this.imageRepository.create({
+                    key,
+                    product: updatedProduct,
+                });
+                newImages.push(image);
+            }
+            await this.imageRepository.save(newImages)
+        }
+        return this.findProduct(updatedProduct.id)
     }
 
     async deleteProduct(productId: number) {
-        const product = await this.productRepository.findOne({ where: {id: productId}})
+        const product = await this.productRepository.findOne({ where: {id: productId}, relations: ["images"]})
 
         if(!product) {
             throw new NotFoundException
         }
 
+        for (const image of product.images) {
+            await this.awsS3Service.deleteFile(image.key)
+        }
+        
         return this.productRepository.remove(product)
     }
 }

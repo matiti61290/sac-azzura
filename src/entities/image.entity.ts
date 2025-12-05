@@ -7,7 +7,7 @@ export class ImageEntity {
     id: number
 
     @Column()
-    url: string
+    key: string
 
     @ManyToOne(()=> ProductEntity, (product) => product.images)
     product: ProductEntity
