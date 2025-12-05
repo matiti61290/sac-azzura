@@ -21,7 +21,10 @@ export class ProductController {
     async findProduct(
         @Param('productId', ParseIntPipe) productId: number)
     {
-        return this.productService.findProduct(productId)
+        // return this.productService.findProduct(productId)
+        let product = await this.productService.findProduct(productId)
+
+        return product?.images
     }
 
     @Post('add-product')

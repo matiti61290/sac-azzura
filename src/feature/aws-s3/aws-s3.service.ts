@@ -12,11 +12,11 @@ export class AwsS3Service {
             Bucket: this.bucketName,
             Key: key,
             Body: file.buffer,
-            ContentType: file.mimetype
+            ContentType: file.mimetype, 
         })
 
         await s3Client.send(command)
-        return this.getFileUrl(key)
+        return key
     }
 
     async getFileUrl(key: string) {
@@ -25,11 +25,12 @@ export class AwsS3Service {
             Key: key
         })
 
-        return getSignedUrl(s3Client, command, { expiresIn: 3600 })
+        const signedUrl = await getSignedUrl(s3Client, command, { expiresIn: 3600 })
+        return signedUrl
     }
 
-    async DeleteBucketLifecycleCommand(key: string) {
-        const command = new DeleteObjectCommand({
+    async deleteFile(key: string) {
+        const command = new DeleteObjectCommand ({
             Bucket: this.bucketName,
             Key: key
         })
