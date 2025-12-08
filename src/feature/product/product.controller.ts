@@ -24,7 +24,7 @@ export class ProductController {
         // return this.productService.findProduct(productId)
         let product = await this.productService.findProduct(productId)
 
-        return product?.images
+        return product
     }
 
     @Post('add-product')
@@ -40,10 +40,13 @@ export class ProductController {
 
     @Post('update-product/:productId')
     @UseGuards(JwtAuthGuard, AdminGuard)
+    @UseInterceptors(FilesInterceptor('files'))
     async updateProduct(
         @Param('productId', ParseIntPipe) productId: number,
-        @Body() updateProductDto: UpdateProductDto
+        @Body() updateProductDto: UpdateProductDto,
+        @UploadedFiles() files: Express.Multer.File[]
     ){
+        updateProductDto.files = files
         return this.productService.updateProduct(productId, updateProductDto)
     }
 
@@ -52,6 +55,7 @@ export class ProductController {
     async deleteProduct(
         @Param('productId', ParseIntPipe) productId: number
     ) {
+        console.log("le controleur est appele")
         this.productService.deleteProduct(productId)
         return "Produit supprime"
     }
