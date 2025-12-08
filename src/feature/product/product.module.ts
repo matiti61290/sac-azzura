@@ -11,7 +11,8 @@ import { AuthModule } from "../auth/auth.module";
 @Module({
     imports:[TypeOrmModule.forFeature([ProductEntity, SubcategoryEntity, ImageEntity]), AuthModule],
     controllers: [ProductController],
-    providers: [ProductService, AwsS3Service]
+    providers: [ProductService, AwsS3Service],
+    exports: [ProductService]
 })
 
 export class ProductModule {}

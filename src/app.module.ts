@@ -15,6 +15,7 @@ import { ColorModule } from './feature/color/color.module';
 import { MaterialModule } from './feature/material/material.module';
 import { AwsS3Service } from './feature/aws-s3/aws-s3.service';
 import { AdminGuard } from './feature/auth/guards/admin.guard';
+import { StockModule } from './feature/stock/stock.module';
 
 @Module({
   imports: [
@@ -28,7 +29,8 @@ import { AdminGuard } from './feature/auth/guards/admin.guard';
     CategoryModule,
     SubcategoryModule,
     ColorModule,
-    MaterialModule
+    MaterialModule,
+    StockModule
   ],
   controllers: [AppController],
   providers: [AppService, AwsS3Service],
