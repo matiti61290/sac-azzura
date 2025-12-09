@@ -7,6 +7,7 @@ import { AddProductDto } from "src/shared/dtos/product/addProduct.dto";
 import { UpdateProductDto } from "src/shared/dtos/product/updateProduct.dto";
 import { Repository } from "typeorm";
 import { AwsS3Service } from "../aws-s3/aws-s3.service";
+import { StockService } from "../stock/stock.service";
 
 @Injectable()
 export class ProductService {
@@ -20,7 +21,9 @@ export class ProductService {
         @InjectRepository(ImageEntity)
         private readonly imageRepository: Repository<ImageEntity>,
 
-        private readonly awsS3Service: AwsS3Service
+        private readonly awsS3Service: AwsS3Service,
+
+        private readonly stockService: StockService
     ) {}
 
     async getAllProducts(){
@@ -84,6 +87,13 @@ export class ProductService {
         }
 
         await this.imageRepository.save(images)
+
+        await this.stockService.addStock(
+            addProductDto.quantity,
+            product.id,
+            addProductDto.colorId, 
+            addProductDto.materialId
+        )
 
         return this.findProduct(savedProduct.id)
     }
