@@ -7,6 +7,7 @@ import { AddProductDto } from "src/shared/dtos/product/addProduct.dto";
 import { UpdateProductDto } from "src/shared/dtos/product/updateProduct.dto";
 import { Repository } from "typeorm";
 import { AwsS3Service } from "../aws-s3/aws-s3.service";
+import { StockService } from "../stock/stock.service";
 
 @Injectable()
 export class ProductService {
@@ -20,7 +21,9 @@ export class ProductService {
         @InjectRepository(ImageEntity)
         private readonly imageRepository: Repository<ImageEntity>,
 
-        private readonly awsS3Service: AwsS3Service
+        private readonly awsS3Service: AwsS3Service,
+
+        private readonly stockService: StockService
     ) {}
 
     async getAllProducts(){
@@ -85,45 +88,51 @@ export class ProductService {
 
         await this.imageRepository.save(images)
 
+        await this.stockService.addStock(
+            addProductDto.quantity,
+            product.id,
+            addProductDto.colorId, 
+            addProductDto.materialId
+        )
+
         return this.findProduct(savedProduct.id)
     }
 
-    async updateProduct(productId: number, updateProductDto: UpdateProductDto, files?: Express.Multer.File[]){
-        const product = await this.productRepository.findOne({ where: {id: productId} })
-
+    async updateProduct(productId: number, updateProductDto: UpdateProductDto){
+        const product = await this.productRepository.findOne({ where: {id: productId}, relations: ['subcategory', 'images'] })
+        console.log(product)
         if(!product){
             throw new NotFoundException
 
         }
         
         Object.assign(product, updateProductDto)
+        console.log("Produit mis a jour:", product)
         const updatedProduct = await this.productRepository.save(product)
 
-        if(files && files.length>0) {
-            const newImages : ImageEntity[] = []
-            for (const file of files) {
-                const key = `products/${Date.now()}_${file.originalname}`;
-                await this.awsS3Service.uploadFile(file, key);
-                const image = this.imageRepository.create({
-                    key,
-                    product: updatedProduct,
-                });
-                newImages.push(image);
-            }
-            await this.imageRepository.save(newImages)
+        const images: ImageEntity[] = []
+        for (const file of updateProductDto.files) {
+            const key = `products/${Date.now()}_${file.originalname}`
+            await this.awsS3Service.uploadFile(file, key)
+            const image = this.imageRepository.create({ key, product: updatedProduct })
+            images.push(image)
         }
+        await this.imageRepository.save(images)
+
         return this.findProduct(updatedProduct.id)
     }
 
     async deleteProduct(productId: number) {
+        console.log("Le service est appele")
         const product = await this.productRepository.findOne({ where: {id: productId}, relations: ["images"]})
-
+        console.log("Le produit est le suivant:", product)
         if(!product) {
             throw new NotFoundException
         }
 
         for (const image of product.images) {
             await this.awsS3Service.deleteFile(image.key)
+            await this.imageRepository.remove(image)
         }
         
         return this.productRepository.remove(product)
