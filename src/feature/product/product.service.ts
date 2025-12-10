@@ -93,7 +93,8 @@ export class ProductService {
             addProductDto.quantity,
             product.id,
             addProductDto.colorId, 
-            addProductDto.materialId
+            addProductDto.materialId,
+            addProductDto.subcategoryId
         )
 
         return this.findProduct(savedProduct.id)
