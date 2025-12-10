@@ -8,4 +8,8 @@ export class AddSubcategoryDto {
     @IsNotEmpty()
     @IsInt()
     categoryId: number
+
+    @IsNotEmpty()
+    @IsString()
+    sku_code: string
 }

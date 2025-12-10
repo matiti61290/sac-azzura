@@ -35,4 +35,8 @@ export class AddProductDto{
     @IsNotEmpty()
     @IsInt()
     materialId: number
+
+    @IsNotEmpty()
+    @IsString()
+    sku_code: string
 }

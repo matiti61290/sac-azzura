@@ -1,17 +1,17 @@
 import { MigrationInterface, QueryRunner } from "typeorm";
 
-export class Migrations1764943278246 implements MigrationInterface {
-    name = 'Migrations1764943278246'
+export class Database1765368014853 implements MigrationInterface {
+    name = 'Database1765368014853'
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.query(`CREATE TABLE \`Address\` (\`id\` int NOT NULL AUTO_INCREMENT, \`type\` enum ('delivery', 'billing') NOT NULL, \`street\` varchar(255) NOT NULL, \`additional\` varchar(255) NOT NULL, \`zipcode\` varchar(20) NOT NULL, \`city\` varchar(255) NOT NULL, \`userId\` int NULL, INDEX \`IDX_08a96a002044d5ca902ce834d9\` (\`userId\`), PRIMARY KEY (\`id\`)) ENGINE=InnoDB`);
-        await queryRunner.query(`CREATE TABLE \`Category\` (\`id\` int NOT NULL AUTO_INCREMENT, \`name\` varchar(255) NOT NULL, UNIQUE INDEX \`IDX_0ac420e8701e781dbf1231dc23\` (\`name\`), PRIMARY KEY (\`id\`)) ENGINE=InnoDB`);
-        await queryRunner.query(`CREATE TABLE \`Subcategory\` (\`id\` int NOT NULL AUTO_INCREMENT, \`name\` varchar(255) NOT NULL, \`categoryId\` int NULL, UNIQUE INDEX \`IDX_36fe52e276a8b562d967dab768\` (\`name\`), PRIMARY KEY (\`id\`)) ENGINE=InnoDB`);
-        await queryRunner.query(`CREATE TABLE \`Color\` (\`id\` int NOT NULL AUTO_INCREMENT, \`name\` varchar(255) NOT NULL, UNIQUE INDEX \`IDX_a29e349d26b88314ec5324a428\` (\`name\`), PRIMARY KEY (\`id\`)) ENGINE=InnoDB`);
-        await queryRunner.query(`CREATE TABLE \`Material\` (\`id\` int NOT NULL AUTO_INCREMENT, \`name\` varchar(255) NOT NULL, UNIQUE INDEX \`IDX_944a945c72ce0228b54ca7a370\` (\`name\`), PRIMARY KEY (\`id\`)) ENGINE=InnoDB`);
+        await queryRunner.query(`CREATE TABLE \`Category\` (\`id\` int NOT NULL AUTO_INCREMENT, \`name\` varchar(255) NOT NULL, \`sku_code\` varchar(5) NOT NULL, UNIQUE INDEX \`IDX_0ac420e8701e781dbf1231dc23\` (\`name\`), UNIQUE INDEX \`IDX_e9bc13a4c6a2cb71d7f07d0e3c\` (\`sku_code\`), PRIMARY KEY (\`id\`)) ENGINE=InnoDB`);
+        await queryRunner.query(`CREATE TABLE \`Subcategory\` (\`id\` int NOT NULL AUTO_INCREMENT, \`name\` varchar(255) NOT NULL, \`sku_code\` varchar(5) NOT NULL, \`categoryId\` int NULL, UNIQUE INDEX \`IDX_36fe52e276a8b562d967dab768\` (\`name\`), UNIQUE INDEX \`IDX_a00d335bf0a398b3a906f58c02\` (\`sku_code\`), PRIMARY KEY (\`id\`)) ENGINE=InnoDB`);
+        await queryRunner.query(`CREATE TABLE \`Color\` (\`id\` int NOT NULL AUTO_INCREMENT, \`name\` varchar(255) NOT NULL, \`sku_code\` varchar(5) NOT NULL, UNIQUE INDEX \`IDX_a29e349d26b88314ec5324a428\` (\`name\`), UNIQUE INDEX \`IDX_faaec86b4a9de0457f620fc8d2\` (\`sku_code\`), PRIMARY KEY (\`id\`)) ENGINE=InnoDB`);
+        await queryRunner.query(`CREATE TABLE \`Material\` (\`id\` int NOT NULL AUTO_INCREMENT, \`name\` varchar(255) NOT NULL, \`sku_code\` varchar(5) NOT NULL, UNIQUE INDEX \`IDX_944a945c72ce0228b54ca7a370\` (\`name\`), UNIQUE INDEX \`IDX_8be0d0a974b6e6641ece924a4e\` (\`sku_code\`), PRIMARY KEY (\`id\`)) ENGINE=InnoDB`);
         await queryRunner.query(`CREATE TABLE \`Stock\` (\`id\` int NOT NULL AUTO_INCREMENT, \`quantity\` int NOT NULL, \`createdAt\` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP, \`updatedAt\` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, \`sku\` varchar(50) NOT NULL, \`productId\` int NULL, \`materialId\` int NULL, \`colorId\` int NULL, UNIQUE INDEX \`IDX_9ee732e1cc687f8a67c5d12fcc\` (\`sku\`), PRIMARY KEY (\`id\`)) ENGINE=InnoDB`);
         await queryRunner.query(`CREATE TABLE \`image_entity\` (\`id\` int NOT NULL AUTO_INCREMENT, \`key\` varchar(255) NOT NULL, \`productId\` int NULL, PRIMARY KEY (\`id\`)) ENGINE=InnoDB`);
-        await queryRunner.query(`CREATE TABLE \`Product\` (\`id\` int NOT NULL AUTO_INCREMENT, \`name\` varchar(255) NOT NULL, \`description\` varchar(512) NOT NULL, \`price\` decimal(10,2) NOT NULL, \`createdAt\` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP, \`updatedAt\` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, \`isActive\` tinyint NOT NULL DEFAULT 1, \`subcategoryId\` int NULL, UNIQUE INDEX \`IDX_08cd99ca921561a289373c14b4\` (\`name\`), PRIMARY KEY (\`id\`)) ENGINE=InnoDB`);
+        await queryRunner.query(`CREATE TABLE \`Product\` (\`id\` int NOT NULL AUTO_INCREMENT, \`name\` varchar(255) NOT NULL, \`description\` varchar(512) NOT NULL, \`price\` decimal(10,2) NOT NULL, \`createdAt\` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP, \`updatedAt\` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, \`isActive\` tinyint NOT NULL DEFAULT 1, \`sku_code\` varchar(5) NOT NULL, \`subcategoryId\` int NULL, UNIQUE INDEX \`IDX_08cd99ca921561a289373c14b4\` (\`name\`), UNIQUE INDEX \`IDX_280f769af0c63e863b53d1c726\` (\`sku_code\`), PRIMARY KEY (\`id\`)) ENGINE=InnoDB`);
         await queryRunner.query(`CREATE TABLE \`Promotion\` (\`id\` int NOT NULL AUTO_INCREMENT, \`code\` varchar(255) NOT NULL, \`promotion_type\` varchar(255) NOT NULL, \`valeur\` int NOT NULL, \`startdate\` datetime NOT NULL, \`enddate\` datetime NOT NULL, \`condition\` text NULL, \`isActive\` tinyint NOT NULL, UNIQUE INDEX \`IDX_797949ef9e79c48e5bc4563ffe\` (\`code\`), PRIMARY KEY (\`id\`)) ENGINE=InnoDB`);
         await queryRunner.query(`CREATE TABLE \`Order\` (\`id\` int NOT NULL AUTO_INCREMENT, \`status\` enum ('pending', 'paid', 'shipped', 'cancelled') NOT NULL DEFAULT 'pending', \`quantity\` int NOT NULL DEFAULT '1', \`priceAtPurchase\` decimal(20,2) NOT NULL, \`total\` decimal(10,2) NOT NULL, \`createdAt\` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP, \`userId\` int NULL, \`productId\` int NULL, \`promotionId\` int NULL, INDEX \`IDX_8a2a38faa1708165e53e23c2fa\` (\`status\`), PRIMARY KEY (\`id\`)) ENGINE=InnoDB`);
         await queryRunner.query(`CREATE TABLE \`User\` (\`id\` int NOT NULL AUTO_INCREMENT, \`firstname\` varchar(255) NOT NULL, \`lastname\` varchar(255) NOT NULL, \`mail\` varchar(255) NOT NULL, \`phoneNumber\` varchar(20) NOT NULL, \`password\` varchar(255) NOT NULL, \`isVerified\` tinyint NOT NULL, \`isAdmin\` tinyint NOT NULL, UNIQUE INDEX \`IDX_dc78ff11c856c4f8b4c8288386\` (\`mail\`), PRIMARY KEY (\`id\`)) ENGINE=InnoDB`);
@@ -44,17 +44,22 @@ export class Migrations1764943278246 implements MigrationInterface {
         await queryRunner.query(`DROP TABLE \`Order\``);
         await queryRunner.query(`DROP INDEX \`IDX_797949ef9e79c48e5bc4563ffe\` ON \`Promotion\``);
         await queryRunner.query(`DROP TABLE \`Promotion\``);
+        await queryRunner.query(`DROP INDEX \`IDX_280f769af0c63e863b53d1c726\` ON \`Product\``);
         await queryRunner.query(`DROP INDEX \`IDX_08cd99ca921561a289373c14b4\` ON \`Product\``);
         await queryRunner.query(`DROP TABLE \`Product\``);
         await queryRunner.query(`DROP TABLE \`image_entity\``);
         await queryRunner.query(`DROP INDEX \`IDX_9ee732e1cc687f8a67c5d12fcc\` ON \`Stock\``);
         await queryRunner.query(`DROP TABLE \`Stock\``);
+        await queryRunner.query(`DROP INDEX \`IDX_8be0d0a974b6e6641ece924a4e\` ON \`Material\``);
         await queryRunner.query(`DROP INDEX \`IDX_944a945c72ce0228b54ca7a370\` ON \`Material\``);
         await queryRunner.query(`DROP TABLE \`Material\``);
+        await queryRunner.query(`DROP INDEX \`IDX_faaec86b4a9de0457f620fc8d2\` ON \`Color\``);
         await queryRunner.query(`DROP INDEX \`IDX_a29e349d26b88314ec5324a428\` ON \`Color\``);
         await queryRunner.query(`DROP TABLE \`Color\``);
+        await queryRunner.query(`DROP INDEX \`IDX_a00d335bf0a398b3a906f58c02\` ON \`Subcategory\``);
         await queryRunner.query(`DROP INDEX \`IDX_36fe52e276a8b562d967dab768\` ON \`Subcategory\``);
         await queryRunner.query(`DROP TABLE \`Subcategory\``);
+        await queryRunner.query(`DROP INDEX \`IDX_e9bc13a4c6a2cb71d7f07d0e3c\` ON \`Category\``);
         await queryRunner.query(`DROP INDEX \`IDX_0ac420e8701e781dbf1231dc23\` ON \`Category\``);
         await queryRunner.query(`DROP TABLE \`Category\``);
         await queryRunner.query(`DROP INDEX \`IDX_08a96a002044d5ca902ce834d9\` ON \`Address\``);
