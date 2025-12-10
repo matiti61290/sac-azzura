@@ -49,4 +49,7 @@ export class ProductEntity {
 
     @Column({ default: true })
     isActive: boolean
+
+    @Column({ length: 5, nullable: false, unique: true})
+    sku_code: string
 }

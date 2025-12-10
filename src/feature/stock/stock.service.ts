@@ -4,6 +4,7 @@ import { ColorEntity } from "src/entities/color.entity";
 import { MaterialEntity } from "src/entities/material.entity";
 import { ProductEntity } from "src/entities/product.entity";
 import { StockEntity } from "src/entities/stock.entity";
+import { SubcategoryEntity } from "src/entities/subcategory.entity";
 import { Repository } from "typeorm";
 
 @Injectable()
@@ -19,7 +20,10 @@ export class StockService {
         private readonly colorRepository: Repository<ColorEntity>,
 
         @InjectRepository(MaterialEntity)
-        private readonly materialRepository: Repository<MaterialEntity>
+        private readonly materialRepository: Repository<MaterialEntity>,
+
+        @InjectRepository(SubcategoryEntity)
+        private readonly subcategoryRepository: Repository<SubcategoryEntity>
     ){}
 
     async getAllStock (){
@@ -42,20 +46,41 @@ export class StockService {
         return stock
     }
 
-    async addStock(quantity: number, productId: number, colorId: number, materialId: number){
+    async addStock(quantity: number, productId: number, colorId: number, materialId: number, subcategoryId: number){
+        console.log("Le service est appele")
         const color = await this.colorRepository.findOne({ where: {id: colorId}})
         const material = await this.materialRepository.findOne({ where: {id: materialId}})
         const product = await this.productRepository.findOne({ where: {id: productId}})
+        const subcategory = await this.subcategoryRepository.findOne({ where: {id: subcategoryId}, relations: ["category"]})
 
-        if(!color || !material || !product){
+        if(!color || !material || !product || !subcategory){
             throw new NotFoundException
         }
+
+        
+
+        const colorSkuCode = color.sku_code
+        const materialSkuCode = material.sku_code
+        const productSkuCode = product.sku_code
+        const subcategorySkuCode = subcategory.sku_code
+        const categorySkuCode = subcategory.category.sku_code
+
+        console.log("Voice le sku des elements: ", colorSkuCode)
+        console.log("Voice le sku des elements: ", materialSkuCode)
+        console.log("Voice le sku des elements: ", productSkuCode)
+        console.log("Voice le sku des elements: ", subcategorySkuCode)
+        console.log("Voice le sku des elements: ", categorySkuCode)
+
+        const stockSkuCode = productSkuCode + "_" + categorySkuCode + "_" + subcategorySkuCode + "_" + colorSkuCode + "_" + materialSkuCode
+
+        console.log(stockSkuCode)
 
         const stock = this.stockRepository.create({
            quantity: quantity,
            product: product,
            material: material,
-           color: color 
+           color: color,
+           sku: stockSkuCode
         })
         
         const savedStock = await this.stockRepository.save(stock)

@@ -19,4 +19,7 @@ export class SubcategoryEntity {
         {onDelete: "CASCADE"}
     )
     category: CategoryEntity;
+
+    @Column({ length: 5, nullable: false, unique: true})
+    sku_code: string
 }

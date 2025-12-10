@@ -11,4 +11,7 @@ export class ColorEntity {
 
     @OneToMany(()=> StockEntity, (stock)=> stock.color)
     stocks: StockEntity[];
+
+    @Column({ length: 5, nullable: false, unique: true })
+    sku_code: string
 }
