@@ -36,8 +36,8 @@ export class StockService {
         return stocks        
     }
 
-    async getStock(stockId: number) {
-        const stock = await this.stockRepository.findOne({ where: {id: stockId}, relations: ["color", "material", "product"]})
+    async getStock(stockSku: string) {
+        const stock = await this.stockRepository.findOne({ where: {sku: stockSku}, relations: ["color", "material", "product"]})
 
         if(!stock){
             throw new NotFoundException
@@ -78,7 +78,7 @@ export class StockService {
         
         const savedStock = await this.stockRepository.save(stock)
 
-        return this.getStock(savedStock.id)
+        return this.getStock(savedStock.sku)
     }
 
     async updateStock(quantity: number, stockSku: string) {
@@ -91,6 +91,16 @@ export class StockService {
         stock.quantity = quantity
         const updatedStock = await this.stockRepository.save(stock)
 
-        return this.getStock(updatedStock.id)
+        return this.getStock(updatedStock.sku)
     }
+
+    async deleteStockByProductId(stockId: number){
+        const stock = await this.stockRepository.findOne({ where: {id: stockId}})
+
+        if(!stock){
+            throw new NotFoundException
+        }
+
+        await this.stockRepository.remove(stock)
+    }  
 }

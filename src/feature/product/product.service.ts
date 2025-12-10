@@ -21,6 +21,7 @@ export class ProductService {
         @InjectRepository(ImageEntity)
         private readonly imageRepository: Repository<ImageEntity>,
 
+
         private readonly awsS3Service: AwsS3Service,
 
         private readonly stockService: StockService
@@ -129,7 +130,7 @@ export class ProductService {
 
     async deleteProduct(productId: number) {
         console.log("Le service est appele")
-        const product = await this.productRepository.findOne({ where: {id: productId}, relations: ["images"]})
+        const product = await this.productRepository.findOne({ where: {id: productId}, relations: ["images", "stocks"]})
         console.log("Le produit est le suivant:", product)
         if(!product) {
             throw new NotFoundException
@@ -139,7 +140,7 @@ export class ProductService {
             await this.awsS3Service.deleteFile(image.key)
             await this.imageRepository.remove(image)
         }
-        
+
         return this.productRepository.remove(product)
     }
 }
