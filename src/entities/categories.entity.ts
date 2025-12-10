@@ -15,4 +15,7 @@ export class CategoryEntity {
         { cascade: true}
     )
     subcategories: SubcategoryEntity[];
+
+    @Column({length: 5, nullable: false, unique: true})
+    sku_code: string
 }
