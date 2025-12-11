@@ -46,7 +46,7 @@ export class ProductService {
     }
 
     async findProduct(productId: number){
-        const product = await this.productRepository.findOne({ where: {id: productId}, relations: ["images", 'subcategory.category']})
+        const product = await this.productRepository.findOne({ where: {id: productId}, relations: ["images", 'subcategory.category', "stocks"]})
 
         if(!product){
             throw new NotFoundException
@@ -139,6 +139,10 @@ export class ProductService {
         for (const image of product.images) {
             await this.awsS3Service.deleteFile(image.key)
             await this.imageRepository.remove(image)
+        }
+
+        for (const stock of product.stocks){
+            await this.stockService.deleteStockByProductId(stock.sku)
         }
 
         return this.productRepository.remove(product)

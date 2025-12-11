@@ -14,9 +14,11 @@ export class StockController {
 
     @Post('delete-stock/:stockId')
     async deleteStock(
-        @Param('stockSku', ParseIntPipe) stockId: number
+        @Param('stockId', ParseIntPipe) stockId: number
     ){
-        this.stockService.deleteStockByProductId(stockId)
+        const stock = await this.stockService.getStockById(stockId)
+        const stockSku = stock.sku
+        this.stockService.deleteStockByProductId(stockSku)
         return "Stock supprime"
     }
 }
