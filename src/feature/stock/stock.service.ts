@@ -36,8 +36,18 @@ export class StockService {
         return stocks        
     }
 
-    async getStock(stockId: number) {
-        const stock = await this.stockRepository.findOne({ where: {id: stockId}, relations: ["color", "material", "product"]})
+    async getStockBySku(stockSku: string) {
+        const stock = await this.stockRepository.findOne({ where: {sku: stockSku}, relations: ["color", "material", "product"]})
+
+        if(!stock){
+            throw new NotFoundException
+        }
+
+        return stock
+    }
+
+    async getStockById(stockId: number){
+        const stock =  await this.stockRepository.findOne({where: {id: stockId}, relations: ["color", "material", "product"]})
 
         if(!stock){
             throw new NotFoundException
@@ -47,7 +57,6 @@ export class StockService {
     }
 
     async addStock(quantity: number, productId: number, colorId: number, materialId: number, subcategoryId: number){
-        console.log("Le service est appele")
         const color = await this.colorRepository.findOne({ where: {id: colorId}})
         const material = await this.materialRepository.findOne({ where: {id: materialId}})
         const product = await this.productRepository.findOne({ where: {id: productId}})
@@ -65,12 +74,6 @@ export class StockService {
         const subcategorySkuCode = subcategory.sku_code
         const categorySkuCode = subcategory.category.sku_code
 
-        console.log("Voice le sku des elements: ", colorSkuCode)
-        console.log("Voice le sku des elements: ", materialSkuCode)
-        console.log("Voice le sku des elements: ", productSkuCode)
-        console.log("Voice le sku des elements: ", subcategorySkuCode)
-        console.log("Voice le sku des elements: ", categorySkuCode)
-
         const stockSkuCode = productSkuCode + "_" + categorySkuCode + "_" + subcategorySkuCode + "_" + colorSkuCode + "_" + materialSkuCode
 
         console.log(stockSkuCode)
@@ -85,6 +88,29 @@ export class StockService {
         
         const savedStock = await this.stockRepository.save(stock)
 
-        return this.getStock(savedStock.id)
+        return this.getStockBySku(savedStock.sku)
+    }
+
+    async updateStock(quantity: number, stockSku: string) {
+        const stock = await this.stockRepository.findOne({ where: {sku: stockSku}})
+
+        if(!stock){
+            throw new NotFoundException
+        }
+
+        stock.quantity = quantity
+        const updatedStock = await this.stockRepository.save(stock)
+
+        return this.getStockBySku(updatedStock.sku)
+    }
+
+    async deleteStockByProductId(stockSku?: string){
+        const stock = await this.stockRepository.findOne({ where: {sku: stockSku}})
+
+        if(!stock){
+            throw new NotFoundException
+        }
+
+        await this.stockRepository.remove(stock)
     }
 }

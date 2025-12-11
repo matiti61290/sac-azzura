@@ -21,6 +21,7 @@ export class ProductService {
         @InjectRepository(ImageEntity)
         private readonly imageRepository: Repository<ImageEntity>,
 
+
         private readonly awsS3Service: AwsS3Service,
 
         private readonly stockService: StockService
@@ -45,7 +46,7 @@ export class ProductService {
     }
 
     async findProduct(productId: number){
-        const product = await this.productRepository.findOne({ where: {id: productId}, relations: ["images", 'subcategory.category']})
+        const product = await this.productRepository.findOne({ where: {id: productId}, relations: ["images", 'subcategory.category', "stocks"]})
 
         if(!product){
             throw new NotFoundException
@@ -101,11 +102,10 @@ export class ProductService {
     }
 
     async updateProduct(productId: number, updateProductDto: UpdateProductDto){
-        const product = await this.productRepository.findOne({ where: {id: productId}, relations: ['subcategory', 'images'] })
+        const product = await this.productRepository.findOne({ where: {id: productId}, relations: ['subcategory', 'images', 'stocks'] })
         console.log(product)
         if(!product){
             throw new NotFoundException
-
         }
         
         Object.assign(product, updateProductDto)
@@ -120,13 +120,17 @@ export class ProductService {
             images.push(image)
         }
         await this.imageRepository.save(images)
+        
+        if(updateProductDto.quantity !== undefined && updateProductDto.stock_sku !== undefined) {
+            await this.stockService.updateStock(updateProductDto.quantity, updateProductDto.stock_sku)
+        }
 
         return this.findProduct(updatedProduct.id)
     }
 
     async deleteProduct(productId: number) {
         console.log("Le service est appele")
-        const product = await this.productRepository.findOne({ where: {id: productId}, relations: ["images"]})
+        const product = await this.productRepository.findOne({ where: {id: productId}, relations: ["images", "stocks"]})
         console.log("Le produit est le suivant:", product)
         if(!product) {
             throw new NotFoundException
@@ -136,7 +140,11 @@ export class ProductService {
             await this.awsS3Service.deleteFile(image.key)
             await this.imageRepository.remove(image)
         }
-        
+
+        for (const stock of product.stocks){
+            await this.stockService.deleteStockByProductId(stock.sku)
+        }
+
         return this.productRepository.remove(product)
     }
 }
