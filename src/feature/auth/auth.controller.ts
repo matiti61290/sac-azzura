@@ -5,7 +5,7 @@ import { LocalAuthGuard } from "./guards/local-auth.guard";
 import { JwtAuthGuard } from "./guards/jwt-auth.guard";
 import type { Request, Response, } from "express";
 import { MailDto } from "src/shared/dtos/auth/mail.dtos";
-import { NewPasswordDto } from "src/shared/dtos/auth/newPassword.dtos";
+import { NewPasswordDto } from "src/shared/dtos/auth/newPassword.dto";
 
 
 @Controller('auth')
