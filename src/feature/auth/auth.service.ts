@@ -9,7 +9,7 @@ import * as bcrypt from 'bcrypt'
 import { Response } from "express";
 import { newPasswordMailService } from "./authMail/newPasswordMail.service";
 import { MailDto } from "src/shared/dtos/auth/mail.dtos";
-import { NewPasswordDto } from "src/shared/dtos/auth/newPassword.dtos";
+import { NewPasswordDto } from "src/shared/dtos/auth/newPassword.dto";
 /**
  * Service s'occupant des fonctions liées à l'authentification comme l'inscription ou la connexion d'un utilisateur.
  */
