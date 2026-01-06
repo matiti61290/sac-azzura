@@ -54,5 +54,10 @@ export class PaymentService {
                 quantity: item.quantity
             })
         }
+
+        return {
+            totalAmount,
+            items: validatedItems
+        }
     }
 }
