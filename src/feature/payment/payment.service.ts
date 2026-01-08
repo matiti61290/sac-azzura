@@ -88,4 +88,14 @@ export class PaymentService {
             throw new InternalServerErrorException('failed to create checkout session')
         }
     }
+
+    async constructEventWebhook (req, res, signature) {
+        const endpointSecret = process.env.SECRET_WEBHOOK_KEY
+
+        if(!endpointSecret){
+            throw new NotFoundException("Le webhook ne fonctionne pas")
+        }
+
+        
+    }
 }

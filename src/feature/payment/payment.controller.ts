@@ -25,4 +25,9 @@ export class PaymentController {
     async paymentFailed() {
         return "Fuck. Ca marche pas"
     }
+
+    @Post('webhook')
+    async handleStripeWebhook(){
+        
+    }
 }
