@@ -96,6 +96,26 @@ export class PaymentService {
             throw new NotFoundException("Le webhook ne fonctionne pas")
         }
 
-        
+        let event: Stripe.Event
+
+        try{
+            event = this.stripe.webhooks.constructEvent(
+                req.body,
+                signature,
+                endpointSecret
+            )
+        } catch(error){
+            return res.status(401).send(`webhook error: ${error.message}`)
+        }
+
+        if(event.type === 'checkout.session.completed') {
+            const session = event.data.object as Stripe.Checkout.Session
+            const metadata = session.metadata
+            if(!metadata){
+                throw new InternalServerErrorException('Les metadatas n\'existent pas')
+            }
+
+            //metadata a determiner
+        }
     }
 }
