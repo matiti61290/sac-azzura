@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
+import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import * as dotenv from 'dotenv'
 import { ProductEntity } from "src/entities/product.entity";
@@ -44,7 +44,6 @@ export class PaymentService {
             }
 
             const priceInCents = variant.product.price * 100
-
             totalAmount += priceInCents * item.quantity
 
             validatedItems.push({
@@ -55,9 +54,68 @@ export class PaymentService {
             })
         }
 
-        return {
-            totalAmount,
-            items: validatedItems
+        this.createCheckoutSession(validatedItems)
+    }
+
+    async createCheckoutSession (validatedItems){
+        console.log('Le service de paiement est appele. Voici son contenu:', validatedItems)
+
+        const line_items = validatedItems.map(item => ({
+            price_data: {
+                currency: 'eur',
+                product_data: {
+                    name: item.name
+                },
+                unit_amount: item.price
+            },
+            quantity: item.quantity
+        }))
+        console.log("Jusqu'ici, ca marche! aka apres le map")
+
+        try{
+            const session = await this.stripe.checkout.sessions.create({
+                payment_method_types: ['card'],
+                line_items: line_items,
+                mode: 'payment',
+                success_url: 'http://localhost:3000/payment/payment_success',
+                cancel_url: 'http://localhost:3000/payment/payment_failed'
+            })
+            console.log(session.url)
+
+            return { url: session.url}
+        } catch (error) {
+            console.error("Error creating session: ", error)
+            throw new InternalServerErrorException('failed to create checkout session')
+        }
+    }
+
+    async constructEventWebhook (req, res, signature) {
+        const endpointSecret = process.env.SECRET_WEBHOOK_KEY
+
+        if(!endpointSecret){
+            throw new NotFoundException("Le webhook ne fonctionne pas")
+        }
+
+        let event: Stripe.Event
+
+        try{
+            event = this.stripe.webhooks.constructEvent(
+                req.body,
+                signature,
+                endpointSecret
+            )
+        } catch(error){
+            return res.status(401).send(`webhook error: ${error.message}`)
+        }
+
+        if(event.type === 'checkout.session.completed') {
+            const session = event.data.object as Stripe.Checkout.Session
+            const metadata = session.metadata
+            if(!metadata){
+                throw new InternalServerErrorException('Les metadatas n\'existent pas')
+            }
+
+            //metadata a determiner
         }
     }
 }
