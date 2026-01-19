@@ -3,6 +3,7 @@ import { UserEntity } from "./user.entity";
 import { ProductEntity } from "./product.entity";
 import { PromotionEntity } from "./promotion.entity";
 import { OrderStatus } from "src/shared/enum/order.enum";
+import { StockEntity } from "./stock.entity";
 
 @Entity('Order')
 export class OrderEntity {
@@ -17,11 +18,11 @@ export class OrderEntity {
     user: UserEntity;
 
     @ManyToOne(
-        ()=> ProductEntity, 
-        (product)=> product.orders, 
+        ()=> StockEntity,
+        (stock)=> stock.orders,
         {onDelete: "SET NULL"}
     )
-    product: ProductEntity;
+    stock: StockEntity
 
     @ManyToOne(
         ()=>PromotionEntity, 

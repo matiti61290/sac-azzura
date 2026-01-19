@@ -24,7 +24,7 @@ export class PaymentService {
         this.stripe = new Stripe(secretKey)
     }
 
-    async verificationOrder(cartDto: CartDto) {
+    async verificationOrder(cartDto: CartDto, userId: number) {
         let totalAmount = 0
         const validatedItems: ValidatedItem[]= []
 
@@ -54,10 +54,11 @@ export class PaymentService {
             })
         }
 
-        this.createCheckoutSession(validatedItems)
+        console.log("La verification fonctionne")
+        return await this.createCheckoutSession(validatedItems, userId)
     }
 
-    async createCheckoutSession (validatedItems){
+    async createCheckoutSession (validatedItems, userId: number){
         console.log('Le service de paiement est appele. Voici son contenu:', validatedItems)
 
         const line_items = validatedItems.map(item => ({
@@ -78,7 +79,11 @@ export class PaymentService {
                 line_items: line_items,
                 mode: 'payment',
                 success_url: 'http://localhost:3000/payment/payment_success',
-                cancel_url: 'http://localhost:3000/payment/payment_failed'
+                cancel_url: 'http://localhost:3000/payment/payment_failed',
+                metadata:{
+                    user: userId,
+                    line_items
+                }
             })
             console.log(session.url)
 
@@ -95,12 +100,12 @@ export class PaymentService {
         if(!endpointSecret){
             throw new NotFoundException("Le webhook ne fonctionne pas")
         }
-
+        console.log('le webhook a ete call!!!')
         let event: Stripe.Event
 
         try{
             event = this.stripe.webhooks.constructEvent(
-                req.body,
+                req.rawBody,
                 signature,
                 endpointSecret
             )
@@ -115,7 +120,11 @@ export class PaymentService {
                 throw new InternalServerErrorException('Les metadatas n\'existent pas')
             }
 
-            //metadata a determiner
+            const userId = Number(metadata.userId)
+            const lineItems = metadata.line_items
+
+            console.log("le user id est:", userId)
+            console.log("Les items sont: ", lineItems)
         }
     }
 }

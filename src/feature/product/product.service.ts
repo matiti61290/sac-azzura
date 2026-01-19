@@ -61,7 +61,7 @@ export class ProductService {
         return { ...product, images: imagesWithUrls}
     }
 
-    async createProduct(addProductDto: AddProductDto){
+    async createProduct(addProductDto: AddProductDto, files){
         const subcategory = await this.subCategoryRepository.findOne({ where:{ id: addProductDto.subcategoryId}})
 
         if(!subcategory) {
@@ -81,7 +81,7 @@ export class ProductService {
         const savedProduct = await this.productRepository.save(product)
 
         const images: ImageEntity[] = []
-        for (const file of addProductDto.files) {
+        for (const file of files) {
             const key = `products/${Date.now()}_${file.originalname}`
             await this.awsS3Service.uploadFile(file, key)
             const image = this.imageRepository.create({ key, product: savedProduct })
