@@ -1,4 +1,5 @@
-import { IsInt, IsNotEmpty, IsPositive, IsString, IsArray, Matches, isInt } from "class-validator";
+import { Type } from "class-transformer";
+import { IsInt, IsNotEmpty, IsPositive, IsString, IsArray, Matches, isInt, IsNumber } from "class-validator";
 
 export class AddProductDto{
     @IsNotEmpty()
@@ -10,30 +11,29 @@ export class AddProductDto{
     description: string
 
     @IsNotEmpty()
+    @IsNumber({maxDecimalPlaces: 2})
     @IsPositive()
-    @Matches(/^\d+(\.\d{1,2})?$/, {
-        message: "Le prix n'est pas au bon format(exemple: 15.99)."
-    })
+    @Type(()=> Number)
     price: number
 
     @IsNotEmpty()
-    @IsArray()
-    files: Express.Multer.File[]
-
-    @IsNotEmpty()
     @IsInt()
+    @Type(()=> Number)
     subcategoryId: number
 
     @IsNotEmpty()
     @IsInt()
+    @Type(()=> Number)
     quantity: number
 
     @IsNotEmpty()
     @IsInt()
+    @Type(()=> Number)
     colorId: number
 
     @IsNotEmpty()
     @IsInt()
+    @Type(()=> Number)
     materialId: number
 
     @IsNotEmpty()
