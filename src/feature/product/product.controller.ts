@@ -34,8 +34,7 @@ export class ProductController {
         @Body() addProductDto: AddProductDto,
         @UploadedFiles() files: Express.Multer.File[]
     ) {
-        addProductDto.files = files
-        return this.productService.createProduct(addProductDto)
+        return this.productService.createProduct(addProductDto, files)
     }
 
     @Post('update-product/:productId')
