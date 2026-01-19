@@ -81,7 +81,8 @@ export class PaymentService {
                 success_url: 'http://localhost:3000/payment/payment_success',
                 cancel_url: 'http://localhost:3000/payment/payment_failed',
                 metadata:{
-                    user: userId
+                    user: userId,
+                    line_items
                 }
             })
             console.log(session.url)
@@ -119,7 +120,11 @@ export class PaymentService {
                 throw new InternalServerErrorException('Les metadatas n\'existent pas')
             }
 
-            // metadata a determiner
+            const userId = Number(metadata.userId)
+            const lineItems = metadata.line_items
+
+            console.log("le user id est:", userId)
+            console.log("Les items sont: ", lineItems)
         }
     }
 }

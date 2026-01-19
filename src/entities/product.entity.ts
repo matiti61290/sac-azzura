@@ -31,9 +31,6 @@ export class ProductEntity {
     )
     stocks: StockEntity[]
 
-    @OneToMany(()=> OrderEntity, (order)=> order.product)
-    orders: OrderEntity[]
-
     @Column({ 
         type: 'timestamp', 
         default: ()=> "CURRENT_TIMESTAMP"
