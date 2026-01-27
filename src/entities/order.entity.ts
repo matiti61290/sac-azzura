@@ -1,10 +1,8 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, Index, OneToMany } from "typeorm";
 import { UserEntity } from "./user.entity";
-import { ProductEntity } from "./product.entity";
 import { PromotionEntity } from "./promotion.entity";
 import { OrderStatus } from "src/shared/enum/order.enum";
-import { StockEntity } from "./stock.entity";
-import { OrderItemEntity } from "./OrderItem.entity";
+import { OrderItemEntity } from "./orderItem.entity";
 
 @Entity('Order')
 export class OrderEntity {

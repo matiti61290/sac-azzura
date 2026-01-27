@@ -1,9 +1,14 @@
 import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import * as dotenv from 'dotenv'
+import { OrderEntity } from "src/entities/order.entity";
+import { OrderItemEntity } from "src/entities/orderItem.entity";
 import { ProductEntity } from "src/entities/product.entity";
 import { StockEntity } from "src/entities/stock.entity";
+import { UserEntity } from "src/entities/user.entity";
 import { CartDto } from "src/shared/dtos/payment/cart.dto";
+import { CartItemDto } from "src/shared/dtos/payment/cartItem.dto";
+import { OrderStatus } from "src/shared/enum/order.enum";
 import { ValidatedItem } from "src/shared/interfaces/validatedItem.interface";
 import { Stripe } from 'stripe'
 import { Repository } from "typeorm";
@@ -13,7 +18,10 @@ export class PaymentService {
     private stripe: Stripe
     constructor(
         @InjectRepository(StockEntity)
-        private readonly stockEntity: Repository<StockEntity>,
+        private readonly stockRepository : Repository<StockEntity>,
+
+        @InjectRepository(OrderEntity)
+        private readonly orderRepository : Repository<OrderEntity>
     ) {
         const secretKey = process.env.SECRET_KEY_STRIPE
 
@@ -24,75 +32,82 @@ export class PaymentService {
         this.stripe = new Stripe(secretKey)
     }
 
-    async verificationOrder(cartDto: CartDto, userId: number) {
+    async verificationOrder(cartDto: CartDto, user: UserEntity){
         let totalAmount = 0
-        const validatedItems: ValidatedItem[]= []
+
+        const order = new OrderEntity()
+        order.user = user
+        order.status = OrderStatus.PENDING
+        order.items = []
 
         for (const item of cartDto.items){
-            const variant = await this.stockEntity.findOne({where: {sku: item.sku}, relations:['product']})
+            const variant = await this.stockRepository.findOne({where: {sku: item.sku}, relations: ['product']})
 
-            if(!variant){
-                throw new NotFoundException('Aucun produit ne correspond a ce code sku.')
+            if (!variant){
+                throw new NotFoundException("Le variant n'a pas ete trouve")
             }
-            
+
             if(!variant.product){
-                throw new BadRequestException('Pas de produit associe a ce stock')
+                throw new NotFoundException("Le produit n'a pas ete trouve")
             }
 
             if (variant.quantity < item.quantity){
-                throw new BadRequestException('Stock insuffisant')
+                throw new BadRequestException('Le stock est inferieur a la quantite commandee')
             }
 
-            const priceInCents = variant.product.price * 100
-            totalAmount += priceInCents * item.quantity
+            const orderItem = new OrderItemEntity()
+            orderItem.stock = variant;
+            orderItem.quantity = item.quantity
+            orderItem.priceAtPurchase = variant.product.price
 
-            validatedItems.push({
-                sku: variant.sku,
-                name: variant.product.name,
-                price: priceInCents,
-                quantity: item.quantity
-            })
+            order.items.push(orderItem)
+
+            totalAmount += variant.product.price * item.quantity
         }
 
-        console.log("La verification fonctionne")
-        return await this.createCheckoutSession(validatedItems, userId)
+        order.totalAmount = totalAmount
+
+        const savedOrder = await this.orderRepository.save(order)
+
+        return savedOrder
+        // return this.createCheckoutSession(savedOrder.id, user.id, order.items)
     }
 
-    async createCheckoutSession (validatedItems, userId: number){
-        console.log('Le service de paiement est appele. Voici son contenu:', validatedItems)
+    // async createCheckoutSession (validatedItems, userId: number){
+        // console.log('Le service de paiement est appele. Voici son contenu:', validatedItems)
 
-        const line_items = validatedItems.map(item => ({
-            price_data: {
-                currency: 'eur',
-                product_data: {
-                    name: item.name
-                },
-                unit_amount: item.price
-            },
-            quantity: item.quantity
-        }))
-        console.log("Jusqu'ici, ca marche! aka apres le map")
+        // const line_items = validatedItems.map(item => ({
+        //     price_data: {
+        //         currency: 'eur',
+        //         product_data: {
+        //             name: item.name
+        //         },
+        //         unit_amount: item.price
+        //     },
+        //     quantity: item.quantity
+        // }))
+        // console.log("Jusqu'ici, ca marche! aka apres le map")
 
-        try{
-            const session = await this.stripe.checkout.sessions.create({
-                payment_method_types: ['card'],
-                line_items: line_items,
-                mode: 'payment',
-                success_url: 'http://localhost:3000/payment/payment_success',
-                cancel_url: 'http://localhost:3000/payment/payment_failed',
-                metadata:{
-                    user: userId,
-                    line_items
-                }
-            })
-            console.log(session.url)
+        // try{
+        //     const session = await this.stripe.checkout.sessions.create({
+        //         payment_method_types: ['card'],
+        //         line_items: line_items,
+        //         mode: 'payment',
+        //         success_url: 'http://localhost:3000/payment/payment_success',
+        //         cancel_url: 'http://localhost:3000/payment/payment_failed',
+        //         metadata:{
+        //             user: userId,
+        //             line_items
+        //         }
+        //     })
+        //     console.log(session.url)
 
-            return { url: session.url}
-        } catch (error) {
-            console.error("Error creating session: ", error)
-            throw new InternalServerErrorException('failed to create checkout session')
-        }
-    }
+        //     return { url: session.url}
+        // } catch (error) {
+        //     console.error("Error creating session: ", error)
+        //     throw new InternalServerErrorException('failed to create checkout session')
+        // }
+    // }
 
     async constructEventWebhook (req, res, signature) {
         const endpointSecret = process.env.SECRET_WEBHOOK_KEY
