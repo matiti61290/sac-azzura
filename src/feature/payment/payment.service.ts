@@ -149,6 +149,57 @@ export class PaymentService {
     // }
 
     async constructEventWebhook ( req: any, res: any, signature: string){
+        const endpointSecret = process.env.SECRET_WEBHOOK_KEY
+        if(!endpointSecret){
+            throw new NotFoundException("Le webhook ne fonctionne pas")
+        }
+        console.log('le webhook a ete call!!!')
         
+        let event: Stripe.Event
+        try{
+            event = this.stripe.webhooks.constructEvent(
+                req.rawBody,
+                signature,
+                endpointSecret
+            )
+        } catch(error){
+            return res.status(401).send(`webhook error: ${error.message}`)
+        }
+
+        if(event.type === 'checkout.session.completed'){
+            const session = event.data.object as Stripe.Checkout.Session
+            const metadata = session.metadata
+
+            if(!metadata){
+                throw new InternalServerErrorException('Les metadatas n\'existent pas')
+            }
+
+            const orderId = Number(metadata.orderId)
+
+            const order = await this.orderRepository.findOne({
+                where: {id:orderId},
+                relations:['items', 'items.stock']
+            })
+
+            if(order && order.status=== OrderStatus.PENDING){
+                order.status = OrderStatus.PAID
+                await this.orderRepository.save(order)
+            }
+
+            if(!order){
+                throw new InternalServerErrorException()
+            }
+
+            for (const line of order.items) {
+                line.stock.quantity -= line.quantity
+                await this.stockRepository.save(line.stock)
+            }
+
+            console.log(`Commande ${orderId} validee et stocks mis a jour!`)
+        }
+
+        return res.status(200).json({received: true})
     }
+
+    
 }
