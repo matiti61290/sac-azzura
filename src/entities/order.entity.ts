@@ -1,62 +1,33 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, Index } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, Index, OneToMany } from "typeorm";
 import { UserEntity } from "./user.entity";
 import { ProductEntity } from "./product.entity";
 import { PromotionEntity } from "./promotion.entity";
 import { OrderStatus } from "src/shared/enum/order.enum";
 import { StockEntity } from "./stock.entity";
+import { OrderItemEntity } from "./OrderItem.entity";
 
 @Entity('Order')
 export class OrderEntity {
-    @PrimaryGeneratedColumn({ type: 'int' })
-    id: number;
+    @PrimaryGeneratedColumn()
+    id: number
 
-    @ManyToOne(
-        ()=> UserEntity, 
-        (user)=> user.orders, 
-        {onDelete: "SET NULL"}
-    )
-    user: UserEntity;
+    @ManyToOne(()=> UserEntity, (user)=> user.orders, { cascade: true})
+    user: UserEntity
 
-    @ManyToOne(
-        ()=> StockEntity,
-        (stock)=> stock.orders,
-        {onDelete: "SET NULL"}
-    )
-    stock: StockEntity
+    @OneToMany(()=> OrderItemEntity, (item)=> item.order, {cascade: true})
+    items: OrderItemEntity[]
 
-    @ManyToOne(
-        ()=>PromotionEntity, 
-        (promotion)=> promotion.orders, 
-        {onDelete: "SET NULL"}
-    )
-    promotion: PromotionEntity;
-
-    @Column({
-        type:'enum',
-        enum: OrderStatus,
-        default: OrderStatus.PENDING
-    })
-    @Index()
+    @Column({ type: "enum", enum: OrderStatus, default: OrderStatus.PENDING})
     status: OrderStatus
 
-    @Column({
-        type: 'int',
-        default: 1
-    })
-    quantity: number
+    @Column({ type: 'decimal', precision: 10, scale:2})
+    totalAmount: number
 
-    @Column({ 
-        type: 'decimal',
-        precision: 20,
-        scale: 2
-    })
-    priceAtPurchase: number
+    @Column({ nullable: true})
+    stripeSessionId: string
 
-    @Column({ 
-        type: 'decimal', 
-        precision: 10, scale: 2 
-    })
-    total: number
+    @ManyToOne(()=> PromotionEntity, {nullable: true})
+    promotion: PromotionEntity
 
     @Column({ 
         type: 'timestamp', 
