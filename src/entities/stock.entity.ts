@@ -2,8 +2,7 @@ import { Entity, PrimaryGeneratedColumn, Column, ManyToOne , Index, OneToMany} f
 import { ColorEntity } from "./color.entity";
 import { MaterialEntity } from "./material.entity";
 import { ProductEntity } from "./product.entity";
-import { OrderEntity } from "./order.entity";
-import { OrderItemEntity } from "./OrderItem.entity";
+
 
 @Entity('Stock')
 export class StockEntity {

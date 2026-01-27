@@ -18,9 +18,8 @@ export class PaymentController {
         @Req() req
     ){
         const user = req.user
-        const userId = user.id
-        console.log("L'id de l'user est:", userId)
-        return this.paymentService.verificationOrder(cartDto, userId)
+        console.log("L'id de l'user est:", user)
+        return this.paymentService.verificationOrder(cartDto, user)
     }
 
     @Get('payment_success')

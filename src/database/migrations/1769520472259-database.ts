@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from "typeorm";
 
-export class Database1768832534378 implements MigrationInterface {
-    name = 'Database1768832534378'
+export class Database1769520472259 implements MigrationInterface {
+    name = 'Database1769520472259'
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.query(`CREATE TABLE \`Address\` (\`id\` int NOT NULL AUTO_INCREMENT, \`type\` enum ('delivery', 'billing') NOT NULL, \`street\` varchar(255) NOT NULL, \`additional\` varchar(255) NOT NULL, \`zipcode\` varchar(20) NOT NULL, \`city\` varchar(255) NOT NULL, \`userId\` int NULL, INDEX \`IDX_08a96a002044d5ca902ce834d9\` (\`userId\`), PRIMARY KEY (\`id\`)) ENGINE=InnoDB`);
@@ -13,7 +13,8 @@ export class Database1768832534378 implements MigrationInterface {
         await queryRunner.query(`CREATE TABLE \`image_entity\` (\`id\` int NOT NULL AUTO_INCREMENT, \`key\` varchar(255) NOT NULL, \`productId\` int NULL, PRIMARY KEY (\`id\`)) ENGINE=InnoDB`);
         await queryRunner.query(`CREATE TABLE \`Product\` (\`id\` int NOT NULL AUTO_INCREMENT, \`name\` varchar(255) NOT NULL, \`description\` varchar(512) NOT NULL, \`price\` decimal(10,2) NOT NULL, \`createdAt\` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP, \`updatedAt\` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, \`isActive\` tinyint NOT NULL DEFAULT 1, \`sku_code\` varchar(5) NOT NULL, \`subcategoryId\` int NULL, UNIQUE INDEX \`IDX_08cd99ca921561a289373c14b4\` (\`name\`), UNIQUE INDEX \`IDX_280f769af0c63e863b53d1c726\` (\`sku_code\`), PRIMARY KEY (\`id\`)) ENGINE=InnoDB`);
         await queryRunner.query(`CREATE TABLE \`Stock\` (\`id\` int NOT NULL AUTO_INCREMENT, \`quantity\` int NOT NULL, \`createdAt\` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP, \`updatedAt\` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, \`sku\` varchar(50) NOT NULL, \`productId\` int NULL, \`materialId\` int NULL, \`colorId\` int NULL, UNIQUE INDEX \`IDX_9ee732e1cc687f8a67c5d12fcc\` (\`sku\`), PRIMARY KEY (\`id\`)) ENGINE=InnoDB`);
-        await queryRunner.query(`CREATE TABLE \`Order\` (\`id\` int NOT NULL AUTO_INCREMENT, \`status\` enum ('pending', 'paid', 'shipped', 'cancelled') NOT NULL DEFAULT 'pending', \`quantity\` int NOT NULL DEFAULT '1', \`priceAtPurchase\` decimal(20,2) NOT NULL, \`total\` decimal(10,2) NOT NULL, \`createdAt\` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP, \`userId\` int NULL, \`stockId\` int NULL, \`promotionId\` int NULL, INDEX \`IDX_8a2a38faa1708165e53e23c2fa\` (\`status\`), PRIMARY KEY (\`id\`)) ENGINE=InnoDB`);
+        await queryRunner.query(`CREATE TABLE \`OrderItem\` (\`id\` int NOT NULL AUTO_INCREMENT, \`quantity\` int NOT NULL, \`priceAtPurchase\` decimal(10,2) NOT NULL, \`orderId\` int NULL, \`stockId\` int NULL, PRIMARY KEY (\`id\`)) ENGINE=InnoDB`);
+        await queryRunner.query(`CREATE TABLE \`Order\` (\`id\` int NOT NULL AUTO_INCREMENT, \`status\` enum ('pending', 'paid', 'shipped', 'cancelled') NOT NULL DEFAULT 'pending', \`totalAmount\` decimal(10,2) NOT NULL, \`stripeSessionId\` varchar(255) NULL, \`createdAt\` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP, \`userId\` int NULL, \`promotionId\` int NULL, PRIMARY KEY (\`id\`)) ENGINE=InnoDB`);
         await queryRunner.query(`CREATE TABLE \`User\` (\`id\` int NOT NULL AUTO_INCREMENT, \`firstname\` varchar(255) NOT NULL, \`lastname\` varchar(255) NOT NULL, \`mail\` varchar(255) NOT NULL, \`phoneNumber\` varchar(20) NOT NULL, \`password\` varchar(255) NOT NULL, \`isVerified\` tinyint NOT NULL, \`isAdmin\` tinyint NOT NULL, UNIQUE INDEX \`IDX_dc78ff11c856c4f8b4c8288386\` (\`mail\`), PRIMARY KEY (\`id\`)) ENGINE=InnoDB`);
         await queryRunner.query(`ALTER TABLE \`Address\` ADD CONSTRAINT \`FK_08a96a002044d5ca902ce834d97\` FOREIGN KEY (\`userId\`) REFERENCES \`User\`(\`id\`) ON DELETE CASCADE ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE \`Subcategory\` ADD CONSTRAINT \`FK_ea8bf5437032e203a991a8a316b\` FOREIGN KEY (\`categoryId\`) REFERENCES \`Category\`(\`id\`) ON DELETE CASCADE ON UPDATE NO ACTION`);
@@ -22,15 +23,17 @@ export class Database1768832534378 implements MigrationInterface {
         await queryRunner.query(`ALTER TABLE \`Stock\` ADD CONSTRAINT \`FK_17b0ef39058eca67f3bcd9aa49e\` FOREIGN KEY (\`productId\`) REFERENCES \`Product\`(\`id\`) ON DELETE SET NULL ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE \`Stock\` ADD CONSTRAINT \`FK_cde3988360d99875dffbe7e6d1c\` FOREIGN KEY (\`materialId\`) REFERENCES \`Material\`(\`id\`) ON DELETE NO ACTION ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE \`Stock\` ADD CONSTRAINT \`FK_93179cddb3235fc8cba510d70fa\` FOREIGN KEY (\`colorId\`) REFERENCES \`Color\`(\`id\`) ON DELETE NO ACTION ON UPDATE NO ACTION`);
-        await queryRunner.query(`ALTER TABLE \`Order\` ADD CONSTRAINT \`FK_cdc25a0a42e8f451020a26680b3\` FOREIGN KEY (\`userId\`) REFERENCES \`User\`(\`id\`) ON DELETE SET NULL ON UPDATE NO ACTION`);
-        await queryRunner.query(`ALTER TABLE \`Order\` ADD CONSTRAINT \`FK_e1ea8b79930b002a56f99350677\` FOREIGN KEY (\`stockId\`) REFERENCES \`Stock\`(\`id\`) ON DELETE SET NULL ON UPDATE NO ACTION`);
-        await queryRunner.query(`ALTER TABLE \`Order\` ADD CONSTRAINT \`FK_dc8843682208b9a47d7c0bf046e\` FOREIGN KEY (\`promotionId\`) REFERENCES \`Promotion\`(\`id\`) ON DELETE SET NULL ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE \`OrderItem\` ADD CONSTRAINT \`FK_c94ace27164b9ffde93ebdbe95c\` FOREIGN KEY (\`orderId\`) REFERENCES \`Order\`(\`id\`) ON DELETE NO ACTION ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE \`OrderItem\` ADD CONSTRAINT \`FK_e2918aa39ea4841b056765b29b2\` FOREIGN KEY (\`stockId\`) REFERENCES \`Stock\`(\`id\`) ON DELETE NO ACTION ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE \`Order\` ADD CONSTRAINT \`FK_cdc25a0a42e8f451020a26680b3\` FOREIGN KEY (\`userId\`) REFERENCES \`User\`(\`id\`) ON DELETE NO ACTION ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE \`Order\` ADD CONSTRAINT \`FK_dc8843682208b9a47d7c0bf046e\` FOREIGN KEY (\`promotionId\`) REFERENCES \`Promotion\`(\`id\`) ON DELETE NO ACTION ON UPDATE NO ACTION`);
     }
 
     public async down(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.query(`ALTER TABLE \`Order\` DROP FOREIGN KEY \`FK_dc8843682208b9a47d7c0bf046e\``);
-        await queryRunner.query(`ALTER TABLE \`Order\` DROP FOREIGN KEY \`FK_e1ea8b79930b002a56f99350677\``);
         await queryRunner.query(`ALTER TABLE \`Order\` DROP FOREIGN KEY \`FK_cdc25a0a42e8f451020a26680b3\``);
+        await queryRunner.query(`ALTER TABLE \`OrderItem\` DROP FOREIGN KEY \`FK_e2918aa39ea4841b056765b29b2\``);
+        await queryRunner.query(`ALTER TABLE \`OrderItem\` DROP FOREIGN KEY \`FK_c94ace27164b9ffde93ebdbe95c\``);
         await queryRunner.query(`ALTER TABLE \`Stock\` DROP FOREIGN KEY \`FK_93179cddb3235fc8cba510d70fa\``);
         await queryRunner.query(`ALTER TABLE \`Stock\` DROP FOREIGN KEY \`FK_cde3988360d99875dffbe7e6d1c\``);
         await queryRunner.query(`ALTER TABLE \`Stock\` DROP FOREIGN KEY \`FK_17b0ef39058eca67f3bcd9aa49e\``);
@@ -40,8 +43,8 @@ export class Database1768832534378 implements MigrationInterface {
         await queryRunner.query(`ALTER TABLE \`Address\` DROP FOREIGN KEY \`FK_08a96a002044d5ca902ce834d97\``);
         await queryRunner.query(`DROP INDEX \`IDX_dc78ff11c856c4f8b4c8288386\` ON \`User\``);
         await queryRunner.query(`DROP TABLE \`User\``);
-        await queryRunner.query(`DROP INDEX \`IDX_8a2a38faa1708165e53e23c2fa\` ON \`Order\``);
         await queryRunner.query(`DROP TABLE \`Order\``);
+        await queryRunner.query(`DROP TABLE \`OrderItem\``);
         await queryRunner.query(`DROP INDEX \`IDX_9ee732e1cc687f8a67c5d12fcc\` ON \`Stock\``);
         await queryRunner.query(`DROP TABLE \`Stock\``);
         await queryRunner.query(`DROP INDEX \`IDX_280f769af0c63e863b53d1c726\` ON \`Product\``);
