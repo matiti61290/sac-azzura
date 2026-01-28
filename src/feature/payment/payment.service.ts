@@ -98,7 +98,7 @@ export class PaymentService {
                 line_items,
                 mode:'payment',
                 success_url: 'http://localhost:3000/payment/payment_success',
-                cancel_url: 'http://localhost:3000/payment/payment_failed',
+                cancel_url: `http://localhost:3000/payment/payment_failed/${orderId}`,
 
                 metadata: {
                     orderId: orderId.toString(),
@@ -113,40 +113,6 @@ export class PaymentService {
         }
     }
 
-
-    // async constructEventWebhook (req, res, signature) {
-    //     const endpointSecret = process.env.SECRET_WEBHOOK_KEY
-
-    //     if(!endpointSecret){
-    //         throw new NotFoundException("Le webhook ne fonctionne pas")
-    //     }
-    //     console.log('le webhook a ete call!!!')
-    //     let event: Stripe.Event
-
-    //     try{
-    //         event = this.stripe.webhooks.constructEvent(
-    //             req.rawBody,
-    //             signature,
-    //             endpointSecret
-    //         )
-    //     } catch(error){
-    //         return res.status(401).send(`webhook error: ${error.message}`)
-    //     }
-
-    //     if(event.type === 'checkout.session.completed') {
-    //         const session = event.data.object as Stripe.Checkout.Session
-    //         const metadata = session.metadata
-    //         if(!metadata){
-    //             throw new InternalServerErrorException('Les metadatas n\'existent pas')
-    //         }
-
-    //         const userId = Number(metadata.userId)
-    //         const lineItems = metadata.line_items
-
-    //         console.log("le user id est:", userId)
-    //         console.log("Les items sont: ", lineItems)
-    //     }
-    // }
 
     async constructEventWebhook ( req: any, res: any, signature: string){
         const endpointSecret = process.env.SECRET_WEBHOOK_KEY
@@ -196,10 +162,36 @@ export class PaymentService {
             }
 
             console.log(`Commande ${orderId} validee et stocks mis a jour!`)
+        } else if (event.type ==='checkout.session.expired'){
+            const session = event.data.object as Stripe.Checkout.Session
+            const metadata = session.metadata
+
+            if(!metadata){
+                throw new InternalServerErrorException('Les metadatas n\'existent pas')
+            }
+
+            const orderId = Number(metadata.orderId)
+
+            const order = await this.orderRepository.findOne({where: {id: orderId}})
+
+            if(order && order.status === OrderStatus.PENDING){
+                order.status = OrderStatus.CANCELLED
+                await this.orderRepository.save(order)
+            }
         }
 
         return res.status(200).json({received: true})
     }
 
-    
+    async paymentFailed(orderId: number){
+        const order = await this.orderRepository.findOne({where: {id: orderId}})
+        console.log('la commande avant la modification:', order)
+
+        if(order && order.status === OrderStatus.PENDING){
+            order.status = OrderStatus.CANCELLED
+            await this.orderRepository.save(order)
+        }
+
+        console.log('la commande mise a jour est:', order)
+    }
 }

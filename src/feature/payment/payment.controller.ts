@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Headers, HttpCode, HttpStatus, Post, Req, Res, UseGuards } from "@nestjs/common";
+import { Body, Controller, Get, Param,  Headers, HttpCode, HttpStatus, ParseIntPipe, Post, Req, Res, UseGuards } from "@nestjs/common";
 import { PaymentService } from "./payment.service";
 import { CartDto } from "src/shared/dtos/payment/cart.dto";
 import type { Request, Response } from "express";
@@ -27,9 +27,11 @@ export class PaymentController {
         return "Youhou. Ca marche"
     }
 
-    @Get('payment-failed')
-    async paymentFailed() {
-        return "Fuck. Ca marche pas"
+    @Get('payment_failed/:orderId')
+    async paymentFailed(
+        @Param('orderId', ParseIntPipe) orderId: number
+    ) {
+        return this.paymentService.paymentFailed(orderId)
     }
 
     @Post('webhook')
