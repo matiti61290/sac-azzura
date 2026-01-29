@@ -11,7 +11,8 @@ import { CartItemDto } from "src/shared/dtos/payment/cartItem.dto";
 import { OrderStatus } from "src/shared/enum/order.enum";
 import { ValidatedItem } from "src/shared/interfaces/validatedItem.interface";
 import { Stripe } from 'stripe'
-import { Repository } from "typeorm";
+import { DataSource, Repository } from "typeorm";
+import { PaymentSuccessMailService } from "./paymentMail/paymentSuccessMail.service";
 
 @Injectable()
 export class PaymentService {
@@ -21,7 +22,14 @@ export class PaymentService {
         private readonly stockRepository : Repository<StockEntity>,
 
         @InjectRepository(OrderEntity)
-        private readonly orderRepository : Repository<OrderEntity>
+        private readonly orderRepository : Repository<OrderEntity>,
+
+        @InjectRepository(UserEntity)
+        private readonly userRepository: Repository<UserEntity>,
+
+        private dataSource: DataSource,
+
+        private readonly paymentSuccessMail: PaymentSuccessMailService
     ) {
         const secretKey = process.env.SECRET_KEY_STRIPE
 
@@ -98,7 +106,7 @@ export class PaymentService {
                 line_items,
                 mode:'payment',
                 success_url: 'http://localhost:3000/payment/payment_success',
-                cancel_url: 'http://localhost:3000/payment/payment_failed',
+                cancel_url: `http://localhost:3000/payment/payment_failed/${orderId}`,
 
                 metadata: {
                     orderId: orderId.toString(),
@@ -113,42 +121,108 @@ export class PaymentService {
         }
     }
 
+        async paymentFailed(orderId: number){
+        const order = await this.orderRepository.findOne({where: {id: orderId}})
+        console.log('la commande avant la modification:', order)
 
-    // async constructEventWebhook (req, res, signature) {
-    //     const endpointSecret = process.env.SECRET_WEBHOOK_KEY
+        if(order && order.status === OrderStatus.PENDING){
+            order.status = OrderStatus.CANCELLED
+            await this.orderRepository.save(order)
+        }
 
-    //     if(!endpointSecret){
-    //         throw new NotFoundException("Le webhook ne fonctionne pas")
-    //     }
-    //     console.log('le webhook a ete call!!!')
-    //     let event: Stripe.Event
-
-    //     try{
-    //         event = this.stripe.webhooks.constructEvent(
-    //             req.rawBody,
-    //             signature,
-    //             endpointSecret
-    //         )
-    //     } catch(error){
-    //         return res.status(401).send(`webhook error: ${error.message}`)
-    //     }
-
-    //     if(event.type === 'checkout.session.completed') {
-    //         const session = event.data.object as Stripe.Checkout.Session
-    //         const metadata = session.metadata
-    //         if(!metadata){
-    //             throw new InternalServerErrorException('Les metadatas n\'existent pas')
-    //         }
-
-    //         const userId = Number(metadata.userId)
-    //         const lineItems = metadata.line_items
-
-    //         console.log("le user id est:", userId)
-    //         console.log("Les items sont: ", lineItems)
-    //     }
-    // }
+        console.log('la commande mise a jour est:', order)
+    }
 
     async constructEventWebhook ( req: any, res: any, signature: string){
+        const endpointSecret = process.env.SECRET_WEBHOOK_KEY
+        if(!endpointSecret){
+            throw new NotFoundException("Le webhook ne fonctionne pas")
+        }
+        console.log('le webhook a ete call!!!')
         
+        let event: Stripe.Event
+        try{
+            event = this.stripe.webhooks.constructEvent(
+                req.rawBody,
+                signature,
+                endpointSecret
+            )
+        } catch(error){
+            return res.status(401).send(`webhook error: ${error.message}`)
+        }
+
+        if(event.type === 'checkout.session.completed'){
+            const session = event.data.object as Stripe.Checkout.Session
+            const metadata = session.metadata
+
+            if(!metadata){
+                throw new InternalServerErrorException('Les metadatas n\'existent pas')
+            }
+
+            const orderId = Number(metadata.orderId)
+            const userId = Number(metadata.userId)
+
+            try{
+                await this.dataSource.transaction(async (transactionalEntityManager) => {
+                const order = await transactionalEntityManager.findOne(OrderEntity, {
+                    where:{id: orderId},
+                    relations: ['items', 'items.stock']
+                })
+
+                if(!order || order.status !== OrderStatus.PENDING){
+                    return
+                }
+
+                order.status = OrderStatus.PAID
+                await transactionalEntityManager.save(order)
+
+                for(const line of order.items) {
+                    const currentStock = line.stock
+
+                    if(currentStock.quantity < line.quantity) {
+                        throw new InternalServerErrorException(`Stock insuffisant pour l'item ${currentStock.sku}`)
+                    }
+
+                    currentStock.quantity -= line.quantity
+                    await transactionalEntityManager.save(currentStock)
+
+                    console.log(`Transaction reussie. Commande ${orderId} payee et stock deduits.`)
+
+                    const user = await this.userRepository.findOne({ where: {id: userId}})
+
+                    if(!user){
+                        throw new InternalServerErrorException(`L'utilisateur avec l'id ${userId} n'existe pas`)
+                    }
+                    const mail = user.mail
+                    await this.sendMailPaymentSuccess(mail, orderId)
+                }
+            })
+            } catch(error){
+                console.error('Echec de la transaction')
+            }
+
+        } else if (event.type ==='checkout.session.expired'){
+            const session = event.data.object as Stripe.Checkout.Session
+            const metadata = session.metadata
+
+            if(!metadata){
+                throw new InternalServerErrorException('Les metadatas n\'existent pas')
+            }
+
+            const orderId = Number(metadata.orderId)
+
+            const order = await this.orderRepository.findOne({where: {id: orderId}})
+
+            if(order && order.status === OrderStatus.PENDING){
+                order.status = OrderStatus.CANCELLED
+                await this.orderRepository.save(order)
+            }
+        }
+
+        return res.status(200).json({received: true})
+    }
+
+    async sendMailPaymentSuccess(mail: string, orderId: number){
+        return this.paymentSuccessMail.sendPaymentSuccessMail(mail, orderId)
     }
 }
