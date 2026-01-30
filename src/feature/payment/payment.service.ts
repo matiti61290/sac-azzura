@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException } from "@nestjs/common";
+import { BadRequestException, ForbiddenException, Injectable, InternalServerErrorException, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import * as dotenv from 'dotenv'
 import { OrderEntity } from "src/entities/order.entity";
@@ -13,6 +13,8 @@ import { ValidatedItem } from "src/shared/interfaces/validatedItem.interface";
 import { Stripe } from 'stripe'
 import { DataSource, Repository } from "typeorm";
 import { PaymentSuccessMailService } from "./paymentMail/paymentSuccessMail.service";
+import { paymentFailMailService } from "./paymentMail/paymentFailMail.service";
+import { threadId } from "worker_threads";
 
 @Injectable()
 export class PaymentService {
@@ -29,7 +31,9 @@ export class PaymentService {
 
         private dataSource: DataSource,
 
-        private readonly paymentSuccessMail: PaymentSuccessMailService
+        private readonly paymentSuccessMail: PaymentSuccessMailService,
+
+        private readonly paymentFailMail: paymentFailMailService
     ) {
         const secretKey = process.env.SECRET_KEY_STRIPE
 
@@ -106,7 +110,7 @@ export class PaymentService {
                 line_items,
                 mode:'payment',
                 success_url: 'http://localhost:3000/payment/payment_success',
-                cancel_url: `http://localhost:3000/payment/payment_failed/${orderId}`,
+                cancel_url: `http://localhost:3000/payment/payment_failed/${orderId}/${userId}`,
 
                 metadata: {
                     orderId: orderId.toString(),
@@ -121,9 +125,13 @@ export class PaymentService {
         }
     }
 
-        async paymentFailed(orderId: number){
-        const order = await this.orderRepository.findOne({where: {id: orderId}})
-        console.log('la commande avant la modification:', order)
+        async paymentFailed(orderId: number, userId: number){
+
+        const order = await this.orderRepository.findOne({where:{ id:orderId, user:{id: userId}}, relations: ['user']})
+
+        if(!order){
+            throw new ForbiddenException('Cette commande ne vous appartient pas')
+        }
 
         if(order && order.status === OrderStatus.PENDING){
             order.status = OrderStatus.CANCELLED
@@ -131,6 +139,12 @@ export class PaymentService {
         }
 
         console.log('la commande mise a jour est:', order)
+
+        const mail = order.user.mail
+
+        await this.sendMailPaymentFail(orderId, mail)
+
+        
     }
 
     async constructEventWebhook ( req: any, res: any, signature: string){
@@ -224,5 +238,9 @@ export class PaymentService {
 
     async sendMailPaymentSuccess(mail: string, orderId: number){
         return this.paymentSuccessMail.sendPaymentSuccessMail(mail, orderId)
+    }
+
+    async sendMailPaymentFail(orderId: number, mail: string){
+        return this.paymentFailMail.sendPaymentFailMail(orderId, mail)
     }
 }

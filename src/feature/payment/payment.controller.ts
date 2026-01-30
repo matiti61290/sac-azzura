@@ -27,11 +27,14 @@ export class PaymentController {
         return "Youhou. Ca marche"
     }
 
-    @Get('payment_failed/:orderId')
+    @Get('payment_failed/:orderId/:userId')
     async paymentFailed(
-        @Param('orderId', ParseIntPipe) orderId: number
+        @Param('orderId', ParseIntPipe) orderId: number,
+        @Param('userId', ParseIntPipe) userId: number
     ) {
-        return this.paymentService.paymentFailed(orderId)
+        await this.paymentService.paymentFailed(orderId, userId)
+
+        return "la commande a echoue"
     }
 
     @Post('webhook')
