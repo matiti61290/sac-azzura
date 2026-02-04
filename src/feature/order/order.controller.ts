@@ -1,4 +1,4 @@
-import { Controller, Get, Param, ParseIntPipe } from "@nestjs/common";
+import { Controller, Get, Param, ParseIntPipe, Post } from "@nestjs/common";
 import { OrderService } from "./order.service";
 
 @Controller('orders')
@@ -16,5 +16,12 @@ constructor(
         @Param('orderId', ParseIntPipe) orderId: number
     ) {
         return this.orderService.getOrderById(orderId)
+    }
+
+    @Post("/:orderId/:status")
+    async updateStatus(
+        @Param('orderId', ParseIntPipe) orderId: number,
+    ){
+        
     }
 }

@@ -21,4 +21,8 @@ export class OrderService {
 
         return order
     }
+
+    async updateStatus(orderId, status) {
+        
+    }
 }
