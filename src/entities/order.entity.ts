@@ -22,7 +22,10 @@ export class OrderEntity {
     totalAmount: number
 
     @Column({nullable: true})
-    trackingNumber
+    trackingNumber: number
+
+    @Column({nullable: true})
+    shippedAt: Date
 
     @Column({ nullable: true})
     stripeSessionId: string

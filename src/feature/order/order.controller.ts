@@ -1,5 +1,6 @@
-import { Controller, Get, Param, ParseIntPipe, Post } from "@nestjs/common";
+import { Body, Controller, Get, Param, ParseIntPipe, Patch } from "@nestjs/common";
 import { OrderService } from "./order.service";
+import { UpdateOrderStatusDto } from "src/shared/dtos/order/updateOrderStatus.dto";
 
 @Controller('orders')
 export class OrderController {
@@ -18,10 +19,11 @@ constructor(
         return this.orderService.getOrderById(orderId)
     }
 
-    @Post("/:orderId/:status")
+    @Patch("/:orderId/:status")
     async updateStatus(
         @Param('orderId', ParseIntPipe) orderId: number,
+        @Body() updateOrderStatusDto: UpdateOrderStatusDto
     ){
-        
+        return this.orderService.updateStatus(orderId, updateOrderStatusDto)
     }
 }
