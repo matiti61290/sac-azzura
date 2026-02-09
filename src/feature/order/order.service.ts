@@ -1,6 +1,7 @@
 import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { OrderEntity } from "src/entities/order.entity";
+import { UserEntity } from "src/entities/user.entity";
 import { UpdateOrderStatusDto } from "src/shared/dtos/order/updateOrderStatus.dto";
 import { OrderStatus } from "src/shared/enum/order.enum";
 import { Repository } from "typeorm";
@@ -10,6 +11,9 @@ export class OrderService {
     constructor(
         @InjectRepository(OrderEntity)
         private readonly orderRepository: Repository<OrderEntity>,
+
+        @InjectRepository(UserEntity)
+        private readonly userRepository: Repository<UserEntity>
     ) {}
 
     //Define authorized transitions
@@ -27,13 +31,32 @@ export class OrderService {
         return orders
     }
 
+    async getOrdersByUser(user){
+        const orders = await this.userRepository.findOne({where: {id: user.id}, relations: ['order']})
+
+        return orders
+    }
+
     async getOrderById(orderId:number) {
         const order = this.orderRepository.findOne({where:{id: orderId}, relations:['user, stock']})
 
         return order
     }
 
-    async updateStatus(orderId, updateOrderStatusDto: UpdateOrderStatusDto) {
+    async getOrderByIdByUser(user: any, orderId: number){
+        const order = await this.orderRepository.findOneBy({
+            id: orderId,
+            user: {id: user.id}
+        })
+
+        if(!order) {
+            throw new NotFoundException("Commande introuvable pour cette utilisateur")
+        }
+
+        return order
+    }
+
+    async updateStatus(orderId:number , updateOrderStatusDto: UpdateOrderStatusDto) {
         const order = await this.orderRepository.findOne({ where: {id: orderId}})
 
         if(!order){

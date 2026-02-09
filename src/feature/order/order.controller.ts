@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, ParseIntPipe, Patch, Post } from "@nestjs/common";
+import { Body, Controller, Get, Param, ParseIntPipe, Patch, Post, Req } from "@nestjs/common";
 import { OrderService } from "./order.service";
 import { UpdateOrderStatusDto } from "src/shared/dtos/order/updateOrderStatus.dto";
 
@@ -12,6 +12,14 @@ constructor(
         return this.orderService.getAllOrder()
     }
 
+    @Get('user/orders')
+    async getOrdersByUser(
+        @Req() req
+    ){
+        const user = req.user
+        return this.orderService.getOrdersByUser(user)
+    }
+
     @Get('/:orderId')
     async getOrderById(
         @Param('orderId', ParseIntPipe) orderId: number
@@ -19,7 +27,16 @@ constructor(
         return this.orderService.getOrderById(orderId)
     }
 
-    @Patch("/:orderId/:status")
+    @Get("/user/orders/:orderId")
+    async GetOrderByIdByUser(
+        @Req() req,
+        @Param('orderId', ParseIntPipe) orderId: number
+    ){
+        const user = req.user
+        return this.orderService.getOrderByIdByUser(user, orderId)
+    }
+
+    @Patch("/:orderId")
     async updateStatus(
         @Param('orderId', ParseIntPipe) orderId: number,
         @Body() updateOrderStatusDto: UpdateOrderStatusDto
