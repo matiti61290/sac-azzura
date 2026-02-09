@@ -55,4 +55,14 @@ export class OrderService {
 
         return this.orderRepository.update(orderId, updateData)
     }
+
+    async deleteOrder(orderId: number){
+        const order = await this.orderRepository.findOne({where: {id: orderId}})
+
+        if(!order){
+            throw new NotFoundException("Aucune commande trouvee")
+        }
+
+        return this.orderRepository.remove(order)
+    }
 }

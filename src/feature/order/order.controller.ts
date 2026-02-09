@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, ParseIntPipe, Patch } from "@nestjs/common";
+import { Body, Controller, Get, Param, ParseIntPipe, Patch, Post } from "@nestjs/common";
 import { OrderService } from "./order.service";
 import { UpdateOrderStatusDto } from "src/shared/dtos/order/updateOrderStatus.dto";
 
@@ -25,5 +25,12 @@ constructor(
         @Body() updateOrderStatusDto: UpdateOrderStatusDto
     ){
         return this.orderService.updateStatus(orderId, updateOrderStatusDto)
+    }
+
+    @Post("delete-order/:orderId")
+    async deleteMaterial(
+        @Param('orderId', ParseIntPipe) orderId: number
+    ) {
+        return this.orderService.deleteOrder(orderId)
     }
 }
