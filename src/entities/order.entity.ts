@@ -21,6 +21,12 @@ export class OrderEntity {
     @Column({ type: 'decimal', precision: 10, scale:2})
     totalAmount: number
 
+    @Column({nullable: true})
+    trackingNumber: number
+
+    @Column({nullable: true})
+    shippedAt: Date
+
     @Column({ nullable: true})
     stripeSessionId: string
 
