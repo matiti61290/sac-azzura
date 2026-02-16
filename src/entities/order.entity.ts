@@ -22,7 +22,7 @@ export class OrderEntity {
     totalAmount: number
 
     @Column({nullable: true})
-    trackingNumber: number
+    trackingNumber: string
 
     @Column({nullable: true})
     shippedAt: Date
