@@ -18,6 +18,7 @@ import { AdminGuard } from './feature/auth/guards/admin.guard';
 import { StockModule } from './feature/stock/stock.module';
 import { PaymentModule } from './feature/payment/payment.module';
 import { OrderModule } from './feature/order/order.module';
+import { AddressModule } from './feature/address/address.module';
 
 @Module({
   imports: [
@@ -34,7 +35,8 @@ import { OrderModule } from './feature/order/order.module';
     MaterialModule,
     StockModule,
     PaymentModule,
-    OrderModule
+    OrderModule,
+    AddressModule
   ],
   controllers: [AppController],
   providers: [AppService, AwsS3Service],

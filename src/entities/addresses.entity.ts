@@ -1,16 +1,14 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, Index } from "typeorm";
 import { UserEntity } from "./user.entity";
+import { AddressType } from "src/shared/enum/address.enum";
 
 @Entity('Address')
 export class AddressEntity {
     @PrimaryGeneratedColumn({ type: 'int' })
     id: number
 
-    @Column({
-        type: 'enum',
-        enum: ['delivery', 'billing']
-    })
-    type: 'delivery' | 'billing'
+    @Column({ type: "enum", enum: AddressType})
+    type: AddressType
     
     @Column({ length: 255, nullable: false})
     street: string
