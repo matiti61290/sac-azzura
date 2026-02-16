@@ -17,6 +17,7 @@ import { AwsS3Service } from './feature/aws-s3/aws-s3.service';
 import { AdminGuard } from './feature/auth/guards/admin.guard';
 import { StockModule } from './feature/stock/stock.module';
 import { PaymentModule } from './feature/payment/payment.module';
+import { OrderModule } from './feature/order/order.module';
 
 @Module({
   imports: [
@@ -32,7 +33,8 @@ import { PaymentModule } from './feature/payment/payment.module';
     ColorModule,
     MaterialModule,
     StockModule,
-    PaymentModule
+    PaymentModule,
+    OrderModule
   ],
   controllers: [AppController],
   providers: [AppService, AwsS3Service],

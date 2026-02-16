@@ -31,14 +31,14 @@ export class OrderService {
         return orders
     }
 
-    async getOrdersByUser(user){
-        const orders = await this.userRepository.findOne({where: {id: user.id}, relations: ['order']})
+    async getOrdersByUser(user:any){
+        const orders = await this.orderRepository.find({ where: {user:{id: user.id}}})
 
         return orders
     }
 
     async getOrderById(orderId:number) {
-        const order = this.orderRepository.findOne({where:{id: orderId}, relations:['user, stock']})
+        const order = this.orderRepository.findOne({where:{id: orderId}, relations:['user', 'items', 'items.stock', 'items.stock.product', 'items.stock.product']})
 
         return order
     }
@@ -63,20 +63,22 @@ export class OrderService {
             throw new NotFoundException("Aucune commande n'a ete trouve")
         }
 
-        const possibleNextStatuses = this.allowedTransitions[updateOrderStatusDto.status]
+        const possibleNextStatuses = this.allowedTransitions[order.status]
 
-        if(!possibleNextStatuses.includes(updateOrderStatusDto.status)) {
+        if(!possibleNextStatuses || !possibleNextStatuses.includes(updateOrderStatusDto.status)) {
             throw new BadRequestException(`transition impossible du statut ${order.status} vers le statut $${updateOrderStatusDto.status}`)
         }
 
         const updateData: any = {status: updateOrderStatusDto.status}
 
         if(updateOrderStatusDto.status === OrderStatus.SHIPPED){
-            updateData.trackingNumber = updateData.trackingNumber
+            updateData.trackingNumber = updateOrderStatusDto.trackingNumber
             updateData.shippedAt = new Date()
         }
 
-        return this.orderRepository.update(orderId, updateData)
+        await this.orderRepository.update(orderId, updateData)
+
+        return {...order, ...updateData}
     }
 
     async deleteOrder(orderId: number){
