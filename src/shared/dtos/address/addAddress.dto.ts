@@ -1,7 +1,7 @@
 import { IsEnum, IsNotEmpty, IsOptional, IsString } from "class-validator";
 import { AddressType } from "src/shared/enum/address.enum";
 
-export class AddressDto {
+export class AddAddressDto {
     @IsEnum(AddressType)
     type: AddressType
 
