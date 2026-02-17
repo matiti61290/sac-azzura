@@ -83,4 +83,14 @@ export class AddressController {
         const user = req.user
         return this.addressService.updateAddress(addressId, updateAddressDto, user)
     }
+
+    @Post('/user/delete-address/:addressId')
+    @UseGuards(JwtAuthGuard)
+    async deleteAddress(
+        @Param('addressId', ParseIntPipe) addressId,
+        @Req() req
+    ) {
+        const user = req.user
+        return this.addressService.deleteAddress(addressId, user)
+    }
 }

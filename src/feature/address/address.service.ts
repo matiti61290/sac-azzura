@@ -92,5 +92,16 @@ export class AddressService {
         return { address, updatedAddress}
     }
 
+    async deleteAddress(addressId: number, user: any){
+        const address = await  this.addressRepository.findOneBy({
+            id: addressId,
+            user: {id: user.id}
+        })
 
+        if(!address) {
+            throw new InternalServerErrorException('Cette adresse ne correspond pas a une adresse de l\'utilisateur')
+        }
+
+        return this.addressRepository.remove(address)
+    }
 }

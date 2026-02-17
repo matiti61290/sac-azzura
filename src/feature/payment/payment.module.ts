@@ -8,9 +8,10 @@ import { OrderEntity } from "src/entities/order.entity";
 import { UserEntity } from "src/entities/user.entity";
 import { PaymentSuccessMailService } from "./paymentMail/paymentSuccessMail.service";
 import { paymentFailMailService } from "./paymentMail/paymentFailMail.service";
+import { AddressEntity } from "src/entities/addresses.entity";
 
 @Module({
-    imports:[TypeOrmModule.forFeature([StockEntity, ProductEntity, OrderEntity, UserEntity])],
+    imports:[TypeOrmModule.forFeature([StockEntity, ProductEntity, OrderEntity, UserEntity, AddressEntity])],
     controllers: [PaymentController],
     providers: [PaymentService, PaymentSuccessMailService, paymentFailMailService]
 })

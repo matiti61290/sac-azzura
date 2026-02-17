@@ -80,15 +80,15 @@ export class ProductService {
 
         const savedProduct = await this.productRepository.save(product)
 
-        const images: ImageEntity[] = []
-        for (const file of files) {
-            const key = `products/${Date.now()}_${file.originalname}`
-            await this.awsS3Service.uploadFile(file, key)
-            const image = this.imageRepository.create({ key, product: savedProduct })
-            images.push(image)
-        }
+        // const images: ImageEntity[] = []
+        // for (const file of files) {
+        //     const key = `products/${Date.now()}_${file.originalname}`
+        //     await this.awsS3Service.uploadFile(file, key)
+        //     const image = this.imageRepository.create({ key, product: savedProduct })
+        //     images.push(image)
+        // }
 
-        await this.imageRepository.save(images)
+        // await this.imageRepository.save(images)
 
         await this.stockService.addStock(
             addProductDto.quantity,

@@ -15,6 +15,7 @@ import { DataSource, Repository } from "typeorm";
 import { PaymentSuccessMailService } from "./paymentMail/paymentSuccessMail.service";
 import { paymentFailMailService } from "./paymentMail/paymentFailMail.service";
 import { threadId } from "worker_threads";
+import { AddressEntity } from "src/entities/addresses.entity";
 
 @Injectable()
 export class PaymentService {
@@ -28,6 +29,9 @@ export class PaymentService {
 
         @InjectRepository(UserEntity)
         private readonly userRepository: Repository<UserEntity>,
+
+        @InjectRepository(AddressEntity)
+        private readonly addressRepository: Repository<AddressEntity>,
 
         private dataSource: DataSource,
 
@@ -45,12 +49,29 @@ export class PaymentService {
     }
 
     async verificationOrder(cartDto: CartDto, user: UserEntity){
+        const deliveryAddress = await this.addressRepository.findOneBy({
+            id: cartDto.delivery_address_id,
+            user: {id: user.id}
+        })
+
+        const billingAddress = await this.addressRepository.findOneBy({
+            id: cartDto.billing_address_id,
+            user: {id: user.id}
+        })
+
+        if(!deliveryAddress || !billingAddress){
+            throw new InternalServerErrorException("les adresses n'appartiennent pas a cet utilisateur")
+        }
+
         let totalAmount = 0
 
         const order = new OrderEntity()
         order.user = user
         order.status = OrderStatus.PENDING
         order.items = []
+        order.delivery_address = deliveryAddress
+        order.billing_address = billingAddress
+
 
         for (const item of cartDto.items){
             const variant = await this.stockRepository.findOne({where: {sku: item.sku}, relations: ['product']})

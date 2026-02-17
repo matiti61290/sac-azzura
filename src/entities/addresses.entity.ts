@@ -1,6 +1,7 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, Index } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, Index, OneToMany } from "typeorm";
 import { UserEntity } from "./user.entity";
 import { AddressType } from "src/shared/enum/address.enum";
+import { OrderEntity } from "./order.entity";
 
 @Entity('Address')
 export class AddressEntity {
@@ -29,4 +30,7 @@ export class AddressEntity {
     )
     @Index()
     user: UserEntity;
+
+    @OneToMany(()=> OrderEntity, (order)=> order.delivery_address)
+    orders: []
 }
