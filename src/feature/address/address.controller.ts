@@ -1,8 +1,9 @@
-import { Body, Controller, Get, Param, ParseIntPipe, Post, Req, UseGuards } from "@nestjs/common";
+import { Body, Controller, Get, Param, ParseIntPipe, Patch, Post, Req, UseGuards } from "@nestjs/common";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 import { AdminGuard } from "../auth/guards/admin.guard";
 import { AddressService } from "./address.service";
-import { AddressDto } from "src/shared/dtos/address/addAddress.dto";
+import { AddAddressDto } from "src/shared/dtos/address/addAddress.dto";
+import { UpdateAddressDto } from "src/shared/dtos/address/updateAddress.dto";
 
 @Controller('addresses')
 export class AddressController {
@@ -62,13 +63,24 @@ export class AddressController {
         return this.addressService.getBillingAddressByIdByUser(billingAddressId, user)
     }
 
-    @Post('/add-delivery-address')
+    @Post('/user/add-address')
     @UseGuards(JwtAuthGuard)
-    async addDeliveryAddress (
-        @Body() addressDto: AddressDto,
+    async addAddress (
+        @Body() addAddressDto: AddAddressDto,
         @Req() req
     ){
         const user = req.user
-        return this.addressService.addDeliveryAddress(addressDto, user)
+        return this.addressService.addAddress(addAddressDto, user)
+    }
+
+    @Patch('/user/update-address/:addressId')
+    @UseGuards(JwtAuthGuard)
+    async updateAddress(
+        @Param('addressId', ParseIntPipe) addressId,
+        @Body() updateAddressDto: UpdateAddressDto,
+        @Req() req
+    ) {
+        const user = req.user
+        return this.addressService.updateAddress(addressId, updateAddressDto, user)
     }
 }

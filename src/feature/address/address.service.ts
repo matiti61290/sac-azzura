@@ -1,7 +1,8 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, InternalServerErrorException, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { AddressEntity } from "src/entities/addresses.entity";
-import { AddressDto } from "src/shared/dtos/address/addAddress.dto";
+import { AddAddressDto } from "src/shared/dtos/address/addAddress.dto";
+import { UpdateAddressDto } from "src/shared/dtos/address/updateAddress.dto";
 import { AddressType } from "src/shared/enum/address.enum";
 import { Repository } from "typeorm";
 
@@ -62,12 +63,34 @@ export class AddressService {
         return billingAddress
     }
 
-    async addDeliveryAddress(addressDto: AddressDto, user: any){
+    async addAddress(addAddressDto: AddAddressDto, user: any){
         const newAddress = this.addressRepository.create({
-            ...addressDto,
+            ...addAddressDto,
             user: user
         })
 
         await this.addressRepository.save(newAddress)
     }
+
+    async updateAddress(addressId: number, updateAddressDto: UpdateAddressDto, user: any) {
+
+        const address = await this.addressRepository.findOneBy({
+            id: addressId,
+            user: {id: user.id}
+        })
+
+        if(!address){
+            throw new InternalServerErrorException('Cette adresse ne correspond pas a une adresse de l\'utilisateur')
+        }
+
+        const updatedAddress: any = updateAddressDto
+
+        console.log
+
+        await this.addressRepository.update(addressId, updatedAddress)
+
+        return { address, updatedAddress}
+    }
+
+
 }
