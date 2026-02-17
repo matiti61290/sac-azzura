@@ -3,6 +3,7 @@ import { UserEntity } from "./user.entity";
 import { PromotionEntity } from "./promotion.entity";
 import { OrderStatus } from "src/shared/enum/order.enum";
 import { OrderItemEntity } from "./orderItem.entity";
+import { AddressEntity } from "./addresses.entity";
 
 @Entity('Order')
 export class OrderEntity {
@@ -11,6 +12,12 @@ export class OrderEntity {
 
     @ManyToOne(()=> UserEntity, (user)=> user.orders, { cascade: true})
     user: UserEntity
+
+    @ManyToOne(()=> AddressEntity)
+    delivery_address: AddressEntity
+
+    @ManyToOne(()=> AddressEntity)
+    billing_address: AddressEntity
 
     @OneToMany(()=> OrderItemEntity, (item)=> item.order, {cascade: true})
     items: OrderItemEntity[]
