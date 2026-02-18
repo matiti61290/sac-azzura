@@ -22,4 +22,6 @@ export class PromotionController {
     ) {
         return this.promotionService.getPromotionById(promotionId)
     }
+
+    
 }
