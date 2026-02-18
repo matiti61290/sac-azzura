@@ -1,10 +1,10 @@
 import { MigrationInterface, QueryRunner } from "typeorm";
 
-export class Database1771339914232 implements MigrationInterface {
-    name = 'Database1771339914232'
+export class Database1771424249914 implements MigrationInterface {
+    name = 'Database1771424249914'
 
     public async up(queryRunner: QueryRunner): Promise<void> {
-        await queryRunner.query(`CREATE TABLE \`Promotion\` (\`id\` int NOT NULL AUTO_INCREMENT, \`code\` varchar(255) NOT NULL, \`promotion_type\` varchar(255) NOT NULL, \`valeur\` int NOT NULL, \`startdate\` datetime NOT NULL, \`enddate\` datetime NOT NULL, \`condition\` text NULL, \`isActive\` tinyint NOT NULL, UNIQUE INDEX \`IDX_797949ef9e79c48e5bc4563ffe\` (\`code\`), PRIMARY KEY (\`id\`)) ENGINE=InnoDB`);
+        await queryRunner.query(`CREATE TABLE \`Promotion\` (\`id\` int NOT NULL AUTO_INCREMENT, \`name\` varchar(255) NOT NULL, \`promotionType\` enum ('percentage', 'fixed_amount') NOT NULL DEFAULT 'percentage', \`percentageValue\` int NULL, \`fixedValue\` int NULL, \`startdate\` datetime NOT NULL, \`enddate\` datetime NOT NULL, \`minAmount\` int NULL, \`categories\` json NULL, \`isActive\` tinyint NOT NULL, UNIQUE INDEX \`IDX_9786eb4269fd8acfdd69620a65\` (\`name\`), PRIMARY KEY (\`id\`)) ENGINE=InnoDB`);
         await queryRunner.query(`CREATE TABLE \`Color\` (\`id\` int NOT NULL AUTO_INCREMENT, \`name\` varchar(255) NOT NULL, \`sku_code\` varchar(5) NOT NULL, UNIQUE INDEX \`IDX_a29e349d26b88314ec5324a428\` (\`name\`), UNIQUE INDEX \`IDX_faaec86b4a9de0457f620fc8d2\` (\`sku_code\`), PRIMARY KEY (\`id\`)) ENGINE=InnoDB`);
         await queryRunner.query(`CREATE TABLE \`Material\` (\`id\` int NOT NULL AUTO_INCREMENT, \`name\` varchar(255) NOT NULL, \`sku_code\` varchar(5) NOT NULL, UNIQUE INDEX \`IDX_944a945c72ce0228b54ca7a370\` (\`name\`), UNIQUE INDEX \`IDX_8be0d0a974b6e6641ece924a4e\` (\`sku_code\`), PRIMARY KEY (\`id\`)) ENGINE=InnoDB`);
         await queryRunner.query(`CREATE TABLE \`Category\` (\`id\` int NOT NULL AUTO_INCREMENT, \`name\` varchar(255) NOT NULL, \`sku_code\` varchar(5) NOT NULL, UNIQUE INDEX \`IDX_0ac420e8701e781dbf1231dc23\` (\`name\`), UNIQUE INDEX \`IDX_e9bc13a4c6a2cb71d7f07d0e3c\` (\`sku_code\`), PRIMARY KEY (\`id\`)) ENGINE=InnoDB`);
@@ -69,7 +69,7 @@ export class Database1771339914232 implements MigrationInterface {
         await queryRunner.query(`DROP INDEX \`IDX_faaec86b4a9de0457f620fc8d2\` ON \`Color\``);
         await queryRunner.query(`DROP INDEX \`IDX_a29e349d26b88314ec5324a428\` ON \`Color\``);
         await queryRunner.query(`DROP TABLE \`Color\``);
-        await queryRunner.query(`DROP INDEX \`IDX_797949ef9e79c48e5bc4563ffe\` ON \`Promotion\``);
+        await queryRunner.query(`DROP INDEX \`IDX_9786eb4269fd8acfdd69620a65\` ON \`Promotion\``);
         await queryRunner.query(`DROP TABLE \`Promotion\``);
     }
 

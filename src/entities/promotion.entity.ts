@@ -8,7 +8,7 @@ export class PromotionEntity {
     id: number;
 
     @Column({ length: 255, nullable: false, unique: true })
-    code: string;
+    name: string;
 
     @Column({ type: 'enum', enum: PromotionType, default: PromotionType.PERCENTAGE})
     promotionType: PromotionType
