@@ -1,8 +1,9 @@
-import { Body, Controller, Get, Param, ParseIntPipe, Post, UseGuards } from "@nestjs/common";
+import { Body, Controller, Get, Param, ParseIntPipe, Patch, Post, UseGuards } from "@nestjs/common";
 import { PromotionService } from "./promotion.service";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 import { AdminGuard } from "../auth/guards/admin.guard";
 import { AddPromotionDto } from "src/shared/dtos/promotion/addPromotion.dto";
+import { UpdatePromotionDto } from "src/shared/dtos/promotion/updatePromotion.dto";
 
 @Controller('promotions')
 export class PromotionController {
@@ -30,5 +31,22 @@ export class PromotionController {
         @Body() addPromotionDto: AddPromotionDto
     ) {
         return this.promotionService.addPromotion(addPromotionDto)
+    }
+
+    @Patch('/update-promotion/:promotionId')
+    @UseGuards(JwtAuthGuard, AdminGuard)
+    async updatePromotion(
+        @Param('promotionId', ParseIntPipe) promotionId: number,
+        @Body() updatePromotionDto: UpdatePromotionDto
+    ) {
+        return this.promotionService.updatePromotion(promotionId, updatePromotionDto)
+    }
+
+    @Post('Delete-promotion/:promotionId')
+    @UseGuards(JwtAuthGuard, AdminGuard)
+    async deletePromotion(
+        @Param('promotionId',ParseIntPipe) promotionId: number
+    ){
+        this.promotionService.deletePromotion(promotionId)
     }
 }

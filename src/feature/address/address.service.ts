@@ -85,8 +85,6 @@ export class AddressService {
 
         const updatedAddress: any = updateAddressDto
 
-        console.log
-
         await this.addressRepository.update(addressId, updatedAddress)
 
         return { address, updatedAddress}
