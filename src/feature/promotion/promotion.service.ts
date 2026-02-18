@@ -1,7 +1,8 @@
-import { Injectable, InternalServerErrorException } from "@nestjs/common";
+import { Injectable, InternalServerErrorException, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { PromotionEntity } from "src/entities/promotion.entity";
 import { AddPromotionDto } from "src/shared/dtos/promotion/addPromotion.dto";
+import { UpdatePromotionDto } from "src/shared/dtos/promotion/updatePromotion.dto";
 import { Repository } from "typeorm";
 
 @Injectable()
@@ -39,5 +40,37 @@ export class PromotionService{
         await this.promotionRepository.save(newPromotion)
 
         return ('It worked')
+    }
+
+    async updatePromotion (promotionId: number, updatePromotionDto: UpdatePromotionDto) {
+        const promotion = await this.promotionRepository.findOne({ where: {id: promotionId}})
+
+        if(!promotion){
+            throw new NotFoundException("La promotion n'existe pas")
+        }
+
+        let updatedPromotion: any = updatePromotionDto
+
+        if(updatePromotionDto.promotionType === "fixed_amount"){
+            updatedPromotion.percentageValue = null
+        }
+
+        if(updatePromotionDto.promotionType === "percentage"){
+            updatedPromotion.fixedValue = null
+        }
+
+        await this.promotionRepository.update(promotionId, updatedPromotion)
+
+        return { promotion, updatedPromotion}
+    }
+
+    async deletePromotion(promotionId: number) {
+        const promotion = await this.promotionRepository.findOne({ where: {id: promotionId}})
+
+        if(!promotion){
+            throw new NotFoundException("Pas de promotion trouvee")
+        }
+
+        await this.promotionRepository.remove(promotion)
     }
 }
