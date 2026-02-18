@@ -19,6 +19,7 @@ import { StockModule } from './feature/stock/stock.module';
 import { PaymentModule } from './feature/payment/payment.module';
 import { OrderModule } from './feature/order/order.module';
 import { AddressModule } from './feature/address/address.module';
+import { PromotionModule } from './feature/promotion/promotion.module';
 
 @Module({
   imports: [
@@ -36,7 +37,8 @@ import { AddressModule } from './feature/address/address.module';
     StockModule,
     PaymentModule,
     OrderModule,
-    AddressModule
+    AddressModule,
+    PromotionModule
   ],
   controllers: [AppController],
   providers: [AppService, AwsS3Service],
