@@ -1,3 +1,4 @@
+import { Type } from "class-transformer";
 import { IsDate, IsEnum, IsInt, IsJSON, IsNotEmpty, IsOptional, IsString } from "class-validator";
 import { PromotionType } from "src/shared/enum/promotionType.enum";
 
@@ -19,10 +20,12 @@ export class AddPromotionDto {
     fixedValue: number
 
     @IsNotEmpty()
+    @Type(() => Date)
     @IsDate()
     startdate: Date
 
     @IsNotEmpty()
+    @Type(()=> Date)
     @IsDate()
     enddate: Date
 
