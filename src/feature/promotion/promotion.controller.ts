@@ -4,6 +4,7 @@ import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 import { AdminGuard } from "../auth/guards/admin.guard";
 import { AddPromotionDto } from "src/shared/dtos/promotion/addPromotion.dto";
 import { UpdatePromotionDto } from "src/shared/dtos/promotion/updatePromotion.dto";
+import { CheckPromotionCodeDto } from "src/shared/dtos/promotion/checkPromotionCode.dto";
 
 @Controller('promotions')
 export class PromotionController {
@@ -17,12 +18,20 @@ export class PromotionController {
         return this.promotionService.getAllPromotion()
     }
 
-    @Get('/promotionId')
+    @Get('/:promotionId')
     @UseGuards(JwtAuthGuard, AdminGuard)
     async getPromotionById(
         @Param('promotionId', ParseIntPipe) promotionId: number
     ) {
         return this.promotionService.getPromotionById(promotionId)
+    }
+    
+    @Post('/check-promotion')
+    @UseGuards(JwtAuthGuard)
+    async checkPromotionCode(
+        @Body() checkPromotionCodeDto: CheckPromotionCodeDto
+    ){
+        return this.promotionService.checkPromotionCode(checkPromotionCodeDto)
     }
 
     @Post('/create-promotion')
