@@ -16,6 +16,7 @@ import { PaymentSuccessMailService } from "./paymentMail/paymentSuccessMail.serv
 import { paymentFailMailService } from "./paymentMail/paymentFailMail.service";
 import { threadId } from "worker_threads";
 import { AddressEntity } from "src/entities/addresses.entity";
+import { PromotionEntity } from "src/entities/promotion.entity";
 
 @Injectable()
 export class PaymentService {
@@ -32,6 +33,9 @@ export class PaymentService {
 
         @InjectRepository(AddressEntity)
         private readonly addressRepository: Repository<AddressEntity>,
+
+        @InjectRepository(PromotionEntity)
+        private readonly promotionRepository: Repository<PromotionEntity>,
 
         private dataSource: DataSource,
 
@@ -61,6 +65,12 @@ export class PaymentService {
 
         if(!deliveryAddress || !billingAddress){
             throw new InternalServerErrorException("les adresses n'appartiennent pas a cet utilisateur")
+        }
+
+        const promotionCode = await this.promotionRepository.findOne({ where: {name: cartDto.promotion_code}})
+
+        if(!promotionCode){
+            throw new InternalServerErrorException("Le code de promotion ne fonctionne pas")
         }
 
         let totalAmount = 0
@@ -97,6 +107,24 @@ export class PaymentService {
 
             totalAmount += variant.product.price * item.quantity
         }
+
+        console.log('total avant promo', totalAmount)
+
+        if(promotionCode.minAmount >= totalAmount){
+            throw new InternalServerErrorException("Vous n'avez pas atteint la valeur minimum pour utiliser ce code promotionnel")
+        } else {
+            if(promotionCode.promotionType === "percentage"){
+                const promotionValue = promotionCode.percentageValue
+
+                totalAmount = totalAmount - (totalAmount * promotionValue ) / 100
+            } else if (promotionCode.promotionType === 'fixed_amount'){
+                const promotionValue = promotionCode.fixedValue
+
+                totalAmount = totalAmount - promotionValue
+            }
+        }
+
+        console.log('total apres promo',totalAmount)
 
         order.totalAmount = totalAmount
 

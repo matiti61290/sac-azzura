@@ -2,6 +2,7 @@ import { Injectable, InternalServerErrorException, NotFoundException } from "@ne
 import { InjectRepository } from "@nestjs/typeorm";
 import { PromotionEntity } from "src/entities/promotion.entity";
 import { AddPromotionDto } from "src/shared/dtos/promotion/addPromotion.dto";
+import { CheckPromotionCodeDto } from "src/shared/dtos/promotion/checkPromotionCode.dto";
 import { UpdatePromotionDto } from "src/shared/dtos/promotion/updatePromotion.dto";
 import { Repository } from "typeorm";
 
@@ -22,6 +23,18 @@ export class PromotionService{
         const promotion = await this.promotionRepository.findOne({where: {id: promotionId}})
 
         return promotion
+    }
+
+    async checkPromotionCode(checkPromotionCodeDto: CheckPromotionCodeDto){
+        const promotionCode = await this.promotionRepository.findOne({ where:{name: checkPromotionCodeDto.promotion_code}})
+
+        if(!promotionCode){
+            return "Ce code n'existe pas"
+        } else if(promotionCode.minAmount > checkPromotionCodeDto.totalAmount) {
+            return "La valeur minimale n'est pas atteinte"
+        } else {
+            return "C'est good"
+        }
     }
 
     async addPromotion(addPromotionDto: AddPromotionDto){

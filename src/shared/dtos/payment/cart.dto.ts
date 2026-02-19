@@ -1,5 +1,5 @@
 import { Type } from "class-transformer";
-import { IsArray, IsInt, IsNotEmpty, IsString, ValidateNested } from "class-validator";
+import { IsArray, IsInt, IsNotEmpty, IsOptional, IsString, ValidateNested } from "class-validator";
 import { CartItemDto } from "./cartItem.dto";
 
 export class CartDto {
@@ -16,4 +16,8 @@ export class CartDto {
     @IsNotEmpty()
     @IsInt()
     billing_address_id: number
+
+    @IsOptional()
+    @IsString()
+    promotion_code: string
 }

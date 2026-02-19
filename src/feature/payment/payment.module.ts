@@ -9,9 +9,10 @@ import { UserEntity } from "src/entities/user.entity";
 import { PaymentSuccessMailService } from "./paymentMail/paymentSuccessMail.service";
 import { paymentFailMailService } from "./paymentMail/paymentFailMail.service";
 import { AddressEntity } from "src/entities/addresses.entity";
+import { PromotionEntity } from "src/entities/promotion.entity";
 
 @Module({
-    imports:[TypeOrmModule.forFeature([StockEntity, ProductEntity, OrderEntity, UserEntity, AddressEntity])],
+    imports:[TypeOrmModule.forFeature([StockEntity, ProductEntity, OrderEntity, UserEntity, AddressEntity, PromotionEntity])],
     controllers: [PaymentController],
     providers: [PaymentService, PaymentSuccessMailService, paymentFailMailService]
 })
