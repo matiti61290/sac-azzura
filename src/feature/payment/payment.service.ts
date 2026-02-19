@@ -108,6 +108,8 @@ export class PaymentService {
             totalAmount += variant.product.price * item.quantity
         }
 
+        console.log('total avant promo', totalAmount)
+
         if(promotionCode.minAmount >= totalAmount){
             throw new InternalServerErrorException("Vous n'avez pas atteint la valeur minimum pour utiliser ce code promotionnel")
         } else {
@@ -121,6 +123,8 @@ export class PaymentService {
                 totalAmount = totalAmount - promotionValue
             }
         }
+
+        console.log('total apres promo',totalAmount)
 
         order.totalAmount = totalAmount
 

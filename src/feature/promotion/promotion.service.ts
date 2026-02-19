@@ -30,8 +30,10 @@ export class PromotionService{
 
         if(!promotionCode){
             return "Ce code n'existe pas"
+        } else if(promotionCode.minAmount > checkPromotionCodeDto.totalAmount) {
+            return "La valeur minimale n'est pas atteinte"
         } else {
-            return "Le code existe"
+            return "C'est good"
         }
     }
 
