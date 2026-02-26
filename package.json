@@ -35,11 +35,11 @@
     "@nestjs/passport": "^11.0.5",
     "@nestjs/platform-express": "^11.0.1",
     "@nestjs/typeorm": "^11.0.0",
-    "aws-sdk": "^2.1692.0",
     "bcrypt": "^6.0.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.2",
     "cookie-parser": "^1.4.7",
+    "csrf-csrf": "^4.0.3",
     "dotenv": "^17.2.3",
     "mapped-types": "^0.0.1",
     "multer": "^2.0.2",
@@ -56,8 +56,8 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3.2.0",
     "@eslint/js": "^9.18.0",
-    "@nestjs/cli": "^11.0.0",
-    "@nestjs/schematics": "^11.0.0",
+    "@nestjs/cli": "^11.0.16",
+    "@nestjs/schematics": "^11.0.9",
     "@nestjs/testing": "^11.0.1",
     "@types/express": "^5.0.0",
     "@types/jest": "^30.0.0",
@@ -81,6 +81,9 @@
     "typedoc": "^0.28.14",
     "typescript": "^5.7.3",
     "typescript-eslint": "^8.20.0"
+  },
+  "overrides": {
+    "ajv": "^8.17.2"
   },
   "jest": {
     "moduleFileExtensions": [
