@@ -1,20 +1,15 @@
 import { BadRequestException, ForbiddenException, Injectable, InternalServerErrorException, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import * as dotenv from 'dotenv'
 import { OrderEntity } from "src/entities/order.entity";
 import { OrderItemEntity } from "src/entities/orderItem.entity";
-import { ProductEntity } from "src/entities/product.entity";
 import { StockEntity } from "src/entities/stock.entity";
 import { UserEntity } from "src/entities/user.entity";
 import { CartDto } from "src/shared/dtos/payment/cart.dto";
-import { CartItemDto } from "src/shared/dtos/payment/cartItem.dto";
 import { OrderStatus } from "src/shared/enum/order.enum";
-import { ValidatedItem } from "src/shared/interfaces/validatedItem.interface";
 import { Stripe } from 'stripe'
 import { DataSource, Repository } from "typeorm";
 import { PaymentSuccessMailService } from "./paymentMail/paymentSuccessMail.service";
 import { paymentFailMailService } from "./paymentMail/paymentFailMail.service";
-import { threadId } from "worker_threads";
 import { AddressEntity } from "src/entities/addresses.entity";
 import { PromotionEntity } from "src/entities/promotion.entity";
 
