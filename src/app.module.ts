@@ -20,6 +20,7 @@ import { PaymentModule } from './feature/payment/payment.module';
 import { OrderModule } from './feature/order/order.module';
 import { AddressModule } from './feature/address/address.module';
 import { PromotionModule } from './feature/promotion/promotion.module';
+import { CsrfModule } from './feature/csrf/csrf.module';
 
 @Module({
   imports: [
@@ -38,7 +39,8 @@ import { PromotionModule } from './feature/promotion/promotion.module';
     PaymentModule,
     OrderModule,
     AddressModule,
-    PromotionModule
+    PromotionModule,
+    CsrfModule
   ],
   controllers: [AppController],
   providers: [AppService, AwsS3Service],
