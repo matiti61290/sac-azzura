@@ -1,20 +1,16 @@
-import { Controller, Get, Query, BadRequestException, Post } from '@nestjs/common';
+import { Controller, Get, Query, BadRequestException, Post, Body } from '@nestjs/common';
 import { MondialRelayService } from './service/mondial-relai.service';
+import { FindRelayPointDto } from 'src/shared/dtos/mondial_relai/findRelayPoint.dto';
 
 @Controller('shipping')
 export class ShippingController {
   constructor(private readonly mondialRelayService: MondialRelayService) {}
 
-  @Get('points-relais')
+  @Get('mondial-relai/points-relais')
   async getPointsRelais(
-    @Query('cp') cp: string,
-    @Query('pays') pays: string = 'FR'
+    @Body() findRelayPointDto: FindRelayPointDto
   ) {
-    if (!cp) {
-      throw new BadRequestException('Le code postal (cp) est obligatoire.');
-    }
-
-    const result = await this.mondialRelayService.rechercherPointsRelais(cp, pays);
+    const result = await this.mondialRelayService.rechercherPointsRelais(findRelayPointDto);
     return result
   }
 }

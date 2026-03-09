@@ -1,6 +1,7 @@
 import { Injectable, OnModuleInit, Logger } from '@nestjs/common';
 import * as soap from 'soap';
 import { createHash } from 'crypto';
+import { FindRelayPointDto } from 'src/shared/dtos/mondial_relai/findRelayPoint.dto';
 
 @Injectable()
 export class MondialRelayService implements OnModuleInit {
@@ -24,15 +25,15 @@ export class MondialRelayService implements OnModuleInit {
     }
   }
 
-  async rechercherPointsRelais(cp: string, pays: string = 'FR') {
+  async rechercherPointsRelais(findRelayPointDto: FindRelayPointDto) {
     if (!this.client) return { success: false, message: 'Client non prêt' };
 
     const soapArgs = {
       Enseigne: this.enseigne,
-      Pays: pays.toUpperCase(),
+      Pays: 'FR',
       NumPointRelais: '',
       Ville: '',
-      CP: cp,
+      CP: findRelayPointDto.zipcode,
       Latitude: '',
       Longitude: '',
       Taille: '',
