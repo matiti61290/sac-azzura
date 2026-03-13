@@ -43,6 +43,7 @@
     "cookie-parser": "^1.4.7",
     "csrf-csrf": "^4.0.3",
     "dotenv": "^17.2.3",
+    "fast-xml-parser": "^5.5.0",
     "mapped-types": "^0.0.1",
     "mysql2": "^3.15.3",
     "nodemailer": "^7.0.10",
@@ -87,7 +88,6 @@
   },
   "overrides": {
     "ajv": "^8.17.2",
-    "fast-xml-parser": "^5.0.0",
     "serialize-javascript": "^6.0.2",
     "multer": "^2.0.2-rc.1",
     "@nestjs/cli": {

@@ -13,4 +13,13 @@ export class ShippingController {
     const result = await this.mondialRelayService.rechercherPointsRelais(findRelayPointDto);
     return result
   }
+
+  @Post('create-label')
+  async generateLabel() {
+    // Appel du service qui exécute le fetch vers API2
+    const resultXml = await this.mondialRelayService.createLabel();
+    
+    // Vous pouvez retourner directement le XML, ou idéalement le JSON converti
+    return resultXml; 
+  }
 }
