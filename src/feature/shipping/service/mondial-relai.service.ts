@@ -3,6 +3,7 @@ import * as soap from 'soap';
 import { createHash } from 'crypto';
 import { FindRelayPointDto } from 'src/shared/dtos/mondial_relai/findRelayPoint.dto';
 import { XMLParser } from 'fast-xml-parser';
+import { CreateLabelDto } from 'src/shared/dtos/mondial_relai/createLabelDto.dto';
 
 @Injectable()
 export class MondialRelayService implements OnModuleInit {
@@ -100,7 +101,7 @@ export class MondialRelayService implements OnModuleInit {
     }
   }
 
-  async createLabel(relayId: string): Promise<any> {
+  async createLabel(createLabelDto: CreateLabelDto): Promise<any> {
 
     if(!this.apiV2Url){
       throw new InternalServerErrorException('Probleme d\'url de \'api')
@@ -125,7 +126,7 @@ export class MondialRelayService implements OnModuleInit {
             <OrderNo>CMD-12345</OrderNo>
             <CustomerNo>${this.apiV2Brand}</CustomerNo>
             <ParcelCount>1</ParcelCount>
-            <DeliveryMode Mode="24R" Location="FR-${relayId}" />
+            <DeliveryMode Mode="24R" Location="FR-${createLabelDto.relayId}" />
             <CollectionMode Mode="CCC" Location="" />
             
             <Parcels>

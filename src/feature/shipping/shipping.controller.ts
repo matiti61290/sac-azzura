@@ -1,6 +1,7 @@
 import { Controller, Get, Param, Post, Body, ParseIntPipe } from '@nestjs/common';
 import { MondialRelayService } from './service/mondial-relai.service';
 import { FindRelayPointDto } from 'src/shared/dtos/mondial_relai/findRelayPoint.dto';
+import { CreateLabelDto } from 'src/shared/dtos/mondial_relai/createLabelDto.dto';
 
 @Controller('shipping')
 export class ShippingController {
@@ -14,11 +15,11 @@ export class ShippingController {
     return result
   }
 
-  @Post('create-label/:relayId')
+  @Post('create-label')
   async generateLabel(
-    @Param('relayId') relayId: string
+    @Body() createLabelDto: CreateLabelDto
   ) {
-    const resultXml = await this.mondialRelayService.createLabel(relayId);
+    const resultXml = await this.mondialRelayService.createLabel(createLabelDto);
     
     return resultXml; 
   }
