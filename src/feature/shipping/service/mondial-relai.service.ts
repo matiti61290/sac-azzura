@@ -1,29 +1,31 @@
-import { Injectable, OnModuleInit, Logger, HttpStatus, HttpException } from '@nestjs/common';
+import { Injectable, OnModuleInit, Logger, HttpStatus, HttpException, InternalServerErrorException } from '@nestjs/common';
 import * as soap from 'soap';
 import { createHash } from 'crypto';
 import { FindRelayPointDto } from 'src/shared/dtos/mondial_relai/findRelayPoint.dto';
-import { XMLParser } from 'fast-xml-parser'; // <-- Ajout de l'import
+import { XMLParser } from 'fast-xml-parser';
 
 @Injectable()
 export class MondialRelayService implements OnModuleInit {
   private readonly logger = new Logger(MondialRelayService.name);
   private client: any;
 
-  // --- CONFIGURATION API V1 (SOAP - Recherche de points) ---
-  private readonly enseigneV1 = 'TTMRSDBX';
-  private readonly privateKeyV1 = '9ytnxVCC';
-  private readonly wsdlUrl = 'https://api.mondialrelay.com/Web_Services.asmx?WSDL';
+  //API V1 SOAP
+  private readonly apiV1Brand = process.env.MONDIAL_RELAY_API_V1_BRAND
+  private readonly apiV1PrivateKey = process.env.MONDIAL_RELAY_API_V1_PRIVATE_KEY
+  private readonly apiV1Url = process.env.MONDIAL_RELAY_API_V1_URL
 
-  // --- CONFIGURATION API V2 (REST - Étiquettes) ---
-  // Utilisation des nouveaux identifiants reçus par mail
-  private readonly apiUrlV2 = 'https://connect-api-sandbox.mondialrelay.com/api/shipment';
-  private readonly apiBrandV2 = 'TTMRSDBX'; // Identification de marque
-  private readonly apiLoginV2 = 'TTMRSDBX@business-api.mondialrelay.com'; // Connexion API
-  private readonly apiPasswordV2 = '_iVfPcMexuOcOmF:6sq0'; // Mot de passe API
+  //API 2 REST
+  private readonly apiV2Brand = process.env.MONDIAL_RELAY_API_V2_BRAND
+  private readonly apiV2Mail = process.env.MONDIAL_RELAY_API_V2_MAIL
+  private readonly apiV2Password = process.env.MONDIAL_RELAY_API_V2_PASSWORD
+  private readonly apiV2Url = process.env.MONDIAL_RELAY_API_V2_URL
 
   async onModuleInit() {
+    if(!this.apiV1Url){
+      throw new InternalServerErrorException('probleme url api')
+    }
     try {
-      this.client = await soap.createClientAsync(this.wsdlUrl, {
+      this.client = await soap.createClientAsync(this.apiV1Url, {
         forceSoap12Headers: true,
         endpoint: 'https://api.mondialrelay.com/Web_Services.asmx',
       });
@@ -37,7 +39,7 @@ export class MondialRelayService implements OnModuleInit {
     if (!this.client) return { success: false, message: 'Client non prêt' };
 
     const soapArgs = {
-      Enseigne: this.enseigneV1,
+      Enseigne: this.apiV1Brand,
       Pays: 'FR',
       NumPointRelais: '',
       Ville: '',
@@ -54,9 +56,8 @@ export class MondialRelayService implements OnModuleInit {
       NombreResultats: '10',
     };
 
-    // Concaténation stricte de TOUS les paramètres de soapArgs dans le bon ordre
     const securityString =
-      this.enseigneV1 +
+      this.apiV1Brand +
       soapArgs.Pays +
       soapArgs.NumPointRelais +
       soapArgs.Ville +
@@ -71,7 +72,7 @@ export class MondialRelayService implements OnModuleInit {
       soapArgs.TypeActivite +
       soapArgs.NACE +
       soapArgs.NombreResultats +
-      this.privateKeyV1;
+      this.apiV1PrivateKey;
 
     const security = createHash('md5')
       .update(securityString)
@@ -99,13 +100,17 @@ export class MondialRelayService implements OnModuleInit {
     }
   }
 
-  async createLabel(): Promise<any> {
+  async createLabel(relayId: string): Promise<any> {
+
+    if(!this.apiV2Url){
+      throw new InternalServerErrorException('Probleme d\'url de \'api')
+    }
     const xmlPayload = `<?xml version="1.0" encoding="utf-8"?>
 <ShipmentCreationRequest xmlns="http://www.example.org/Request">
     <Context>
-        <Login>${this.apiLoginV2}</Login>
-        <Password>${this.apiPasswordV2}</Password>
-        <CustomerId>${this.apiBrandV2}</CustomerId>
+        <Login>${this.apiV2Mail}</Login>
+        <Password>${this.apiV2Password}</Password>
+        <CustomerId>${this.apiV2Brand}</CustomerId>
         <Culture>fr-FR</Culture>
         <VersionAPI>1.0</VersionAPI>
     </Context>
@@ -118,9 +123,9 @@ export class MondialRelayService implements OnModuleInit {
     <ShipmentsList>
         <Shipment>
             <OrderNo>CMD-12345</OrderNo>
-            <CustomerNo>${this.apiBrandV2}</CustomerNo>
+            <CustomerNo>${this.apiV2Brand}</CustomerNo>
             <ParcelCount>1</ParcelCount>
-            <DeliveryMode Mode="24R" Location="FR-39807" />
+            <DeliveryMode Mode="24R" Location="FR-${relayId}" />
             <CollectionMode Mode="CCC" Location="" />
             
             <Parcels>
@@ -129,7 +134,7 @@ export class MondialRelayService implements OnModuleInit {
                     <Weight Value="1000" Unit="gr"/>
                 </Parcel>
             </Parcels>
-            
+
             <Sender>
                 <Address>
                     <Title>Mr</Title>
@@ -161,7 +166,7 @@ export class MondialRelayService implements OnModuleInit {
 </ShipmentCreationRequest>`.trim();
 
     try {
-      const response = await fetch(this.apiUrlV2, {
+      const response = await fetch(this.apiV2Url, {
         method: 'POST',
         headers: {
           'Accept': 'application/xml',
@@ -182,12 +187,9 @@ export class MondialRelayService implements OnModuleInit {
 
       this.logger.debug("Réponse brute de Mondial Relay:", responseText);
       
-      // --- NOUVEAU BLOC INTÉGRÉ ICI ---
-      // L'option ignoreAttributes: false est requise pour lire l'attribut `Code="0"`
       const parser = new XMLParser({ ignoreAttributes: false });
       const parsedJson = parser.parse(responseText);
 
-      // On navigue dans l'objet JSON généré par fast-xml-parser
       const statusNode = parsedJson?.ShipmentCreationResponse?.StatusList?.Status;
       const statusCode = statusNode ? (statusNode['@_Code'] || statusNode.Code) : null;
 
@@ -211,7 +213,6 @@ export class MondialRelayService implements OnModuleInit {
               details: statusNode
           };
       }
-      // --------------------------------
 
     } catch (error) {
       this.logger.error("Erreur d'exécution de la création d'étiquette", error);

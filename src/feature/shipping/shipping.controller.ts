@@ -1,4 +1,4 @@
-import { Controller, Get, Query, BadRequestException, Post, Body } from '@nestjs/common';
+import { Controller, Get, Param, Post, Body, ParseIntPipe } from '@nestjs/common';
 import { MondialRelayService } from './service/mondial-relai.service';
 import { FindRelayPointDto } from 'src/shared/dtos/mondial_relai/findRelayPoint.dto';
 
@@ -14,12 +14,12 @@ export class ShippingController {
     return result
   }
 
-  @Post('create-label')
-  async generateLabel() {
-    // Appel du service qui exécute le fetch vers API2
-    const resultXml = await this.mondialRelayService.createLabel();
+  @Post('create-label/:relayId')
+  async generateLabel(
+    @Param('relayId') relayId: string
+  ) {
+    const resultXml = await this.mondialRelayService.createLabel(relayId);
     
-    // Vous pouvez retourner directement le XML, ou idéalement le JSON converti
     return resultXml; 
   }
 }
