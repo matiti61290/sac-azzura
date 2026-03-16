@@ -1,4 +1,4 @@
-import { Injectable, OnModuleInit, Logger, HttpStatus, HttpException, InternalServerErrorException } from '@nestjs/common';
+import { Injectable, OnModuleInit, Logger, HttpStatus, HttpException, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import * as soap from 'soap';
 import { createHash } from 'crypto';
 import { FindRelayPointDto } from 'src/shared/dtos/mondial_relai/findRelayPoint.dto';
@@ -238,6 +238,63 @@ export class MondialRelayService implements OnModuleInit {
         error.message || "Erreur interne",
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
+    }
+  }
+
+  async tracingPackage(orderId: number) {
+    if (!this.client) return { success: false, message: 'Client non prêt' }
+
+    if (!this.apiV1Brand || !this.apiV1PrivateKey) {
+      throw new InternalServerErrorException("Clés API Mondial Relay manquantes");
+    }
+
+    const order = await this.orderRepository.findOne({ where: { id: orderId } })
+
+    if (!order || !order.trackingNumber) {
+      throw new NotFoundException("Aucune commande trouvée ou pas de numéro de suivi")
+    }
+
+    const soapArg = {
+      Enseigne: this.apiV1Brand,
+      Expedition: order.trackingNumber, // 8 caractères numériques fixes
+      Langue: 'FR'
+    }
+
+    // CORRECTION 1 : On ne met l'enseigne qu'une seule fois, dans l'ordre strict de la doc
+    const securityString = 
+      soapArg.Enseigne +
+      soapArg.Expedition +
+      soapArg.Langue + 
+      this.apiV1PrivateKey;
+
+    // Génération du Hash MD5 en majuscules (Correct)
+    const security = createHash('md5')
+      .update(securityString)
+      .digest('hex')
+      .toUpperCase();
+
+    try {
+      const [result] = await this.client.WSI2_TracingColisDetaille(
+        { ...soapArg, Security: security },
+        { forceSoap12Headers: true }
+      );
+
+      const data = result.WSI2_TracingColisDetaille;
+      
+      // CORRECTION 2 : Les codes 80 à 83 sont également des succès pour le tracing
+      const successStatuses = ['0', '80', '81', '82', '83'];
+      const isSuccess = successStatuses.includes(data.STAT?.toString());
+
+      return {
+        success: isSuccess,
+        stat: data.STAT,
+        tracing: data.Tracing // N'oublie pas de retourner les données de tracing utiles au front !
+      }
+    } catch (error) {
+      if (error.response && error.response.data) {
+        this.logger.error("Réponse d'erreur du serveur reçue.", error.response.data);
+      }
+      return { success: false, message: error.message };
     }
   }
 }
