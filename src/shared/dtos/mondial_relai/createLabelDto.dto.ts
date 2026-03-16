@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsOptional, IsString } from "class-validator";
+import { IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
 
 export class CreateLabelDto {
     @IsNotEmpty()
@@ -6,6 +6,6 @@ export class CreateLabelDto {
     relayId: string
 
     @IsOptional()
-    @IsString()
-    orderId: string
+    @IsNumber()
+    orderId: number
 }

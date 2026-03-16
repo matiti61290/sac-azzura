@@ -4,9 +4,17 @@ import { createHash } from 'crypto';
 import { FindRelayPointDto } from 'src/shared/dtos/mondial_relai/findRelayPoint.dto';
 import { XMLParser } from 'fast-xml-parser';
 import { CreateLabelDto } from 'src/shared/dtos/mondial_relai/createLabelDto.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { OrderEntity } from 'src/entities/order.entity';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class MondialRelayService implements OnModuleInit {
+  constructor(
+    @InjectRepository(OrderEntity)
+    private readonly orderRepository: Repository<OrderEntity>
+  ){}
+
   private readonly logger = new Logger(MondialRelayService.name);
   private client: any;
 
@@ -200,6 +208,15 @@ export class MondialRelayService implements OnModuleInit {
           const trackingNumber = shipmentNode['@_ShipmentNumber'] || shipmentNode.ShipmentNumber;
 
           this.logger.log(`Étiquette générée avec succès ! Tracking: ${trackingNumber}`);
+
+          const order = await this.orderRepository.findOne({ where: {id: createLabelDto.orderId}})
+
+          if(!order){
+            throw new InternalServerErrorException("La commande n'a pas ete trouvee")
+          }
+
+          order.trackingNumber = trackingNumber
+          await this.orderRepository.save(order)
           
           return {
               success: true,
