@@ -15,7 +15,7 @@ export class ShippingController {
     return result
   }
 
-  @Post('create-label')
+  @Post('mondial-relai/create-label')
   async generateLabel(
     @Body() createLabelDto: CreateLabelDto
   ) {
@@ -23,4 +23,11 @@ export class ShippingController {
     
     return resultXml; 
   }
-}
+
+  @Get('mondial-relai/tracing-package/:orderId')
+  async tracingPackage(
+    @Param('orderId', ParseIntPipe) orderId: number
+  ){
+    return this.mondialRelayService.tracingPackage(orderId)
+  }
+} 

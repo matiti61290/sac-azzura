@@ -4,6 +4,7 @@ import { PromotionEntity } from "./promotion.entity";
 import { OrderStatus } from "src/shared/enum/order.enum";
 import { OrderItemEntity } from "./orderItem.entity";
 import { AddressEntity } from "./addresses.entity";
+import type { TrackingDetailsData } from "src/shared/interfaces/trackingDetailData.interface";
 
 @Entity('Order')
 export class OrderEntity {
@@ -45,4 +46,10 @@ export class OrderEntity {
         default: ()=> "CURRENT_TIMESTAMP"
     })
     createdAt: Date
+
+    @Column({ nullable: true })
+    lastTrackingUpdate: Date
+
+    @Column({ type: 'json', nullable: true})
+    trackingDetails: TrackingDetailsData
 }

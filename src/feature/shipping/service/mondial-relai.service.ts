@@ -254,41 +254,63 @@ export class MondialRelayService implements OnModuleInit {
       throw new NotFoundException("Aucune commande trouvée ou pas de numéro de suivi")
     }
 
+    const cacheDurationMs = 4*60*60*1000
+    const now = new Date()
+    
+    //If a call was made in less than 4 hours
+    if(order.lastTrackingUpdate && (now.getTime() - order.lastTrackingUpdate.getTime()< cacheDurationMs)) {
+      this.logger.log(`Renvoi des donnees en cache de la commande ${order}`)
+      return {
+        success: true,
+        stat: order.trackingDetails.stat,
+        tracing: order.trackingDetails.tracing,
+        cached: true
+      }
+    }
+
     const soapArg = {
       Enseigne: this.apiV1Brand,
-      Expedition: order.trackingNumber, // 8 caractères numériques fixes
+      Expedition: order.trackingNumber, 
       Langue: 'FR'
     }
 
-    // CORRECTION 1 : On ne met l'enseigne qu'une seule fois, dans l'ordre strict de la doc
     const securityString = 
       soapArg.Enseigne +
       soapArg.Expedition +
       soapArg.Langue + 
       this.apiV1PrivateKey;
 
-    // Génération du Hash MD5 en majuscules (Correct)
     const security = createHash('md5')
       .update(securityString)
       .digest('hex')
       .toUpperCase();
 
     try {
-      const [result] = await this.client.WSI2_TracingColisDetaille(
+      const [result] = await this.client.WSI2_TracingColisDetailleAsync(
         { ...soapArg, Security: security },
         { forceSoap12Headers: true }
       );
 
-      const data = result.WSI2_TracingColisDetaille;
+      const data = result.WSI2_TracingColisDetailleResult;
       
-      // CORRECTION 2 : Les codes 80 à 83 sont également des succès pour le tracing
       const successStatuses = ['0', '80', '81', '82', '83'];
       const isSuccess = successStatuses.includes(data.STAT?.toString());
+
+      if(isSuccess) {
+        order.lastTrackingUpdate = now
+        order.trackingDetails = {
+          stat: data.STAT,
+          tracing: data.Tracing
+        }
+
+        await this.orderRepository.save(order)
+      }
 
       return {
         success: isSuccess,
         stat: data.STAT,
-        tracing: data.Tracing // N'oublie pas de retourner les données de tracing utiles au front !
+        tracing: data.Tracing,
+        cached: false
       }
     } catch (error) {
       if (error.response && error.response.data) {
