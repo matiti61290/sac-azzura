@@ -7,6 +7,7 @@ import { CreateLabelDto } from 'src/shared/dtos/mondial_relai/createLabelDto.dto
 import { InjectRepository } from '@nestjs/typeorm';
 import { OrderEntity } from 'src/entities/order.entity';
 import { Repository } from 'typeorm';
+import { OrderStatus } from 'src/shared/enum/order.enum';
 
 @Injectable()
 export class MondialRelayService implements OnModuleInit {
@@ -299,8 +300,9 @@ export class MondialRelayService implements OnModuleInit {
       if(isSuccess) {
         order.lastTrackingUpdate = now
         order.trackingDetails = {
+          ...(order.trackingDetails || {}),
           stat: data.STAT,
-          tracing: data.Tracing
+          tracing: data.Tracing,
         }
 
         await this.orderRepository.save(order)
@@ -318,5 +320,45 @@ export class MondialRelayService implements OnModuleInit {
       }
       return { success: false, message: error.message };
     }
+  }
+
+  async handleWebhook(payload: any) {
+    this.logger.log(payload)
+
+    //Verifier les logs si c'est bien Expedition ou tracking_number
+    const trackingNumber = payload.Expedition || payload.tracking_number
+    const statusCode = payload.Status || payload.CodeEtape
+
+    if(!trackingNumber) {
+      this.logger.warn('Webhook reçu mais aucun numéro de tracking trouvé dans le payload.')
+    }
+
+    const order = await this.orderRepository.findOne({ where: {trackingNumber}})
+
+    if(!order) {
+      throw new InternalServerErrorException(`le colis avec le tracking number ${trackingNumber} n'existe pas`)
+    }
+
+    order.lastTrackingUpdate = new Date()
+
+    order.trackingDetails = {
+      ...order.trackingDetails,
+      lastestStatus: statusCode,
+      updatedViaWebhookAt: new Date()
+    }
+
+    switch(statusCode){
+      case '81':
+      case '82':
+        order.status = OrderStatus.SHIPPED
+        break
+
+      case '0':
+        order.status = OrderStatus.DELIVERED
+        break
+    }
+
+    await this.orderRepository.save(order)
+    this.logger.log(`Commande ${order.id} mise a jour via webhook (nouveau Statut: ${statusCode})`)
   }
 }

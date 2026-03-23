@@ -1,4 +1,6 @@
 export interface TrackingDetailsData {
     stat: string,
-    tracing: any
+    tracing: any,
+    lastestStatus?: string,
+    updatedViaWebhookAt?: Date
 }

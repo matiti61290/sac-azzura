@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Post, Body, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Param, Post, Body, ParseIntPipe, HttpCode, HttpStatus } from '@nestjs/common';
 import { MondialRelayService } from './service/mondial-relai.service';
 import { FindRelayPointDto } from 'src/shared/dtos/mondial_relai/findRelayPoint.dto';
 import { CreateLabelDto } from 'src/shared/dtos/mondial_relai/createLabelDto.dto';
@@ -29,5 +29,13 @@ export class ShippingController {
     @Param('orderId', ParseIntPipe) orderId: number
   ){
     return this.mondialRelayService.tracingPackage(orderId)
+  }
+
+  @Post('mondial-relay/webhook')
+  @HttpCode(HttpStatus.OK)
+  async handleMondialRelayWebhook(
+    @Body() payload: any
+  ) {
+    
   }
 } 
