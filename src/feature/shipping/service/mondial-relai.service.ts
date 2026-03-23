@@ -1,11 +1,21 @@
-import { Injectable, OnModuleInit, Logger, HttpStatus, HttpException, InternalServerErrorException } from '@nestjs/common';
+import { Injectable, OnModuleInit, Logger, HttpStatus, HttpException, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import * as soap from 'soap';
 import { createHash } from 'crypto';
 import { FindRelayPointDto } from 'src/shared/dtos/mondial_relai/findRelayPoint.dto';
 import { XMLParser } from 'fast-xml-parser';
+import { CreateLabelDto } from 'src/shared/dtos/mondial_relai/createLabelDto.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { OrderEntity } from 'src/entities/order.entity';
+import { Repository } from 'typeorm';
+import { OrderStatus } from 'src/shared/enum/order.enum';
 
 @Injectable()
 export class MondialRelayService implements OnModuleInit {
+  constructor(
+    @InjectRepository(OrderEntity)
+    private readonly orderRepository: Repository<OrderEntity>
+  ){}
+
   private readonly logger = new Logger(MondialRelayService.name);
   private client: any;
 
@@ -100,7 +110,7 @@ export class MondialRelayService implements OnModuleInit {
     }
   }
 
-  async createLabel(relayId: string): Promise<any> {
+  async createLabel(createLabelDto: CreateLabelDto): Promise<any> {
 
     if(!this.apiV2Url){
       throw new InternalServerErrorException('Probleme d\'url de \'api')
@@ -125,7 +135,7 @@ export class MondialRelayService implements OnModuleInit {
             <OrderNo>CMD-12345</OrderNo>
             <CustomerNo>${this.apiV2Brand}</CustomerNo>
             <ParcelCount>1</ParcelCount>
-            <DeliveryMode Mode="24R" Location="FR-${relayId}" />
+            <DeliveryMode Mode="24R" Location="FR-${createLabelDto.relayId}" />
             <CollectionMode Mode="CCC" Location="" />
             
             <Parcels>
@@ -199,6 +209,15 @@ export class MondialRelayService implements OnModuleInit {
           const trackingNumber = shipmentNode['@_ShipmentNumber'] || shipmentNode.ShipmentNumber;
 
           this.logger.log(`Étiquette générée avec succès ! Tracking: ${trackingNumber}`);
+
+          const order = await this.orderRepository.findOne({ where: {id: createLabelDto.orderId}})
+
+          if(!order){
+            throw new InternalServerErrorException("La commande n'a pas ete trouvee")
+          }
+
+          order.trackingNumber = trackingNumber
+          await this.orderRepository.save(order)
           
           return {
               success: true,
@@ -221,5 +240,125 @@ export class MondialRelayService implements OnModuleInit {
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
+  }
+
+  async tracingPackage(orderId: number) {
+    if (!this.client) return { success: false, message: 'Client non prêt' }
+
+    if (!this.apiV1Brand || !this.apiV1PrivateKey) {
+      throw new InternalServerErrorException("Clés API Mondial Relay manquantes");
+    }
+
+    const order = await this.orderRepository.findOne({ where: { id: orderId } })
+
+    if (!order || !order.trackingNumber) {
+      throw new NotFoundException("Aucune commande trouvée ou pas de numéro de suivi")
+    }
+
+    const cacheDurationMs = 4*60*60*1000
+    const now = new Date()
+    
+    //If a call was made in less than 4 hours
+    if(order.lastTrackingUpdate && (now.getTime() - order.lastTrackingUpdate.getTime()< cacheDurationMs)) {
+      this.logger.log(`Renvoi des donnees en cache de la commande ${order}`)
+      return {
+        success: true,
+        stat: order.trackingDetails.stat,
+        tracing: order.trackingDetails.tracing,
+        cached: true
+      }
+    }
+
+    const soapArg = {
+      Enseigne: this.apiV1Brand,
+      Expedition: order.trackingNumber, 
+      Langue: 'FR'
+    }
+
+    const securityString = 
+      soapArg.Enseigne +
+      soapArg.Expedition +
+      soapArg.Langue + 
+      this.apiV1PrivateKey;
+
+    const security = createHash('md5')
+      .update(securityString)
+      .digest('hex')
+      .toUpperCase();
+
+    try {
+      const [result] = await this.client.WSI2_TracingColisDetailleAsync(
+        { ...soapArg, Security: security },
+        { forceSoap12Headers: true }
+      );
+
+      const data = result.WSI2_TracingColisDetailleResult;
+      
+      const successStatuses = ['0', '80', '81', '82', '83'];
+      const isSuccess = successStatuses.includes(data.STAT?.toString());
+
+      if(isSuccess) {
+        order.lastTrackingUpdate = now
+        order.trackingDetails = {
+          ...(order.trackingDetails || {}),
+          stat: data.STAT,
+          tracing: data.Tracing,
+        }
+
+        await this.orderRepository.save(order)
+      }
+
+      return {
+        success: isSuccess,
+        stat: data.STAT,
+        tracing: data.Tracing,
+        cached: false
+      }
+    } catch (error) {
+      if (error.response && error.response.data) {
+        this.logger.error("Réponse d'erreur du serveur reçue.", error.response.data);
+      }
+      return { success: false, message: error.message };
+    }
+  }
+
+  async handleWebhook(payload: any) {
+    this.logger.log(payload)
+
+    //Verifier les logs si c'est bien Expedition ou tracking_number
+    const trackingNumber = payload.Expedition || payload.tracking_number
+    const statusCode = payload.Status || payload.CodeEtape
+
+    if(!trackingNumber) {
+      this.logger.warn('Webhook reçu mais aucun numéro de tracking trouvé dans le payload.')
+    }
+
+    const order = await this.orderRepository.findOne({ where: {trackingNumber}})
+
+    if(!order) {
+      throw new InternalServerErrorException(`le colis avec le tracking number ${trackingNumber} n'existe pas`)
+    }
+
+    order.lastTrackingUpdate = new Date()
+
+    order.trackingDetails = {
+      ...order.trackingDetails,
+      lastestStatus: statusCode,
+      updatedViaWebhookAt: new Date()
+    }
+
+    switch(statusCode){
+      case '81':
+      case '82':
+        order.status = OrderStatus.SHIPPED
+        break
+
+      case '0':
+        order.status = OrderStatus.DELIVERED
+        break
+    }
+
+    await this.orderRepository.save(order)
+    this.logger.log(`Commande ${order.id} mise a jour via webhook (nouveau Statut: ${statusCode})`)
   }
 }
