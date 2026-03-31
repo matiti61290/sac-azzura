@@ -20,7 +20,7 @@ export class ShippingController {
   }
 
   @Post('mondial-relai/create-label')
-  async generateLabel(
+  async generateMrLabel(
     @Body() createLabelDto: CreateLabelDto
   ) {
     const resultXml = await this.mondialRelayService.createLabel(createLabelDto);
@@ -35,11 +35,17 @@ export class ShippingController {
     return this.mondialRelayService.tracingPackage(orderId)
   }
 
+  //A completer quand l'acces a Mondial Relai Connect sera fait
   @Post('mondial-relay/webhook')
   @HttpCode(HttpStatus.OK)
   async handleMondialRelayWebhook(
     @Body() payload: any
   ) {
     
+  }
+
+  @Post('colissimo/generate-label')
+  async generateColissimoLabel(){
+    return this.colissimoService.generateLabel()
   }
 } 
