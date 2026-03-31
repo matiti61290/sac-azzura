@@ -1,4 +1,5 @@
 import { HttpException, HttpStatus, Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
+import * as multipart from 'parse-multipart-data'
 
 @Injectable()
 export class ColissimoService {
@@ -102,7 +103,38 @@ export class ColissimoService {
       }
 
       const arrayBuffer = await response.arrayBuffer()
-      return Buffer.from(arrayBuffer)
+      const rawBuffer = Buffer.from(arrayBuffer)
+      
+      const contentType = response.headers.get('content-type') || ''
+      const boundaryMatch = contentType.match(/boundary="?("[^";]+)"?/i)
+
+      if(!boundaryMatch){
+        throw new Error("impossible de trouver le boundary de la reponse multipart")
+      }
+      const boundary = boundaryMatch[1]
+
+      const parts = multipart.parse(rawBuffer, boundary)
+
+      let parcelNumber = null 
+      let pdfBuffer: Buffer | null = null
+
+      for( const part of parts) {
+        if( part.name === 'jsonInfos') {
+          const jsonContent = JSON.parse(part.data.toString('utf-8'))
+          parcelNumber = jsonContent?.labelV2Response?.parcelNumber
+        } else if (part.name === 'label') {
+          pdfBuffer = part.data
+        }
+      }
+
+      if (!pdfBuffer || !parcelNumber) {
+        throw new Error("Impossible d'extraire l'étiquette ou le numéro de suivi.")
+      }
+      
+      return {
+        parcelNumber:parcelNumber,
+        pdfBuffer:pdfBuffer
+      }
     } catch (error) {
       this.logger.error('Erreur lors de la generation generateLabel', error)
       throw new InternalServerErrorException('Erreur lors de la creation de l\'etiquette Colissimo')
