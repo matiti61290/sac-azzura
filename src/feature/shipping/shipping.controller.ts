@@ -1,11 +1,15 @@
 import { Controller, Get, Param, Post, Body, ParseIntPipe, HttpCode, HttpStatus } from '@nestjs/common';
 import { MondialRelayService } from './service/mondial-relai.service';
+import { ColissimoService } from './service/colissimo.service';
 import { FindRelayPointDto } from 'src/shared/dtos/mondial_relai/findRelayPoint.dto';
 import { CreateLabelDto } from 'src/shared/dtos/mondial_relai/createLabelDto.dto';
 
 @Controller('shipping')
 export class ShippingController {
-  constructor(private readonly mondialRelayService: MondialRelayService) {}
+  constructor(
+    private readonly mondialRelayService: MondialRelayService,
+    private readonly colissimoService: ColissimoService,
+  ) {}
 
   @Get('mondial-relai/points-relais')
   async getPointsRelais(
@@ -16,7 +20,7 @@ export class ShippingController {
   }
 
   @Post('mondial-relai/create-label')
-  async generateLabel(
+  async generateMrLabel(
     @Body() createLabelDto: CreateLabelDto
   ) {
     const resultXml = await this.mondialRelayService.createLabel(createLabelDto);
@@ -31,11 +35,17 @@ export class ShippingController {
     return this.mondialRelayService.tracingPackage(orderId)
   }
 
+  //A completer quand l'acces a Mondial Relai Connect sera fait
   @Post('mondial-relay/webhook')
   @HttpCode(HttpStatus.OK)
   async handleMondialRelayWebhook(
     @Body() payload: any
   ) {
     
+  }
+
+  @Post('colissimo/generate-label')
+  async generateColissimoLabel(){
+    return this.colissimoService.generateLabel()
   }
 } 
