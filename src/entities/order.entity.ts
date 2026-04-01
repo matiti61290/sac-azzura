@@ -49,7 +49,7 @@ export class OrderEntity {
     trackingNumber: string
 
     @Column({ type: 'json', nullable: true})
-    trackingDetails: ShippingDetailsData
+    shippingDetails: ShippingDetailsData
 
     @Column({nullable: true})
     shippedAt: Date

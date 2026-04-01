@@ -1,9 +1,19 @@
-import { HttpException, HttpStatus, Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, InternalServerErrorException, Logger, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
 import * as multipart from 'parse-multipart-data'
+import { OrderEntity } from 'src/entities/order.entity';
+import { AwsS3Service } from 'src/feature/aws-s3/aws-s3.service';
+import { Carrier } from 'src/shared/enum/carrier.enum';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class ColissimoService {
-  constructor() {}
+  constructor(
+    private readonly awsS3Service: AwsS3Service,
+    
+    @InjectRepository(OrderEntity)
+    private readonly orderRepository: Repository<OrderEntity>
+  ) {}
 
   private readonly logger = new Logger(ColissimoService.name)
 
@@ -50,7 +60,14 @@ export class ColissimoService {
     }
   }
   
-  public async generateLabel() {
+  public async generateLabel(orderId: number) {
+
+    const order = await this.orderRepository.findOne({ where: {id: orderId}})
+
+    if(!order){
+      throw new NotFoundException('L\'Id ne correspond pas a une commande existante.')
+    }
+
     const url = `${this.apiUrl}/generateLabel`
 
     const payload = {
@@ -130,10 +147,24 @@ export class ColissimoService {
       if (!pdfBuffer || !parcelNumber) {
         throw new Error("Impossible d'extraire l'étiquette ou le numéro de suivi.")
       }
+
+      const key = `colissimo-shipping-label/${order?.id}-${parcelNumber}.pdf`
+      await this.awsS3Service.uploadPdfBuffer(pdfBuffer, key)
       
+      order.trackingNumber = parcelNumber
+      order.carrier = Carrier.COLISSIMO
+      order.shippedAt = new Date()
+
+      order.shippingDetails ={
+        carrier: Carrier.COLISSIMO,
+        labelS3Key: key
+      }
+
+      await this.orderRepository.save(order)
+
       return {
-        parcelNumber:parcelNumber,
-        pdfBuffer:pdfBuffer
+        message: 'Étiquette générée et stockée avec succès !',
+        trackingNumber: parcelNumber
       }
     } catch (error) {
       this.logger.error('Erreur lors de la generation generateLabel', error)

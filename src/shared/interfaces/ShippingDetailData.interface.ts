@@ -11,12 +11,14 @@ export interface MondialRelayDetails extends BaseShippingDetailsData {
     relayPointName?: string
     stat?: string
     tracing?: any
+    labelUrl?: string
 }
 
 export interface ColissimoDetails extends BaseShippingDetailsData {
     carrier: Carrier.COLISSIMO
-    returnChoice: string
-    trackingEvents: any[]
+    returnChoice?: string
+    trackingEvents?: any[]
+    labelS3Key?:string
 }
 
 export type ShippingDetailsData = MondialRelayDetails | ColissimoDetails
