@@ -31,34 +31,6 @@ export class ColissimoService {
       'Accept': 'multipart/related'
     }
   }
-
-  public async getLabel(parcelNumber: string) {
-    const url = `${this.apiUrl}/getLabel`
-
-    const payload = {
-      parcelNumber: parcelNumber
-    }
-
-    try {
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: this.getHeaders(),
-        body: JSON.stringify(payload)
-      })
-
-      if(!response.ok){
-        const errorText = await response.text()
-        this.logger.error(`erreur HTTP ${response.status} pour le colis ${parcelNumber}`)
-        throw new InternalServerErrorException(`Erreur API colissimo: ${response.text}`)
-      }
-
-      const arrayBuffer = await response.arrayBuffer()
-      return Buffer.from(arrayBuffer)
-    } catch (error) {
-      this.logger.error(`Erreur getLabel pour le colis ${parcelNumber}`, error)
-      HttpStatus.INTERNAL_SERVER_ERROR
-    }
-  }
   
   public async generateLabel(orderId: number) {
 
