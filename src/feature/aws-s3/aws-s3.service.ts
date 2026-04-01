@@ -36,4 +36,16 @@ export class AwsS3Service {
         })
         await s3Client.send(command)
     }
+
+    async uploadPdfBuffer(buffer: Buffer, key: string) {
+        const command = new PutObjectCommand({
+            Bucket: this.bucketName,
+            Key: key,
+            Body: buffer,
+            ContentType: 'application/pdf'
+        })
+
+        await s3Client.send(command)
+        return key
+    }
 }
