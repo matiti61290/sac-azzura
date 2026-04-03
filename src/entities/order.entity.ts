@@ -48,6 +48,9 @@ export class OrderEntity {
     @Column({nullable: true})
     trackingNumber: string
 
+    @Column({ nullable: true})
+    lastTrackingUpdate: Date
+
     @Column({ type: 'json', nullable: true})
     shippingDetails: ShippingDetailsData
 

@@ -127,7 +127,7 @@ export class ColissimoService {
       order.carrier = Carrier.COLISSIMO
       order.shippedAt = new Date()
 
-      order.shippingDetails ={
+      order.shippingDetails = {
         carrier: Carrier.COLISSIMO,
         labelS3Key: key
       }
@@ -143,6 +143,4 @@ export class ColissimoService {
       throw new InternalServerErrorException('Erreur lors de la creation de l\'etiquette Colissimo')
     }
   }
-  
-  public async checkGenerationLabel() {}
 }
