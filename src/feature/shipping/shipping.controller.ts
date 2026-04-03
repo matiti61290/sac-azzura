@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Post, Body, ParseIntPipe, HttpCode, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Param, Post, Body, ParseIntPipe, HttpCode, HttpStatus, Query, UnauthorizedException } from '@nestjs/common';
 import { MondialRelayService } from './service/mondial-relai.service';
 import { ColissimoService } from './service/colissimo.service';
 import { FindRelayPointDto } from 'src/shared/dtos/mondial_relai/findRelayPoint.dto';
@@ -11,41 +11,42 @@ export class ShippingController {
     private readonly colissimoService: ColissimoService,
   ) {}
 
+  //Mondial Relay
   @Get('mondial-relai/points-relais')
   async getPointsRelais(
     @Body() findRelayPointDto: FindRelayPointDto
   ) {
-    const result = await this.mondialRelayService.rechercherPointsRelais(findRelayPointDto);
-    return result
+    return await this.mondialRelayService.rechercherPointsRelais(findRelayPointDto);
   }
 
   @Post('mondial-relai/create-label')
   async generateMrLabel(
     @Body() createLabelDto: CreateLabelDto
   ) {
-    const resultXml = await this.mondialRelayService.createLabel(createLabelDto);
-    
-    return resultXml; 
+    return await this.mondialRelayService.createLabel(createLabelDto);
   }
 
   @Get('mondial-relai/tracing-package/:orderId')
   async tracingPackage(
     @Param('orderId', ParseIntPipe) orderId: number
   ){
-    return this.mondialRelayService.tracingPackage(orderId)
+    return this.mondialRelayService.tracingPackage(orderId);
   }
 
-  //A completer quand l'acces a Mondial Relai Connect sera fait
   @Post('mondial-relay/webhook')
   @HttpCode(HttpStatus.OK)
   async handleMondialRelayWebhook(
+    @Query('token') token: string,
     @Body() payload: any
   ) {
-    
+    await this.mondialRelayService.handleWebhook(payload, token);
   }
 
-  @Post('colissimo/generate-label')
-  async generateColissimoLabel(){
-    return this.colissimoService.generateLabel()
+  //Colissimo
+  @Post('colissimo/generate-label/:orderId')
+  async generateColissimoLabel(
+    @Param('orderId', ParseIntPipe) orderId: number
+  ){
+    return this.colissimoService.generateLabel(orderId);
   }
-} 
+}

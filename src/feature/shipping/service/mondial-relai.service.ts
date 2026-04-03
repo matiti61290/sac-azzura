@@ -1,4 +1,4 @@
-import { Injectable, OnModuleInit, Logger, HttpStatus, HttpException, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { Injectable, OnModuleInit, Logger, HttpStatus, HttpException, InternalServerErrorException, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import * as soap from 'soap';
 import { createHash } from 'crypto';
 import { FindRelayPointDto } from 'src/shared/dtos/mondial_relai/findRelayPoint.dto';
@@ -8,6 +8,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { OrderEntity } from 'src/entities/order.entity';
 import { Repository } from 'typeorm';
 import { OrderStatus } from 'src/shared/enum/order.enum';
+import { Carrier } from 'src/shared/enum/carrier.enum';
 
 @Injectable()
 export class MondialRelayService implements OnModuleInit {
@@ -17,22 +18,23 @@ export class MondialRelayService implements OnModuleInit {
   ){}
 
   private readonly logger = new Logger(MondialRelayService.name);
+  private readonly webhookSecret = process.env.MONDIAL_RELAY_WEBHOOK_SECRET;
   private client: any;
 
-  //API V1 SOAP
-  private readonly apiV1Brand = process.env.MONDIAL_RELAY_API_V1_BRAND
-  private readonly apiV1PrivateKey = process.env.MONDIAL_RELAY_API_V1_PRIVATE_KEY
-  private readonly apiV1Url = process.env.MONDIAL_RELAY_API_V1_URL
+  // API V1 SOAP
+  private readonly apiV1Brand = process.env.MONDIAL_RELAY_API_V1_BRAND;
+  private readonly apiV1PrivateKey = process.env.MONDIAL_RELAY_API_V1_PRIVATE_KEY;
+  private readonly apiV1Url = process.env.MONDIAL_RELAY_API_V1_URL;
 
-  //API 2 REST
-  private readonly apiV2Brand = process.env.MONDIAL_RELAY_API_V2_BRAND
-  private readonly apiV2Mail = process.env.MONDIAL_RELAY_API_V2_MAIL
-  private readonly apiV2Password = process.env.MONDIAL_RELAY_API_V2_PASSWORD
-  private readonly apiV2Url = process.env.MONDIAL_RELAY_API_V2_URL
+  // API 2 REST
+  private readonly apiV2Brand = process.env.MONDIAL_RELAY_API_V2_BRAND;
+  private readonly apiV2Mail = process.env.MONDIAL_RELAY_API_V2_MAIL;
+  private readonly apiV2Password = process.env.MONDIAL_RELAY_API_V2_PASSWORD;
+  private readonly apiV2Url = process.env.MONDIAL_RELAY_API_V2_URL;
 
   async onModuleInit() {
     if(!this.apiV1Url){
-      throw new InternalServerErrorException('probleme url api')
+      throw new InternalServerErrorException('Probleme url api V1');
     }
     try {
       this.client = await soap.createClientAsync(this.apiV1Url, {
@@ -84,10 +86,7 @@ export class MondialRelayService implements OnModuleInit {
       soapArgs.NombreResultats +
       this.apiV1PrivateKey;
 
-    const security = createHash('md5')
-      .update(securityString)
-      .digest('hex')
-      .toUpperCase();
+    const security = createHash('md5').update(securityString).digest('hex').toUpperCase();
 
     try {
       const [result] = await this.client.WSI4_PointRelais_RechercheAsync(
@@ -111,9 +110,8 @@ export class MondialRelayService implements OnModuleInit {
   }
 
   async createLabel(createLabelDto: CreateLabelDto): Promise<any> {
-
     if(!this.apiV2Url){
-      throw new InternalServerErrorException('Probleme d\'url de \'api')
+      throw new InternalServerErrorException('Probleme d\'url de l\'api');
     }
     const xmlPayload = `<?xml version="1.0" encoding="utf-8"?>
 <ShipmentCreationRequest xmlns="http://www.example.org/Request">
@@ -170,7 +168,6 @@ export class MondialRelayService implements OnModuleInit {
                     <City>Paris</City>
                 </Address>
             </Recipient>
-            
         </Shipment>
     </ShipmentsList>
 </ShipmentCreationRequest>`.trim();
@@ -188,14 +185,11 @@ export class MondialRelayService implements OnModuleInit {
       const responseText = await response.text();
 
       if (!response.ok) {
-        this.logger.error(`Erreur HTTP: ${response.status} - ${responseText}`);
         throw new HttpException(
           "Erreur lors de la communication avec l'API Mondial Relay",
           response.status || HttpStatus.INTERNAL_SERVER_ERROR,
         );
       }
-
-      this.logger.debug("Réponse brute de Mondial Relay:", responseText);
       
       const parser = new XMLParser({ ignoreAttributes: false });
       const parsedJson = parser.parse(responseText);
@@ -208,16 +202,28 @@ export class MondialRelayService implements OnModuleInit {
           const pdfUrl = shipmentNode.LabelList.Label.Output;
           const trackingNumber = shipmentNode['@_ShipmentNumber'] || shipmentNode.ShipmentNumber;
 
-          this.logger.log(`Étiquette générée avec succès ! Tracking: ${trackingNumber}`);
-
-          const order = await this.orderRepository.findOne({ where: {id: createLabelDto.orderId}})
+          const order = await this.orderRepository.findOne({ where: {id: createLabelDto.orderId}});
 
           if(!order){
-            throw new InternalServerErrorException("La commande n'a pas ete trouvee")
+            throw new InternalServerErrorException("La commande n'a pas été trouvée");
           }
 
-          order.trackingNumber = trackingNumber
-          await this.orderRepository.save(order)
+          order.trackingNumber = trackingNumber;
+          order.carrier = Carrier.MONDIAL_RELAY;
+          order.shippedAt = new Date();
+
+          const currentDetails = order.shippingDetails?.carrier === Carrier.MONDIAL_RELAY 
+            ? order.shippingDetails 
+            : { relayPointId: createLabelDto.relayId };
+
+          order.shippingDetails = {
+            ...currentDetails,
+            carrier: Carrier.MONDIAL_RELAY,
+            relayPointId: createLabelDto.relayId,
+            labelUrl: pdfUrl
+          };
+
+          await this.orderRepository.save(order);
           
           return {
               success: true,
@@ -225,7 +231,6 @@ export class MondialRelayService implements OnModuleInit {
               pdfUrl: pdfUrl
           };
       } else {
-          this.logger.warn(`Erreur API Mondial Relay détaillée : ${JSON.stringify(statusNode)}`);
           return {
               success: false,
               message: "Erreur lors de la création de l'étiquette (Erreur Métier)",
@@ -234,57 +239,40 @@ export class MondialRelayService implements OnModuleInit {
       }
 
     } catch (error) {
-      this.logger.error("Erreur d'exécution de la création d'étiquette", error);
-      throw new HttpException(
-        error.message || "Erreur interne",
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+      throw new HttpException(error.message || "Erreur interne", HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
   async tracingPackage(orderId: number) {
-    if (!this.client) return { success: false, message: 'Client non prêt' }
+    if (!this.client) return { success: false, message: 'Client non prêt' };
 
-    if (!this.apiV1Brand || !this.apiV1PrivateKey) {
-      throw new InternalServerErrorException("Clés API Mondial Relay manquantes");
-    }
-
-    const order = await this.orderRepository.findOne({ where: { id: orderId } })
+    const order = await this.orderRepository.findOne({ where: { id: orderId } });
 
     if (!order || !order.trackingNumber) {
-      throw new NotFoundException("Aucune commande trouvée ou pas de numéro de suivi")
+      throw new NotFoundException("Aucune commande trouvée ou pas de numéro de suivi");
     }
 
-    const cacheDurationMs = 4*60*60*1000
-    const now = new Date()
+    const cacheDurationMs = 4 * 60 * 60 * 1000;
+    const now = new Date();
     
-    //If a call was made in less than 4 hours
-    if(order.lastTrackingUpdate && (now.getTime() - order.lastTrackingUpdate.getTime()< cacheDurationMs)) {
-      this.logger.log(`Renvoi des donnees en cache de la commande ${order}`)
+    if(order.lastTrackingUpdate && (now.getTime() - order.lastTrackingUpdate.getTime() < cacheDurationMs) && order.shippingDetails?.carrier === Carrier.MONDIAL_RELAY) {
+      this.logger.log(`Renvoi des données en cache de la commande ${order.id}`);
       return {
         success: true,
-        stat: order.trackingDetails.stat,
-        tracing: order.trackingDetails.tracing,
+        stat: order.shippingDetails.stat,
+        tracing: order.shippingDetails.tracing,
         cached: true
-      }
+      };
     }
 
     const soapArg = {
       Enseigne: this.apiV1Brand,
       Expedition: order.trackingNumber, 
       Langue: 'FR'
-    }
+    };
 
-    const securityString = 
-      soapArg.Enseigne +
-      soapArg.Expedition +
-      soapArg.Langue + 
-      this.apiV1PrivateKey;
-
-    const security = createHash('md5')
-      .update(securityString)
-      .digest('hex')
-      .toUpperCase();
+    const securityString = soapArg.Enseigne + soapArg.Expedition + soapArg.Langue + this.apiV1PrivateKey;
+    const security = createHash('md5').update(securityString).digest('hex').toUpperCase();
 
     try {
       const [result] = await this.client.WSI2_TracingColisDetailleAsync(
@@ -293,19 +281,24 @@ export class MondialRelayService implements OnModuleInit {
       );
 
       const data = result.WSI2_TracingColisDetailleResult;
-      
       const successStatuses = ['0', '80', '81', '82', '83'];
       const isSuccess = successStatuses.includes(data.STAT?.toString());
 
       if(isSuccess) {
-        order.lastTrackingUpdate = now
-        order.trackingDetails = {
-          ...(order.trackingDetails || {}),
+        order.lastTrackingUpdate = now;
+
+        const currentDetails = order.shippingDetails?.carrier === Carrier.MONDIAL_RELAY 
+            ? order.shippingDetails 
+            : { relayPointId: 'UNKNOWN' };
+
+        order.shippingDetails = {
+          ...currentDetails,
+          carrier: Carrier.MONDIAL_RELAY,
           stat: data.STAT,
           tracing: data.Tracing,
-        }
+        };
 
-        await this.orderRepository.save(order)
+        await this.orderRepository.save(order);
       }
 
       return {
@@ -313,52 +306,65 @@ export class MondialRelayService implements OnModuleInit {
         stat: data.STAT,
         tracing: data.Tracing,
         cached: false
-      }
+      };
     } catch (error) {
-      if (error.response && error.response.data) {
-        this.logger.error("Réponse d'erreur du serveur reçue.", error.response.data);
-      }
       return { success: false, message: error.message };
     }
   }
 
-  async handleWebhook(payload: any) {
-    this.logger.log(payload)
+  async handleWebhook(payload: any, token: string) {
+    // 1. SÉCURITÉ : On vérifie que la requête vient bien de quelqu'un qui connaît le secret
+    if (!this.webhookSecret || token !== this.webhookSecret) {
+      this.logger.error("Tentative d'accès non autorisé au webhook Mondial Relay");
+      // On jette une 401. La requête est rejetée.
+      throw new UnauthorizedException('Token invalide ou manquant'); 
+    }
 
-    //Verifier les logs si c'est bien Expedition ou tracking_number
-    const trackingNumber = payload.Expedition || payload.tracking_number
-    const statusCode = payload.Status || payload.CodeEtape
+    this.logger.log('Payload Webhook reçu :', payload);
+
+    const trackingNumber = payload.Expedition || payload.tracking_number;
+    const statusCode = payload.Status || payload.CodeEtape;
 
     if(!trackingNumber) {
-      this.logger.warn('Webhook reçu mais aucun numéro de tracking trouvé dans le payload.')
+      this.logger.warn('Webhook reçu mais aucun numéro de tracking trouvé.');
+      return; // On utilise "return" pour envoyer un 200 OK et stopper l'exécution
     }
 
-    const order = await this.orderRepository.findOne({ where: {trackingNumber}})
+    const order = await this.orderRepository.findOne({ where: { trackingNumber } });
 
     if(!order) {
-      throw new InternalServerErrorException(`le colis avec le tracking number ${trackingNumber} n'existe pas`)
+      // On logue l'info, MAIS ON NE JETTE PLUS D'ERREUR 500 !
+      // Cela évite que Mondial Relay ne relance la requête en boucle.
+      this.logger.warn(`Webhook ignoré : Le colis avec le tracking number ${trackingNumber} n'existe pas en BDD`);
+      return; 
     }
 
-    order.lastTrackingUpdate = new Date()
+    // --- À partir d'ici, ton code était déjà très bon, je l'ai juste ajusté pour l'interface ---
+    
+    order.lastTrackingUpdate = new Date();
 
-    order.trackingDetails = {
-      ...order.trackingDetails,
-      lastestStatus: statusCode,
-      updatedViaWebhookAt: new Date()
-    }
+    const currentDetails = order.shippingDetails?.carrier === Carrier.MONDIAL_RELAY 
+        ? order.shippingDetails 
+        : { relayPointId: 'UNKNOWN' };
+
+    order.shippingDetails = {
+      ...currentDetails,
+      carrier: Carrier.MONDIAL_RELAY,
+      latestStatus: statusCode,
+      updateViaWebhookAt: new Date()
+    };
 
     switch(statusCode){
       case '81':
       case '82':
-        order.status = OrderStatus.SHIPPED
-        break
-
+        order.status = OrderStatus.SHIPPED;
+        break;
       case '0':
-        order.status = OrderStatus.DELIVERED
-        break
+        order.status = OrderStatus.DELIVERED;
+        break;
     }
 
-    await this.orderRepository.save(order)
-    this.logger.log(`Commande ${order.id} mise a jour via webhook (nouveau Statut: ${statusCode})`)
+    await this.orderRepository.save(order);
+    this.logger.log(`Commande ${order.id} mise à jour via webhook (nouveau Statut: ${statusCode})`);
   }
 }
