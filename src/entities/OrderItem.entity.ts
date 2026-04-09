@@ -5,17 +5,17 @@ import { StockEntity } from "./stock.entity";
 @Entity('OrderItem')
 export class OrderItemEntity{
     @PrimaryGeneratedColumn()
-    id: number
+    id!: number
 
     @ManyToOne(()=> OrderEntity, (order)=> order.items)
-    order: OrderEntity
+    order!: OrderEntity
 
     @ManyToOne(()=>StockEntity)
-    stock: StockEntity //utiliser le SKU au lieu de l'id
+    stock!: StockEntity //utiliser le SKU au lieu de l'id
 
     @Column({type: 'int'})
-    quantity: number
+    quantity!: number
 
     @Column({ type: 'decimal', precision: 10, scale: 2})
-    priceAtPurchase: number
+    priceAtPurchase!: number
 }

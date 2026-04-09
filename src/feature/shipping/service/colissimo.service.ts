@@ -1,10 +1,10 @@
 import { HttpException, HttpStatus, Injectable, InternalServerErrorException, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as multipart from 'parse-multipart-data'
-import { OrderEntity } from 'src/entities/order.entity';
-import { AwsS3Service } from 'src/feature/aws-s3/aws-s3.service';
-import { Carrier } from 'src/shared/enum/carrier.enum';
 import { Repository } from 'typeorm';
+import { OrderEntity } from '../../../entities/order.entity';
+import { AwsS3Service } from '../../aws-s3/aws-s3.service';
+import { Carrier } from '../../../shared/enum/carrier.enum';
 
 @Injectable()
 export class ColissimoService {

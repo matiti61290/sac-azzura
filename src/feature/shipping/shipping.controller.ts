@@ -1,8 +1,8 @@
 import { Controller, Get, Param, Post, Body, ParseIntPipe, HttpCode, HttpStatus, Query, UnauthorizedException } from '@nestjs/common';
 import { MondialRelayService } from './service/mondial-relai.service';
 import { ColissimoService } from './service/colissimo.service';
-import { FindRelayPointDto } from 'src/shared/dtos/mondial_relai/findRelayPoint.dto';
-import { CreateLabelDto } from 'src/shared/dtos/mondial_relai/createLabelDto.dto';
+import { FindRelayPointDto } from '../../shared/dtos/mondial_relai/findRelayPoint.dto';
+import { CreateLabelDto } from '../../shared/dtos/mondial_relai/createLabelDto.dto';
 
 @Controller('shipping')
 export class ShippingController {

@@ -1,10 +1,10 @@
 import { Injectable, InternalServerErrorException, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { PromotionEntity } from "src/entities/promotion.entity";
-import { AddPromotionDto } from "src/shared/dtos/promotion/addPromotion.dto";
-import { CheckPromotionCodeDto } from "src/shared/dtos/promotion/checkPromotionCode.dto";
-import { UpdatePromotionDto } from "src/shared/dtos/promotion/updatePromotion.dto";
 import { Repository } from "typeorm";
+import { PromotionEntity } from "../../entities/promotion.entity";
+import { AddPromotionDto } from "../../shared/dtos/promotion/addPromotion.dto";
+import { CheckPromotionCodeDto } from "../../shared/dtos/promotion/checkPromotionCode.dto";
+import { UpdatePromotionDto } from "../../shared/dtos/promotion/updatePromotion.dto";
 
 @Injectable()
 export class PromotionService{

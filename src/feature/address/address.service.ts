@@ -1,10 +1,10 @@
 import { Injectable, InternalServerErrorException, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { AddressEntity } from "src/entities/addresses.entity";
-import { AddAddressDto } from "src/shared/dtos/address/addAddress.dto";
-import { UpdateAddressDto } from "src/shared/dtos/address/updateAddress.dto";
-import { AddressType } from "src/shared/enum/address.enum";
 import { Repository } from "typeorm";
+import { AddressEntity } from "../../entities/addresses.entity";
+import { AddAddressDto } from "../../shared/dtos/address/addAddress.dto";
+import { UpdateAddressDto } from "../../shared/dtos/address/updateAddress.dto";
+import { AddressType } from "../../shared/enum/address.enum";
 
 @Injectable()
 export class AddressService {

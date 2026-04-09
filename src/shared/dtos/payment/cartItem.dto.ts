@@ -3,10 +3,10 @@ import { IsInt, IsNotEmpty, IsPositive, IsString } from "class-validator";
 export class CartItemDto {
     @IsNotEmpty()
     @IsString()
-    sku: string
+    sku!: string
 
     @IsNotEmpty()
     @IsInt()
     @IsPositive()
-    quantity: number
+    quantity!: number
 }

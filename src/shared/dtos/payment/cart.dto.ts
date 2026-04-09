@@ -7,17 +7,17 @@ export class CartDto {
     @IsArray()
     @ValidateNested({ each: true})
     @Type(()=> CartItemDto)
-    items: CartItemDto[]
+    items!: CartItemDto[]
 
     @IsNotEmpty()
     @IsInt()
-    delivery_address_id: number
+    delivery_address_id!: number
 
     @IsNotEmpty()
     @IsInt()
-    billing_address_id: number
+    billing_address_id!: number
 
     @IsOptional()
     @IsString()
-    promotion_code: string
+    promotion_code!: string
 }

@@ -1,59 +1,59 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, Index, OneToMany } from "typeorm";
 import { UserEntity } from "./user.entity";
 import { PromotionEntity } from "./promotion.entity";
-import { OrderStatus } from "src/shared/enum/order.enum";
-import { OrderItemEntity } from "./orderItem.entity";
 import { AddressEntity } from "./addresses.entity";
-import type { ShippingDetailsData } from "src/shared/interfaces/ShippingDetailData.interface";
-import { Carrier } from "src/shared/enum/carrier.enum";
+import { OrderStatus } from "../shared/enum/order.enum";
+import { OrderItemEntity } from "./OrderItem.entity";
+import type { ShippingDetailsData } from "../shared/interfaces/ShippingDetailData.interface";
+import { Carrier } from "../shared/enum/carrier.enum";
 
 @Entity('Order')
 export class OrderEntity {
     @PrimaryGeneratedColumn()
-    id: number
+    id!: number
 
     @ManyToOne(()=> UserEntity, (user)=> user.orders, { cascade: true})
-    user: UserEntity
+    user!: UserEntity
 
     @ManyToOne(()=> AddressEntity)
-    delivery_address: AddressEntity
+    delivery_address!: AddressEntity
 
     @ManyToOne(()=> AddressEntity)
-    billing_address: AddressEntity
+    billing_address!: AddressEntity
 
     @OneToMany(()=> OrderItemEntity, (item)=> item.order, {cascade: true})
-    items: OrderItemEntity[]
+    items!: OrderItemEntity[]
 
     @Column({ type: "enum", enum: OrderStatus, default: OrderStatus.PENDING})
-    status: OrderStatus
+    status!: OrderStatus
 
     @Column({ type: 'decimal', precision: 10, scale:2})
-    totalAmount: number
+    totalAmount!: number
 
     @Column({ nullable: true})
-    stripeSessionId: string
+    stripeSessionId!: string
 
     @ManyToOne(()=> PromotionEntity, {nullable: true})
-    promotion: PromotionEntity
+    promotion!: PromotionEntity
 
     @Column({ 
         type: 'timestamp', 
         default: ()=> "CURRENT_TIMESTAMP"
     })
-    createdAt: Date
+    createdAt!: Date
 
     @Column({type: "enum", enum: Carrier, nullable: true})
-    carrier: Carrier
+    carrier!: Carrier
     
     @Column({nullable: true})
-    trackingNumber: string
+    trackingNumber!: string
 
     @Column({ nullable: true})
-    lastTrackingUpdate: Date
+    lastTrackingUpdate!: Date
 
     @Column({ type: 'json', nullable: true})
-    shippingDetails: ShippingDetailsData
+    shippingDetails!: ShippingDetailsData
 
     @Column({nullable: true})
-    shippedAt: Date
+    shippedAt!: Date
 }

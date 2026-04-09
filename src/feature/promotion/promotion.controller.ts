@@ -2,9 +2,9 @@ import { Body, Controller, Get, Param, ParseIntPipe, Patch, Post, UseGuards } fr
 import { PromotionService } from "./promotion.service";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 import { AdminGuard } from "../auth/guards/admin.guard";
-import { AddPromotionDto } from "src/shared/dtos/promotion/addPromotion.dto";
-import { UpdatePromotionDto } from "src/shared/dtos/promotion/updatePromotion.dto";
-import { CheckPromotionCodeDto } from "src/shared/dtos/promotion/checkPromotionCode.dto";
+import { AddPromotionDto } from "../../shared/dtos/promotion/addPromotion.dto";
+import { UpdatePromotionDto } from "../../shared/dtos/promotion/updatePromotion.dto";
+import { CheckPromotionCodeDto } from "../../shared/dtos/promotion/checkPromotionCode.dto";
 
 @Controller('promotions')
 export class PromotionController {

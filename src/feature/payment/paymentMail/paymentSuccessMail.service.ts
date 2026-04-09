@@ -1,9 +1,8 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import * as nodemailer from 'nodemailer'
-import { from, Subject } from "rxjs";
-import { OrderEntity } from "src/entities/order.entity";
 import { Repository } from "typeorm";
+import { OrderEntity } from "../../../entities/order.entity";
 
 @Injectable()
 export class PaymentSuccessMailService {

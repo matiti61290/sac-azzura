@@ -4,18 +4,18 @@ import { SubcategoryEntity } from "./subcategory.entity";
 @Entity('Category')
 export class CategoryEntity {
     @PrimaryGeneratedColumn()
-    id: number;
+    id!: number;
 
     @Column({ length: 255, nullable: false, unique: true })
-    name: string;
+    name!: string;
 
     @OneToMany(
         ()=> SubcategoryEntity, 
         (subcategory)=> subcategory.category,
         { cascade: true}
     )
-    subcategories: SubcategoryEntity[];
+    subcategories!: SubcategoryEntity[];
 
     @Column({length: 5, nullable: false, unique: true})
-    sku_code: string
+    sku_code!: string
 }

@@ -1,14 +1,15 @@
 import { Injectable, OnModuleInit, Logger, HttpStatus, HttpException, InternalServerErrorException, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import * as soap from 'soap';
 import { createHash } from 'crypto';
-import { FindRelayPointDto } from 'src/shared/dtos/mondial_relai/findRelayPoint.dto';
 import { XMLParser } from 'fast-xml-parser';
-import { CreateLabelDto } from 'src/shared/dtos/mondial_relai/createLabelDto.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { OrderEntity } from 'src/entities/order.entity';
 import { Repository } from 'typeorm';
-import { OrderStatus } from 'src/shared/enum/order.enum';
-import { Carrier } from 'src/shared/enum/carrier.enum';
+import { FindRelayPointDto } from '../../../shared/dtos/mondial_relai/findRelayPoint.dto';
+import { CreateLabelDto } from '../../../shared/dtos/mondial_relai/createLabelDto.dto';
+import { OrderEntity } from '../../../entities/order.entity';
+import { OrderStatus } from '../../../shared/enum/order.enum';
+import { Carrier } from '../../../shared/enum/carrier.enum';
+import { ServiceError } from '../../../shared/interfaces/serviceError.interface';
 
 @Injectable()
 export class MondialRelayService implements OnModuleInit {
@@ -43,7 +44,9 @@ export class MondialRelayService implements OnModuleInit {
       });
       this.logger.log('Mondial Relay : Client SOAP (V1) prêt');
     } catch (error) {
-      this.logger.error(`Erreur WSDL : ${error.message}`);
+      if(error instanceof Error){
+        this.logger.error(`Erreur WSDL : ${error.message}`);
+      }
     }
   }
 
@@ -102,10 +105,14 @@ export class MondialRelayService implements OnModuleInit {
         points: data.PointsRelais?.PointRelais_Details || []
       };
     } catch (error) {
-      if (error.response && error.response.data) {
-          this.logger.error("Réponse d'erreur du serveur reçue.");
+      if (error instanceof Error){
+        const serviceError = error as ServiceError
+
+        if (serviceError.response?.data) {
+          this.logger.error("Reponse d'erreur du serveur recue")
+        }
+        return { success: false, message: serviceError.message}
       }
-      return { success: false, message: error.message };
     }
   }
 
@@ -239,7 +246,14 @@ export class MondialRelayService implements OnModuleInit {
       }
 
     } catch (error) {
-      throw new HttpException(error.message || "Erreur interne", HttpStatus.INTERNAL_SERVER_ERROR);
+      if (error instanceof Error){
+        const serviceError = error as ServiceError
+
+        if(serviceError.response?.data){
+          throw new HttpException(error.message || "Erreur interne", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+      }
+      
     }
   }
 
@@ -308,7 +322,14 @@ export class MondialRelayService implements OnModuleInit {
         cached: false
       };
     } catch (error) {
-      return { success: false, message: error.message };
+      if(error instanceof Error){
+        const serviceError = error as ServiceError
+
+        if(serviceError.response?.data){
+          this.logger.error("Reponse d'erreur du serveur recue")
+        }
+        return { success: false, message: error.message}
+      }
     }
   }
 

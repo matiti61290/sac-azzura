@@ -1,10 +1,10 @@
 import { Body, Controller, Get, Param, ParseIntPipe, Post, Query, UploadedFiles, UseGuards, UseInterceptors } from "@nestjs/common";
 import { ProductService } from "./product.service";
-import { AddProductDto } from "src/shared/dtos/product/addProduct.dto";
-import { UpdateProductDto } from "src/shared/dtos/product/updateProduct.dto";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 import { AdminGuard } from "../auth/guards/admin.guard";
 import { FilesInterceptor } from "@nestjs/platform-express";
+import { AddProductDto } from "../../shared/dtos/product/addProduct.dto";
+import { UpdateProductDto } from "../../shared/dtos/product/updateProduct.dto";
 
 @Controller('products')
 export class ProductController {

@@ -4,9 +4,9 @@ export class LoginDto {
     @IsNotEmpty()
     @IsEmail()
     @IsString()
-    mail: string;
+    mail!: string;
 
     @IsNotEmpty()
     @IsString()
-    password: string
+    password!: string
 }

@@ -1,9 +1,9 @@
 import { Body, Controller, Get, Param, ParseIntPipe, Post, UseGuards } from "@nestjs/common";
 import { SubcategoryService } from "./subcategory.service";
-import { AddSubcategoryDto } from "src/shared/dtos/subcategory/addSubcategory.dto";
-import { UpdateSubcategoryDto } from "src/shared/dtos/subcategory/updateSubcategory.dto";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 import { AdminGuard } from "../auth/guards/admin.guard";
+import { AddSubcategoryDto } from "../../shared/dtos/subcategory/addSubcategory.dto";
+import { UpdateSubcategoryDto } from "../../shared/dtos/subcategory/updateSubcategory.dto";
 
 @Controller('subcategory')
 export class SubcategoryController{
@@ -35,7 +35,7 @@ export class SubcategoryController{
     @UseGuards(JwtAuthGuard, AdminGuard)
     async updateSubcategory(
         @Param('subcategoryId', ParseIntPipe) subcategoryId: number,
-        @Body() updateSubcategoryDto: UpdateSubcategoryDto 
+        @Body() updateSubcategoryDto: UpdateSubcategoryDto
     ) {
         return this.subcategoryService.updateSubcategory(subcategoryId, updateSubcategoryDto)
     }

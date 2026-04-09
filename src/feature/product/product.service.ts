@@ -1,13 +1,13 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { ImageEntity } from "src/entities/image.entity";
-import { ProductEntity } from "src/entities/product.entity";
-import { SubcategoryEntity } from "src/entities/subcategory.entity";
-import { AddProductDto } from "src/shared/dtos/product/addProduct.dto";
-import { UpdateProductDto } from "src/shared/dtos/product/updateProduct.dto";
 import { Repository } from "typeorm";
 import { AwsS3Service } from "../aws-s3/aws-s3.service";
 import { StockService } from "../stock/stock.service";
+import { ImageEntity } from "../../entities/image.entity";
+import { ProductEntity } from "../../entities/product.entity";
+import { SubcategoryEntity } from "../../entities/subcategory.entity";
+import { AddProductDto } from "../../shared/dtos/product/addProduct.dto";
+import { UpdateProductDto } from "../../shared/dtos/product/updateProduct.dto";
 
 @Injectable()
 export class ProductService {

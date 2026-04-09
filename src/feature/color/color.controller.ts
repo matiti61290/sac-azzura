@@ -1,9 +1,9 @@
 import { Controller, Get, Post, Param, Body, ParseIntPipe, UseGuards } from "@nestjs/common";
 import { ColorService } from "./color.service";
-import { AddColorDto } from "src/shared/dtos/color/addColor.dto";
-import { UpdateColorDto } from "src/shared/dtos/color/updateColor.dto";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 import { AdminGuard } from "../auth/guards/admin.guard";
+import { AddColorDto } from "../../shared/dtos/color/addColor.dto";
+import { UpdateColorDto } from "../../shared/dtos/color/updateColor.dto";
 
 @Controller('colors')
 export class ColorController {

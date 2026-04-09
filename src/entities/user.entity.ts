@@ -5,36 +5,36 @@ import { OrderEntity } from "./order.entity";
 @Entity('User')
 export class UserEntity {
     @PrimaryGeneratedColumn({ type: 'int' })
-    id: number;
+    id!: number;
 
     @Column({ length: 255 })
-    firstname: string;
+    firstname!: string;
 
     @Column({ length: 255})
-    lastname: string;
+    lastname!: string;
 
     @Column({ length: 255, unique: true })
-    mail: string;
+    mail!: string;
 
     @Column({ length: 20 })
-    phoneNumber: string;
+    phoneNumber!: string;
 
     @Column({ length: 255 })
-    password: string;
+    password!: string;
 
     @Column()
-    isVerified: boolean;
+    isVerified!: boolean;
 
     @OneToMany(
         ()=> AddressEntity, 
         (address)=> address.user, 
         { cascade: true, onDelete: "CASCADE" }
     )
-    addresses: AddressEntity[];
+    addresses!: AddressEntity[];
 
     @OneToMany(()=> OrderEntity, (order)=> order.user)
-    orders: OrderEntity[];
+    orders!: OrderEntity[];
 
     @Column()
-    isAdmin: boolean
+    isAdmin!: boolean
 }

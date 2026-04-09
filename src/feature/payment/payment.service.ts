@@ -1,17 +1,17 @@
 import { BadRequestException, ForbiddenException, Injectable, InternalServerErrorException, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { OrderEntity } from "src/entities/order.entity";
-import { OrderItemEntity } from "src/entities/orderItem.entity";
-import { StockEntity } from "src/entities/stock.entity";
-import { UserEntity } from "src/entities/user.entity";
-import { CartDto } from "src/shared/dtos/payment/cart.dto";
-import { OrderStatus } from "src/shared/enum/order.enum";
 import { Stripe } from 'stripe'
 import { DataSource, Repository } from "typeorm";
 import { PaymentSuccessMailService } from "./paymentMail/paymentSuccessMail.service";
 import { paymentFailMailService } from "./paymentMail/paymentFailMail.service";
-import { AddressEntity } from "src/entities/addresses.entity";
-import { PromotionEntity } from "src/entities/promotion.entity";
+import { OrderEntity } from "../../entities/order.entity";
+import { OrderItemEntity } from "../../entities/OrderItem.entity";
+import { StockEntity } from "../../entities/stock.entity";
+import { UserEntity } from "../../entities/user.entity";
+import { CartDto } from "../../shared/dtos/payment/cart.dto";
+import { OrderStatus } from "../../shared/enum/order.enum";
+import { AddressEntity } from "../../entities/addresses.entity";
+import { PromotionEntity } from "../../entities/promotion.entity";
 
 @Injectable()
 export class PaymentService {
@@ -206,7 +206,11 @@ export class PaymentService {
                 endpointSecret
             )
         } catch(error){
-            return res.status(401).send(`webhook error: ${error.message}`)
+            if (error instanceof Error) {
+                return res.status(401).send(`webhook error: ${error.message}`);
+            } else {
+                return res.status(500).send('An unknown error occurred');
+            }
         }
 
         if(event.type === 'checkout.session.completed'){

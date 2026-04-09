@@ -2,7 +2,7 @@ import { Module } from "@nestjs/common";
 import { AuthController } from "./auth.controller";
 import { AuthService } from "./auth.service";
 import { TypeOrmModule } from "@nestjs/typeorm";
-import { UserEntity } from "src/entities/user.entity";
+
 import { JwtModule } from "@nestjs/jwt";
 import { ConfirmMailService } from "./authMail/corfirmMail.service";
 import * as dotenv from 'dotenv'
@@ -13,6 +13,7 @@ import { JwtAuthGuard } from "./guards/jwt-auth.guard";
 import { newPasswordMailService } from "./authMail/newPasswordMail.service";
 import { UsersService } from "../user/user.service";
 import { AdminGuard } from "./guards/admin.guard";
+import { UserEntity } from "../../entities/user.entity";
 
 dotenv.config()
 
