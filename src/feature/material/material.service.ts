@@ -1,9 +1,9 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { MaterialEntity } from "src/entities/material.entity";
-import { AddMaterialDto } from "src/shared/dtos/material/addMaterial.dto";
-import { UpdateMaterialDto } from "src/shared/dtos/material/updateMaterial.dto";
 import { Repository } from "typeorm";
+import { MaterialEntity } from "../../entities/material.entity";
+import { AddMaterialDto } from "../../shared/dtos/material/addMaterial.dto";
+import { UpdateMaterialDto } from "../../shared/dtos/material/updateMaterial.dto";
 
 @Injectable()
 export class MaterialService {

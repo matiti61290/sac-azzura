@@ -4,5 +4,5 @@ export class MailDto {
     @IsNotEmpty()
     @IsEmail()
     @IsString()
-    mail:string
+    mail!:string
 }

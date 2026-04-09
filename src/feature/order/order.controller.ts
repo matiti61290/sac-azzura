@@ -1,8 +1,8 @@
 import { Body, Controller, Get, Param, ParseIntPipe, Patch, Post, Req, UseGuards } from "@nestjs/common";
 import { OrderService } from "./order.service";
-import { UpdateOrderStatusDto } from "src/shared/dtos/order/updateOrderStatus.dto";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 import { AdminGuard } from "../auth/guards/admin.guard";
+import { UpdateOrderStatusDto } from "../../shared/dtos/order/updateOrderStatus.dto";
 
 @Controller('orders')
 export class OrderController {

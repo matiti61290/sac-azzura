@@ -1,11 +1,11 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { ColorEntity } from "src/entities/color.entity";
-import { MaterialEntity } from "src/entities/material.entity";
-import { ProductEntity } from "src/entities/product.entity";
-import { StockEntity } from "src/entities/stock.entity";
-import { SubcategoryEntity } from "src/entities/subcategory.entity";
 import { Repository } from "typeorm";
+import { ColorEntity } from "../../entities/color.entity";
+import { MaterialEntity } from "../../entities/material.entity";
+import { ProductEntity } from "../../entities/product.entity";
+import { StockEntity } from "../../entities/stock.entity";
+import { SubcategoryEntity } from "../../entities/subcategory.entity";
 
 @Injectable()
 export class StockService {

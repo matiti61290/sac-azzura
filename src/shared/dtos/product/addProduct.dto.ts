@@ -4,39 +4,39 @@ import { IsInt, IsNotEmpty, IsPositive, IsString, IsArray, Matches, isInt, IsNum
 export class AddProductDto{
     @IsNotEmpty()
     @IsString()
-    name: string
+    name!: string
 
     @IsNotEmpty()
     @IsString()
-    description: string
+    description!: string
 
     @IsNotEmpty()
     @IsNumber({maxDecimalPlaces: 2})
     @IsPositive()
     @Type(()=> Number)
-    price: number
+    price!: number
 
     @IsNotEmpty()
     @IsInt()
     @Type(()=> Number)
-    subcategoryId: number
+    subcategoryId!: number
 
     @IsNotEmpty()
     @IsInt()
     @Type(()=> Number)
-    quantity: number
+    quantity!: number
 
     @IsNotEmpty()
     @IsInt()
     @Type(()=> Number)
-    colorId: number
+    colorId!: number
 
     @IsNotEmpty()
     @IsInt()
     @Type(()=> Number)
-    materialId: number
+    materialId!: number
 
     @IsNotEmpty()
     @IsString()
-    sku_code: string
+    sku_code!: string
 }

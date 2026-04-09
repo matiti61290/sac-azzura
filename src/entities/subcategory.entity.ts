@@ -5,21 +5,21 @@ import { ProductEntity } from "./product.entity";
 @Entity('Subcategory')
 export class SubcategoryEntity {
     @PrimaryGeneratedColumn({ type: 'int' })
-    id: number;
+    id!: number;
 
     @Column({ length: 255, unique: true })
-    name: string;
+    name!: string;
 
     @OneToMany(()=> ProductEntity, (product)=> product.subcategory)
-    products: ProductEntity[];
+    products!: ProductEntity[];
 
     @ManyToOne(
         ()=> CategoryEntity, 
         (category)=> category.subcategories,
         {onDelete: "CASCADE"}
     )
-    category: CategoryEntity;
+    category!: CategoryEntity;
 
     @Column({ length: 5, nullable: false, unique: true})
-    sku_code: string
+    sku_code!: string
 }

@@ -1,8 +1,8 @@
 import { Body, Controller, Get, Param,  Headers, HttpCode, HttpStatus, ParseIntPipe, Post, Req, Res, UseGuards } from "@nestjs/common";
 import { PaymentService } from "./payment.service";
-import { CartDto } from "src/shared/dtos/payment/cart.dto";
 import type { Request, Response } from "express";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
+import { CartDto } from "../../shared/dtos/payment/cart.dto";
 
 @Controller('payment')
 export class PaymentController {

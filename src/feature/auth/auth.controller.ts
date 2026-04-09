@@ -1,11 +1,11 @@
 import { Body, Controller, Get, Post, Query, Req, Res, UseGuards, UsePipes, ValidationPipe } from "@nestjs/common";
 import { AuthService } from "./auth.service";
-import { RegisterDto } from "src/shared/dtos/auth/register.dto";
 import { LocalAuthGuard } from "./guards/local-auth.guard";
 import { JwtAuthGuard } from "./guards/jwt-auth.guard";
 import type { Request, Response, } from "express";
-import { MailDto } from "src/shared/dtos/auth/mail.dtos";
-import { NewPasswordDto } from "src/shared/dtos/auth/newPassword.dto";
+import { RegisterDto } from "../../shared/dtos/auth/register.dto";
+import { MailDto } from "../../shared/dtos/auth/mail.dtos";
+import { NewPasswordDto } from "../../shared/dtos/auth/newPassword.dto";
 
 
 @Controller('auth')

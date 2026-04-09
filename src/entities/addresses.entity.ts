@@ -1,27 +1,28 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, Index, OneToMany } from "typeorm";
 import { UserEntity } from "./user.entity";
-import { AddressType } from "src/shared/enum/address.enum";
+
 import { OrderEntity } from "./order.entity";
+import { AddressType } from "../shared/enum/address.enum";
 
 @Entity('Address')
 export class AddressEntity {
     @PrimaryGeneratedColumn({ type: 'int' })
-    id: number
+    id!: number
 
     @Column({ type: "enum", enum: AddressType})
-    type: AddressType
+    type!: AddressType
     
     @Column({ length: 255, nullable: false})
-    street: string
+    street!: string
 
     @Column({ length: 255 })
-    additional: string
+    additional!: string
 
     @Column({ length: 20, nullable: false })
-    zipcode: string;
+    zipcode!: string;
 
     @Column({ length: 255, nullable: false})
-    city: string;
+    city!: string;
 
     @ManyToOne(
         ()=> UserEntity, 
@@ -29,8 +30,8 @@ export class AddressEntity {
         {onDelete: "CASCADE"}
     )
     @Index()
-    user: UserEntity;
+    user!: UserEntity;
 
     @OneToMany(()=> OrderEntity, (order)=> order.delivery_address)
-    orders: []
+    orders!: []
 }

@@ -3,13 +3,13 @@ import { IsInt, IsNotEmpty, IsString } from "class-validator";
 export class AddSubcategoryDto {
     @IsNotEmpty()
     @IsString()
-    name: string
+    name!: string
 
     @IsNotEmpty()
     @IsInt()
-    categoryId: number
+    categoryId!: number
 
     @IsNotEmpty()
     @IsString()
-    sku_code: string
+    sku_code!: string
 }

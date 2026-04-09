@@ -1,9 +1,9 @@
 import { Controller, Get, Param, ParseIntPipe, Post, Body, UseGuards } from "@nestjs/common";
 import { CategoryService } from "./category.service";
-import { AddCategoryDto } from "src/shared/dtos/category/addCategory.dto";
-import { UpdateCategoryDto } from "src/shared/dtos/category/updateCategory.dto";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 import { AdminGuard } from "../auth/guards/admin.guard";
+import { AddCategoryDto } from "../../shared/dtos/category/addCategory.dto";
+import { UpdateCategoryDto } from "../../shared/dtos/category/updateCategory.dto";
 
 @Controller('category')
 export class CategoryController{

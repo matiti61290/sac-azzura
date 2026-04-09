@@ -7,36 +7,36 @@ import { ProductEntity } from "./product.entity";
 @Entity('Stock')
 export class StockEntity {
     @PrimaryGeneratedColumn({ type: 'int' })
-    id: number;
+    id!: number;
 
     @ManyToOne(
         ()=> ProductEntity, 
         (product)=> product.stocks, 
         { onDelete: "SET NULL", nullable: true}
     )
-    product: ProductEntity | null;
+    product!: ProductEntity | null;
 
     @ManyToOne(()=> MaterialEntity, (material)=> material.stocks)
-    material: MaterialEntity
+    material!: MaterialEntity
 
     @ManyToOne(()=> ColorEntity, (color)=> color.stocks)
-    color: ColorEntity;
+    color!: ColorEntity;
 
     @Column({ type: 'int' })
-    quantity: number;
+    quantity!: number;
 
     @Column({ 
         type: 'datetime', 
         default: () => 'CURRENT_TIMESTAMP' 
     })
-    createdAt: Date;
+    createdAt!: Date;
 
     @Column({
         type: 'datetime', 
         default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP' 
     })
-    updatedAt: Date;
+    updatedAt!: Date;
 
     @Column({ length: 50, unique: true })
-    sku: string
+    sku!: string
 }

@@ -1,52 +1,51 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, Index } from "typeorm";
 import { SubcategoryEntity } from "./subcategory.entity";
 import { StockEntity } from "./stock.entity";
-import { OrderEntity } from "./order.entity";
 import { ImageEntity } from "./image.entity";
 
 @Entity('Product')
 export class ProductEntity {
     @PrimaryGeneratedColumn({ type: 'int' })
-    id: number;
+    id!: number;
 
     @Column({ length: 255, nullable: false, unique: true })
-    name: string;
+    name!: string;
 
     @Column({ length: 512, nullable: false })
-    description: string;
+    description!: string;
 
     @Column({ type: "decimal", precision: 10, scale: 2, nullable: false })
-    price: number;
+    price!: number;
 
     @OneToMany(()=> ImageEntity, (image) => image.product, {cascade: true})
-    images: ImageEntity[]
+    images!: ImageEntity[]
 
     @ManyToOne(()=> SubcategoryEntity, (subcategory)=>subcategory.products)
-    subcategory: SubcategoryEntity;
+    subcategory!: SubcategoryEntity;
     
     @OneToMany(
         ()=> StockEntity, 
         (stock)=> stock.product,
         { cascade: true }
     )
-    stocks: StockEntity[]
+    stocks!: StockEntity[]
 
     @Column({ 
         type: 'timestamp', 
         default: ()=> "CURRENT_TIMESTAMP"
     })
-    createdAt: Date
+    createdAt!: Date
 
         @Column({ 
         type: 'timestamp', 
         default: ()=> "CURRENT_TIMESTAMP",
         onUpdate: 'CURRENT_TIMESTAMP'
     })
-    updatedAt: Date
+    updatedAt!: Date
 
     @Column({ default: true })
-    isActive: boolean
+    isActive!: boolean
 
     @Column({ length: 5, nullable: false, unique: true})
-    sku_code: string
+    sku_code!: string
 }

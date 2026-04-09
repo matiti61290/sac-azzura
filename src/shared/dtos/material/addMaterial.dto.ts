@@ -3,9 +3,9 @@ import { IsNotEmpty, IsString } from "class-validator";
 export class AddMaterialDto {
     @IsNotEmpty()
     @IsString()
-    name: string
+    name!: string
 
     @IsNotEmpty()
     @IsString()
-    sku_code: string
+    sku_code!: string
 }

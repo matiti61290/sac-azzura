@@ -1,9 +1,9 @@
 import { Body, Controller, Get, Param, ParseIntPipe, Post, UseGuards } from "@nestjs/common";
 import { MaterialService } from "./material.service";
-import { AddMaterialDto } from "src/shared/dtos/material/addMaterial.dto";
-import { UpdateMaterialDto } from "src/shared/dtos/material/updateMaterial.dto";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 import { AdminGuard } from "../auth/guards/admin.guard";
+import { AddMaterialDto } from "../../shared/dtos/material/addMaterial.dto";
+import { UpdateMaterialDto } from "../../shared/dtos/material/updateMaterial.dto";
 
 @Controller('materials')
 export class MaterialController {

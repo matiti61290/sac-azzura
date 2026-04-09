@@ -2,8 +2,8 @@ import { Body, Controller, Get, Param, ParseIntPipe, Patch, Post, Req, UseGuards
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 import { AdminGuard } from "../auth/guards/admin.guard";
 import { AddressService } from "./address.service";
-import { AddAddressDto } from "src/shared/dtos/address/addAddress.dto";
-import { UpdateAddressDto } from "src/shared/dtos/address/updateAddress.dto";
+import { AddAddressDto } from "../../shared/dtos/address/addAddress.dto";
+import { UpdateAddressDto } from "../../shared/dtos/address/updateAddress.dto";
 
 @Controller('addresses')
 export class AddressController {

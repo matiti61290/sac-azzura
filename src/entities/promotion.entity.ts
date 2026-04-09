@@ -1,41 +1,42 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from "typeorm";
 import { OrderEntity } from "./order.entity";
-import { PromotionType } from "src/shared/enum/promotionType.enum";
+import { PromotionType } from "../shared/enum/promotionType.enum";
+
 
 @Entity('Promotion')
 export class PromotionEntity {
     @PrimaryGeneratedColumn({ type: "int" })
-    id: number;
+    id!: number;
 
     @Column({ length: 255, nullable: false, unique: true })
-    name: string;
+    name!: string;
 
     @Column({ type: 'enum', enum: PromotionType, default: PromotionType.PERCENTAGE})
-    promotionType: PromotionType
+    promotionType!: PromotionType
 
     @Column({ type: 'int', nullable: true })
-    percentageValue: number
+    percentageValue!: number
 
     @Column({ type: 'int', nullable: true})
-    fixedValue: number
+    fixedValue!: number
 
     @Column({ type: 'datetime'})
-    startdate: Date
+    startdate!: Date
 
     @Column({ type: 'datetime' })
-    enddate: Date;
+    enddate!: Date;
 
     @Column({ type: 'int', nullable: true})
-    minAmount: number
+    minAmount!: number
 
     @Column({ type: 'json', nullable: true})
-    categories: string[]
+    categories!: string[]
 
     @Column()
-    isActive: boolean;
+    isActive!: boolean;
 
     @OneToMany(()=>OrderEntity, (order)=> order.promotion)
-    orders: OrderEntity[]
+    orders!: OrderEntity[]
 
     get isExpired(): boolean {
         return this.enddate < new Date()

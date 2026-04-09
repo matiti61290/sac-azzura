@@ -1,15 +1,15 @@
 import { BadRequestException, ConflictException, Injectable, NotFoundException } from "@nestjs/common";
-import { UserEntity } from "src/entities/user.entity";
 import { Repository } from "typeorm";
 import { InjectRepository } from "@nestjs/typeorm";
-import { RegisterDto } from "src/shared/dtos/auth/register.dto";
 import { JwtService } from "@nestjs/jwt";
 import { ConfirmMailService } from "./authMail/corfirmMail.service";
 import * as bcrypt from 'bcrypt'
 import { Response } from "express";
 import { newPasswordMailService } from "./authMail/newPasswordMail.service";
-import { MailDto } from "src/shared/dtos/auth/mail.dtos";
-import { NewPasswordDto } from "src/shared/dtos/auth/newPassword.dto";
+import { UserEntity } from "../../entities/user.entity";
+import { RegisterDto } from "../../shared/dtos/auth/register.dto";
+import { MailDto } from "../../shared/dtos/auth/mail.dtos";
+import { NewPasswordDto } from "../../shared/dtos/auth/newPassword.dto";
 /**
  * Service s'occupant des fonctions liées à l'authentification comme l'inscription ou la connexion d'un utilisateur.
  */

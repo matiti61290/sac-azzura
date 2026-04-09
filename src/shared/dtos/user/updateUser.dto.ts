@@ -1,13 +1,13 @@
 import { IsEmail, IsPhoneNumber } from "class-validator"
 
 export class UpdateUserDto {
-    firstname: string
+    firstname!: string
 
-    lastname: string
+    lastname!: string
 
     @IsEmail()
-    mail: string
+    mail!: string
 
     @IsPhoneNumber()
-    phoneNumber: string
+    phoneNumber!: string
 }
