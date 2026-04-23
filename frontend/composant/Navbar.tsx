@@ -53,7 +53,7 @@ export default function Navbar() {
                 <Link href="/register" className="font-amatic text-2xl text-gray-600 font-bold text-gray-600 hover:text-black">
                   S'inscrire
                 </Link>
-                <Link href="/login" className="px-4 py-2 border-l-2 border-amber-600/50 font-amatic text-2xl text-gray-600 font-bold">
+                <Link href="/login" className="px-4 py-2 border-l-2 border-night-blue/50 font-amatic text-2xl text-gray-600 font-bold">
                   Connexion
                 </Link>
               </div>
@@ -83,7 +83,7 @@ export default function Navbar() {
               <DisclosureButton as={Link} href="/register" className="block py-2 text-center font-amatic text-2xl text-gray-600 font-bold hover:text-black">
                 S'inscrire
               </DisclosureButton>
-              <DisclosureButton as={Link} href="/login" className="block py-2 text-center font-amatic text-2xl text-gray-600 font-bold hover:text-black border-t-2 border-amber-600/50 ">
+              <DisclosureButton as={Link} href="/login" className="block py-2 text-center font-amatic text-2xl text-gray-600 font-bold hover:text-black border-t-2 border-night-blue/50 ">
                 Connexion
               </DisclosureButton>
             </div>

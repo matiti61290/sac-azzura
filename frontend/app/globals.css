@@ -7,6 +7,11 @@
   --font-mono: var(--font-geist-mono);
   --font-titre: var(--font-title);
   --font-text: var(--font-text);
+
+  --color-light-blue: #BBE7FF ;
+  --color-dark-blue: #1F58C2 ;
+  --color-night-blue: #040669 ;
+  --color-orange: #FFAA67 ;
 }
 
 body {
