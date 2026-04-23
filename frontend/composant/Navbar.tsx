@@ -8,7 +8,7 @@ import { Bars3Icon, XMarkIcon, ShoppingBagIcon } from '@heroicons/react/24/outli
 export default function Navbar() {
   return (
     // Disclosure est le composant magique qui gère l'état ouvert/fermé
-    <Disclosure as="nav" className="relative bg-white shadow-md/20 shadow-blue-800 p-4">
+    <Disclosure as="nav" className="relative bg-white shadow-md/20 shadow-night-blue p-4">
       {/* On récupère la variable "open" fournie par Disclosure pour changer l'icône */}
       {({ open }) => (
         <>
@@ -32,16 +32,16 @@ export default function Navbar() {
 
               {/* Liens bureau (Utilisation de next/link) */}
               <div className="hidden ml-5 md:flex items-center justify-center space-x-6">
-                <Link href="/" className="font-text text-2xl text-gray-600 font-bold hover:text-black">Accueil</Link>
-                <Link href="/services" className="font-amatic text-2xl text-gray-600 font-bold hover:text-black">La boutique</Link>
-                <Link href="/about" className="font-amatic text-2xl text-gray-600 font-bold hover:text-black">Personnalisation</Link>
-                <Link href="/about" className="font-amatic text-2xl text-gray-600 font-bold hover:text-black">À propos</Link>
+                <Link href="/" className="font-text text-2xl text-gray-600 hover:text-black">Accueil</Link>
+                <Link href="/services" className="font-text text-2xl text-gray-600 hover:text-black">La boutique</Link>
+                <Link href="/about" className="font-text text-2xl text-gray-600 hover:text-black">Personnalisation</Link>
+                <Link href="/about" className="font-text text-2xl text-gray-600  hover:text-black">À propos</Link>
               </div>
             </div>
 
             {/* 2. CENTRE : Le Logo */}
             <div className="flex flex-shrink-0 justify-center">
-              <Link href="/" className="text-2xl font-bold tracking-widest text-indigo-600">
+              <Link href="/" className="text-2xl tracking-widest text-indigo-600">
                   <Image src='/static/logo.png' width={150} height={150} alt="Logo de la marque Sac'Azura" />
               </Link>
             </div>
@@ -50,10 +50,10 @@ export default function Navbar() {
             <div className="mr-5 flex flex-1 justify-end space-x-6">
               <ShoppingBagIcon className='w-auto h-8'/>
               <div className="hidden md:flex items-center space-x-4">
-                <Link href="/register" className="font-amatic text-2xl text-gray-600 font-bold text-gray-600 hover:text-black">
+                <Link href="/register" className="font-text text-2xl text-gray-600 text-gray-600 hover:text-black">
                   S'inscrire
                 </Link>
-                <Link href="/login" className="px-4 py-2 border-l-2 border-night-blue/50 font-amatic text-2xl text-gray-600 font-bold">
+                <Link href="/login" className="px-4 py-2 border-l-2 border-night-blue/50 font-text text-2xl text-gray-600">
                   Connexion
                 </Link>
               </div>
@@ -65,25 +65,25 @@ export default function Navbar() {
           {/* DisclosurePanel gère automatiquement l'affichage basé sur l'état "open" */}
           <DisclosurePanel className="md:hidden absolute left-0 top-full w-full bg-white px-4 pt-2 pb-4 shadow-lg z-10">
             <div className="space-y-1">
-              <DisclosureButton as={Link} href="/" className="block py-3 font-amatic text-2xl text-gray-600 font-bold hover:text-black">
+              <DisclosureButton as={Link} href="/" className="block py-3 font-text text-2xl text-gray-600 hover:text-black">
                 Accueil
               </DisclosureButton>
-              <DisclosureButton as={Link} href="/services" className="block py-3 font-amatic text-2xl text-gray-600 font-bold hover:text-black">
+              <DisclosureButton as={Link} href="/services" className="block py-3 font-text text-2xl text-gray-600 hover:text-black">
                 La boutique
               </DisclosureButton>
-              <DisclosureButton as={Link} href="/services" className="block py-3 font-amatic text-2xl text-gray-600 font-bold hover:text-black">
+              <DisclosureButton as={Link} href="/services" className="block py-3 font-text text-2xl text-gray-600 hover:text-black">
                 Personnalisation
               </DisclosureButton>
-              <DisclosureButton as={Link} href="/about" className="block py-3 font-amatic text-2xl text-gray-600 font-bold hover:text-black">
+              <DisclosureButton as={Link} href="/about" className="block py-3 font-text text-2xl text-gray-600 hover:text-black">
                 À propos
               </DisclosureButton>
             </div>
             
             <div className="mt-4 flex flex-col space-y-2">
-              <DisclosureButton as={Link} href="/register" className="block py-2 text-center font-amatic text-2xl text-gray-600 font-bold hover:text-black">
+              <DisclosureButton as={Link} href="/register" className="block py-2 text-center font-text text-2xl text-gray-600 hover:text-black">
                 S'inscrire
               </DisclosureButton>
-              <DisclosureButton as={Link} href="/login" className="block py-2 text-center font-amatic text-2xl text-gray-600 font-bold hover:text-black border-t-2 border-night-blue/50 ">
+              <DisclosureButton as={Link} href="/login" className="block py-2 text-center font-text text-2xl text-gray-600 hover:text-black border-t-2 border-night-blue/50 ">
                 Connexion
               </DisclosureButton>
             </div>
