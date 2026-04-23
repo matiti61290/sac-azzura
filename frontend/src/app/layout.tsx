@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
 import localFont from 'next/font/local'
-import { Geist, Geist_Mono, Amatic_SC, Raleway } from "next/font/google";
 import "./globals.css";
-import Header from "@/composant/Header";
-import Footer from "@/composant/Footer";
+import Header from "@/src/composants/Header";
+import Footer from "@/src/composants/Footer";
 
 const avallonFont = localFont({
   src: './fonts/Avallon.woff2',
