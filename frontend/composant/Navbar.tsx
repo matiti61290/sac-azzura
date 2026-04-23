@@ -1,6 +1,7 @@
 "use client"; // Obligatoire car Headless UI utilise des interactions côté client
 
 import Link from 'next/link';
+import Image from 'next/image'
 import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/react';
 import { Bars3Icon, XMarkIcon, ShoppingBagIcon } from '@heroicons/react/24/outline';
 
@@ -41,7 +42,7 @@ export default function Navbar() {
             {/* 2. CENTRE : Le Logo */}
             <div className="flex flex-shrink-0 justify-center">
               <Link href="/" className="text-2xl font-bold tracking-widest text-indigo-600">
-                MON LOGO
+                  <Image src='/static/logo.png' width={150} height={150} alt="Logo de la marque Sac'Azura" />
               </Link>
             </div>
 
