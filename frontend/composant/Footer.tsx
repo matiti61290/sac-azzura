@@ -5,7 +5,7 @@ export default function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="bg-gray-50 pt-12 pb-8 border-t border-gray-200 mt-auto inset-shadow-xs">
+    <footer className="bg-gray-50 pt-12 pb-8 border-t border-night-blue/40 mt-auto inset-shadow-xs">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* LA GRILLE RESPONSIVE 
@@ -16,27 +16,27 @@ export default function Footer() {
           
           {/* 1. PLAN DU SITE */}
           <div>
-            <h3 className="text-lg font-bold text-gray-900 mb-4 font-raleway tracking-wider uppercase text-sm">
+            <h3 className="text-lg font-bold text-gray-900 mb-4 font-text tracking-wider uppercase text-sm">
               Plan du site
             </h3>
             <ul className="space-y-3">
               <li>
-                <Link href="/" className="text-gray-600 font-raleway hover:text-marque transition-colors">
+                <Link href="/" className="text-gray-600 font-text hover:text-marque transition-colors">
                   Accueil
                 </Link>
               </li>
               <li>
-                <Link href="/boutique" className="text-gray-600 font-raleway hover:text-marque transition-colors">
+                <Link href="/boutique" className="text-gray-600 font-text hover:text-marque transition-colors">
                   Boutique
                 </Link>
               </li>
               <li>
-                <Link href="/upcycling" className="text-gray-600 font-raleway hover:text-marque transition-colors">
+                <Link href="/upcycling" className="text-gray-600 font-text hover:text-marque transition-colors">
                   Personnalisation
                 </Link>
               </li>
               <li>
-                <Link href="/sur-mesure" className="text-gray-600 font-raleway hover:text-marque transition-colors">
+                <Link href="/sur-mesure" className="text-gray-600 font-text hover:text-marque transition-colors">
                   A propos
                 </Link>
               </li>
@@ -45,22 +45,22 @@ export default function Footer() {
 
           {/* 2. CONTACT & LÉGAL */}
           <div>
-            <h3 className="text-lg font-bold text-gray-900 mb-4 font-raleway tracking-wider uppercase text-sm">
+            <h3 className="text-lg font-bold text-gray-900 mb-4 font-text tracking-wider uppercase text-sm">
               Informations
             </h3>
             <ul className="space-y-3">
               <li>
-                <Link href="/contact" className="text-gray-600 font-raleway hover:text-marque transition-colors">
+                <Link href="/contact" className="text-gray-600 font-text hover:text-marque transition-colors">
                   Contact
                 </Link>
               </li>
               <li>
-                <Link href="/mentions-legales" className="text-gray-600 font-raleway hover:text-marque transition-colors">
+                <Link href="/mentions-legales" className="text-gray-600 font-text hover:text-marque transition-colors">
                   Mentions légales
                 </Link>
               </li>
               <li>
-                <Link href="/cgv" className="text-gray-600 font-raleway hover:text-marque transition-colors">
+                <Link href="/cgv" className="text-gray-600 font-text hover:text-marque transition-colors">
                   Conditions Générales (CGV)
                 </Link>
               </li>
@@ -93,7 +93,7 @@ export default function Footer() {
         </div>
 
         {/* 4. COPYRIGHT */}
-        <div className="mt-12 pt-8 border-t border-amber-600/50">
+        <div className="mt-12 pt-8 border-t border-night-blue/50">
           <p className="text-center text-sm text-gray-500">
             &copy; {currentYear} Sac'Azura. Tous droits réservés.
           </p>
