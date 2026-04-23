@@ -1,31 +1,19 @@
 import type { Metadata } from "next";
+import localFont from 'next/font/local'
 import { Geist, Geist_Mono, Amatic_SC, Raleway } from "next/font/google";
 import "./globals.css";
 import Header from "@/composant/Header";
 import Footer from "@/composant/Footer";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
-const amaticSC = Amatic_SC({
-  weight: ['400', '700'], 
-  variable: "--font-amatic",
-  subsets: ["latin"],
-});
-
-const raleway = Raleway({
-  variable: "--font-raleway",
-  subsets: ['latin']
+const avallonFont = localFont({
+  src: './fonts/Avallon.woff2',
+  variable: '--font-avallon',
 })
 
-
+const quicksandFont = localFont({
+  src: './fonts/Quicksand-VariableFont_wght.ttf',
+  variable: '--font-text'
+})
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -40,7 +28,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} ${amaticSC.variable} h-full antialiased`}
+      className={`${avallonFont.variable} ${quicksandFont.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
         <Header />

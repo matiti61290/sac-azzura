@@ -5,9 +5,8 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-
-  --font-amatic: var(--font-amatic);
-  --font-raleway: var(--font-raileway)
+  --font-titre: var(--font-title);
+  --font-text: var(--font-text);
 }
 
 body {

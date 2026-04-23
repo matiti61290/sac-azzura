@@ -32,7 +32,7 @@ export default function Navbar() {
 
               {/* Liens bureau (Utilisation de next/link) */}
               <div className="hidden ml-5 md:flex items-center justify-center space-x-6">
-                <Link href="/" className="font-amatic text-2xl text-gray-600 font-bold hover:text-black">Accueil</Link>
+                <Link href="/" className="font-text text-2xl text-gray-600 font-bold hover:text-black">Accueil</Link>
                 <Link href="/services" className="font-amatic text-2xl text-gray-600 font-bold hover:text-black">La boutique</Link>
                 <Link href="/about" className="font-amatic text-2xl text-gray-600 font-bold hover:text-black">Personnalisation</Link>
                 <Link href="/about" className="font-amatic text-2xl text-gray-600 font-bold hover:text-black">À propos</Link>
