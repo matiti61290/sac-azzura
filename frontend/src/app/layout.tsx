@@ -1,16 +1,16 @@
 import type { Metadata } from "next";
 import localFont from 'next/font/local'
-import "./globals.css";
-import Header from "@/src/composants/Header";
-import Footer from "@/src/composants/Footer";
+import "../libs/globals.css";
+import Header from "../components/layout/Header";
+import Footer from "../components/layout/Footer";
 
 const avallonFont = localFont({
-  src: './fonts/Avallon.woff2',
+  src: '../libs/fonts/Avallon.woff2',
   variable: '--font-avallon',
 })
 
 const quicksandFont = localFont({
-  src: './fonts/Quicksand-VariableFont_wght.ttf',
+  src: '../libs/fonts/Quicksand-VariableFont_wght.ttf',
   variable: '--font-text'
 })
 
@@ -34,8 +34,6 @@ export default function RootLayout({
         {children}
         <Footer />
       </body>
-
-
     </html>
   );
 }
