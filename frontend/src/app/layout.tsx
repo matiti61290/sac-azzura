@@ -5,8 +5,8 @@ import Header from "../components/layout/Header";
 import Footer from "../components/layout/Footer";
 
 const avallonFont = localFont({
-  src: '../libs/fonts/Avallon.woff2',
-  variable: '--font-avallon',
+  src: '../libs/fonts/avallon.ttf',
+  variable: '--font-title',
 })
 
 const quicksandFont = localFont({

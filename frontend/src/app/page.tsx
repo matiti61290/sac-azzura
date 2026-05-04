@@ -2,8 +2,10 @@ export default function Home() {
   return (
     <div className="">
       <main className="min-h-screen flex flex-col gap-12 p-6 md:p-12">
-        <section id="slogan" className="text-center">
-          <h1 className="text-3xl font-bold text-gray-800">Slogan Section</h1>
+        <section id="slogan" className="text-center bg-[url(../../public/static/home-background.jpg)] py-15">
+          <h1 className="text-7xl text-white  font-title mx-5 my-5 pb-10">Sacs et accessoires faits main en Normandie, personnalisables et pensés pour durer</h1>
+          <h3 className=" text-xl text-white font-bold font-text m-5">Des créations artisanales uniques, pensées pour vous accompagner au quotidien.</h3>
+          <button className="font-text font-semibold border border-orange rounded-xl p-5 bg-orange">Découvrir la boutique</button>
         </section>
 
         <section id="welcome" className="flex flex-col gap-4">
