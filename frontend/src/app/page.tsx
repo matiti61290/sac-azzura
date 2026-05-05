@@ -36,9 +36,15 @@ export default function Home() {
 
         <hr className="color-night-blue bg-night-blue h-0.5 my-10"/>
 
-        <section id="personalization" className="bg-gray-100 p-6 rounded">
-          <h3 className="font-semibold text-gray-800">Personnalisation</h3>
-          <p className="text-gray-600"></p>
+        <section id="personalization" className="flex flex-col items-center">
+          <Image src="/static/bag-personalized-temporary.png" width={750} height={0} alt="Sac personnalisé"/>
+          <div className="flex flex-col items-center gap-1">
+            <h3 className="font-title text-dark-blue text-6xl mt-5 mb-10">La personnalisation, le cœur de Sac’Azura</h3>
+            <p className="font-text text-lg">Vous avez une envie particulière ? Une couleur précise, un tissu, une broderie, un détail qui compte pour vous ou pour offrir ?</p>
+            <p className="font-text text-lg">Je propose des créations personnalisées et sur-mesure pour que votre sac soit vraiment le vôtre.</p>
+            <p className="font-text text-lg">Parce que ce que j’aime le plus dans mon métier, c’est créer des objets qui ne ressemblent à personne d’autre.</p>
+            <button className="font-text font-semibold border border-orange rounded-xl p-5 bg-orange mt-10">Personnaliser une création</button>
+          </div>
         </section>
 
         <section id="creations" className="flex flex-col md:flex-row gap-6">
