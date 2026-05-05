@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 export default function Home() {
 
   //changer le background de la section slogan
@@ -11,21 +13,32 @@ export default function Home() {
           <button className="font-text font-semibold border border-orange rounded-xl p-5 bg-orange">Découvrir la boutique</button>
         </section>
 
-        <section id="welcome" className="flex flex-col gap-4">
-          <h2 className="text-2xl font-semibold text-gray-700">Welcome Section</h2>
-          <p className="text-gray-600">Bienvenue sur notre site web.</p>
-        </section>
+        <hr className="color-night-blue bg-night-blue h-0.5 my-10"/>
 
-        <section id="shop" className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="bg-white p-4 rounded shadow">
-            <h3 className="font-semibold text-gray-800">Boutique</h3>
-            <p className="text-gray-600">Découvrez nos produits.</p>
+        <section id="welcome" className="flex flex-col items-center gap-4">
+          <Image className="mb-10" src="/static/photo-dev.png"width={2000} height={0}  alt="Photo de la creatice, Gigi"/>
+          <div className="flex flex-col items-center gap-1">
+            <h2 className="text-6xl font-title text-center text-dark-blue mb-10">bienvenue chez Sac'Azura</h2>
+            <p className="font-text text-lg">
+              Je crois aux objets que l’on choisit avec le cœur, que 
+              l’on porte avec plaisir, et que l’on garde parce qu’ils ont du sens.
+            </p>
+            <p className="font-text text-lg">
+              Je m’appelle Gigi, et je confectionne moi-même chaque création dans mon atelier.
+            </p>
+            <p className="font-text text-lg">
+              Ici, vous trouverez des sacs pensés pour le quotidien : 
+              beaux, utiles, solides… et surtout, faits pour vous accompagner longtemps !
+            </p>
+            <button className="font-text font-semibold border border-orange rounded-xl p-5 bg-orange mt-10">Découvrir la boutique</button>
           </div>
         </section>
 
+        <hr className="color-night-blue bg-night-blue h-0.5 my-10"/>
+
         <section id="personalization" className="bg-gray-100 p-6 rounded">
           <h3 className="font-semibold text-gray-800">Personnalisation</h3>
-          <p className="text-gray-600">Personnalisez vos articles.</p>
+          <p className="text-gray-600"></p>
         </section>
 
         <section id="creations" className="flex flex-col md:flex-row gap-6">
@@ -60,6 +73,13 @@ export default function Home() {
               S'inscrire
             </button>
           </form>
+        </section>
+
+        <section id="shop" className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="bg-white p-4 rounded shadow">
+            <h3 className="font-semibold text-gray-800">Boutique</h3>
+            <p className="text-gray-600">Découvrez nos produits.</p>
+          </div>
         </section>
       </main>
     </div>
