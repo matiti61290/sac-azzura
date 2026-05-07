@@ -104,7 +104,7 @@ export default function Home() {
 
         {/*Possible changement de la section 1*/}
         <section>
-          <div className="flex flex-col items-center justify-center bg-[url(../../public/static/photo-dev.png)] h-200">
+          <div className="flex flex-col items-center justify-center bg-[image:var(--image-dev)] bg-cover bg-center h-200">
             <h1 className="text-7xl text-center text-white font-title mx-5 my-5 pb-10">Sacs et accessoires faits main en Normandie, personnalisables et pensés pour durer</h1>
             <h3 className=" text-xl text-white font-bold font-text m-5">Des créations artisanales uniques, pensées pour vous accompagner au quotidien.</h3>
             <button className="font-text font-semibold border border-orange rounded-xl p-5 bg-orange mt-10">Découvrir la boutique</button>
@@ -138,8 +138,11 @@ export default function Home() {
           </div>
         </section>
 
+        <hr className="color-night-blue bg-night-blue h-0.5 my-10"/>
+
         <section id="creations" className="flex flex-col md:flex-row gap-6">
-          <div className="mx-auto max-w-2xl px-4 py-16 sm:px-6 sm:py-24 lg:max-w-7xl lg:px-8">
+          <div className="flex flex-col items-center gap-6 mx-auto max-w-2xl px-4 py-16 sm:px-6 sm:py-24 lg:max-w-7xl lg:px-8">
+            <h2 className="font-title text-6xl text-dark-blue">Des créations artisanales, en petites séries ou en pièce unique</h2>
             <div className="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8">
               {products.map((product) => (
                 <a key={product.id} href="#" className="group">
@@ -149,18 +152,23 @@ export default function Home() {
                 </a>
               ))}
             </div>
-            <h2 className="font-title text-6xl text-dark-blue">Des créations artisanales, en petites séries ou en pièce unique</h2>
           </div>
         </section>
 
-        <section id="review" className="bg-white p-6 rounded shadow">
-          <h3 className="font-semibold text-gray-800">Avis</h3>
-          <p className="text-gray-600">Lisez ce que disent nos clients.</p>
+        <hr className="color-night-blue bg-night-blue h-0.5 my-10"/>
+
+        <section id="review" className="flex flex-col items-center">
+          <h3 className="font-title text-dark-blue text-6xl">Elles en parlent mieux que moi</h3>
+          {/*Voir pour trouver comment importer des*/}
         </section>
 
-        <section id="upcycling" className="flex flex-col gap-4">
-          <h3 className="font-semibold text-gray-800">Upcycling</h3>
-          <p className="text-gray-600">Découvrez nos initiatives d'upcycling.</p>
+        <hr className="color-night-blue bg-night-blue h-0.5 my-10"/>
+
+        <section id="upcycling" className="flex flex-col items-center gap-4">
+          <h3 className="font-title text-6xl text-dark-blue">Donner une seconde vie aux matières</h3>
+          <p className="font-text text-lg">J’aime travailler avec des matières qui ont déjà vécu, comme les jeans, que je transforme pour leur offrir une nouvelle histoire.</p>
+          <p className="font-text text-lg">L’upcycling me permet de créer autrement, sans produire inutilement, tout en donnant naissance à des sacs solides, uniques et chargés d’authenticité.</p>
+          <button className="font-text font-semibold border border-orange rounded-xl p-5 bg-orange">Découvrir les créations upcyclées</button>
         </section>
 
         <section id="newsletter" className="flex flex-col items-center gap-4">

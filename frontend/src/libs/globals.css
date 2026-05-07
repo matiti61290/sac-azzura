@@ -12,6 +12,8 @@
   --color-dark-blue: #1F58C2 ;
   --color-night-blue: #040669 ;
   --color-orange: #FFAA67 ;
+
+  --image-dev: url('/static/photo-dev.png')
 }
 
 body {
