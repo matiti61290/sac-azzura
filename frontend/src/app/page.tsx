@@ -87,7 +87,7 @@ export default async function Home() {
                 // On récupère la première image, ou une image par défaut si le tableau est vide
                 const mainImageUrl = product.images.length > 0 
                   ? product.images[0].url 
-                  : '/images/placeholder.png'; // Ton image par défaut dans le dossier public/
+                  : '/static/placeholder.jpg'; // Ton image par défaut dans le dossier public/
 
                 return (
                   <a key={product.id} href={`/shop/${product.id}`} className="group">
