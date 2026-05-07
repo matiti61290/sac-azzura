@@ -171,13 +171,17 @@ export default function Home() {
           <button className="font-text font-semibold border border-orange rounded-xl p-5 bg-orange">Découvrir les créations upcyclées</button>
         </section>
 
+        <hr className="color-night-blue bg-night-blue h-0.5 my-10"/>
+
         <section id="newsletter" className="flex flex-col items-center gap-4">
-          <h3 className="font-semibold text-gray-800">Newsletter</h3>
-          <form className="w-full max-w-md">
+          <h3 className="font-title text-6xl text-dark-blue">Rejoignez l’univers Sac’Azura</h3>
+          <p className="font-text text-lg">Les nouvelles créations partent vite. Soyez la première à les voir !</p>
+          <p className="font-text text-lg">Coulisses de l’atelier, nouveautés et offres exclusives dans votre boîte mail, sans spam.</p>
+          <form className="flex flex-col items-center w-full max-w-md">
             <input 
               type="email" 
               placeholder="Votre email" 
-              className="w-full p-2 border rounded"
+              className="w-full p-2 border border-2 border-night-blue rounded"
             />
             <button 
               type="submit" 
