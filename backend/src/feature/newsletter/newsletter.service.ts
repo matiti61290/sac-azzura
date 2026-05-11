@@ -47,8 +47,4 @@ export class NewsletterService {
 
     return 'Votre inscription est confirmée !';
   }
-
-  private async sendVerificationEmail(email: string, token: string) {
-
-  }
 }
