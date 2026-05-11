@@ -19,6 +19,7 @@ import { AddressModule } from './feature/address/address.module';
 import { PromotionModule } from './feature/promotion/promotion.module';
 import { CsrfModule } from './feature/csrf/csrf.module';
 import { ShippingModule } from './feature/shipping/shipping.module';
+import { NewsletterModule } from './feature/newsletter/newsletter.module';
 
 @Module({
   imports: [
@@ -39,7 +40,8 @@ import { ShippingModule } from './feature/shipping/shipping.module';
     AddressModule,
     PromotionModule,
     CsrfModule,
-    ShippingModule
+    ShippingModule,
+    NewsletterModule
   ],
   controllers: [AppController],
   providers: [AppService, AwsS3Service],
