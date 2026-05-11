@@ -15,7 +15,7 @@ export const dataSourceOptions: DataSourceOptions = {
     multipleStatements: true,
     synchronize: false, //false in prod
     logging: true,
-    entities: [ isCompiled ? 'dist/entities/*.entity.js' : 'dist/entities/*.entity.ts'],
+    entities: [ isCompiled ? 'dist/entities/*.entity{.ts,.js}' : 'src/entities/*.entity{.ts,.js}'],
     migrations: [isCompiled ? 'dist/database/migrations/*{.js,.ts}' : 'src/database/migrations/*{.ts,.js}'],
     migrationsRun: false
 }
