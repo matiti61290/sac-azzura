@@ -13,7 +13,7 @@ export const dataSourceOptions: DataSourceOptions = {
     database: process.env.DB_DATABASE,
     bigNumberStrings: true,
     multipleStatements: true,
-    synchronize: true, //false in prod
+    synchronize: false, //false in prod
     logging: true,
     entities: [ isCompiled ? 'dist/entities/*.entity{.ts,.js}' : 'src/entities/*.entity{.ts,.js}'],
     migrations: [isCompiled ? 'dist/database/migrations/*{.js,.ts}' : 'src/database/migrations/*{.ts,.js}'],
