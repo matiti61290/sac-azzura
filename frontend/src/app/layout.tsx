@@ -3,6 +3,7 @@ import localFont from 'next/font/local'
 import "../libs/globals.css";
 import Header from "../components/layout/Header";
 import Footer from "../components/layout/Footer";
+import * as dotenv from 'dotenv'
 
 const avallonFont = localFont({
   src: '../libs/fonts/avallon.ttf',
@@ -25,6 +26,7 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  
   return (
     <html
       lang="fr"

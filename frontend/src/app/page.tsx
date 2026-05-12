@@ -1,13 +1,14 @@
 import Image from "next/image";
 import { ProductService } from "../services/product.service";
 import { Product } from "../types/product";
+import NewsletterForm from "../components/homepage/NewsletterForm";
 
 export default async function Home() {
 
 
   //Liste de produit test avant d'ajouter le call API
 
-  const products: Product[] = await ProductService.getAllProduct()
+  // const products: Product[] = await ProductService.getAllProduct()
 
   //changer le background de la section slogan
   return (
@@ -79,7 +80,7 @@ export default async function Home() {
 
         <hr className="color-night-blue bg-night-blue h-0.5 my-10"/>
 
-        <section id="creations" className="flex flex-col md:flex-row gap-6">
+        {/* <section id="creations" className="flex flex-col md:flex-row gap-6">
           <div className="flex flex-col items-center gap-6 mx-auto max-w-2xl px-4 py-16 sm:px-6 sm:py-24 lg:max-w-7xl lg:px-8">
             <h2 className="font-title text-6xl text-dark-blue">Des créations artisanales, en petites séries ou en pièce unique</h2>
             <div className="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8">
@@ -103,7 +104,7 @@ export default async function Home() {
               })}
             </div>
           </div>
-        </section>
+        </section> */}
 
         <hr className="color-night-blue bg-night-blue h-0.5 my-10"/>
 
@@ -123,24 +124,7 @@ export default async function Home() {
 
         <hr className="color-night-blue bg-night-blue h-0.5 my-10"/>
 
-        <section id="newsletter" className="flex flex-col items-center gap-4">
-          <h3 className="font-title text-6xl text-dark-blue">Rejoignez l’univers Sac’Azura</h3>
-          <p className="font-text text-lg">Les nouvelles créations partent vite. Soyez la première à les voir !</p>
-          <p className="font-text text-lg">Coulisses de l’atelier, nouveautés et offres exclusives dans votre boîte mail, sans spam.</p>
-          <form className="flex flex-col items-center w-full max-w-md">
-            <input 
-              type="email" 
-              placeholder="Votre email" 
-              className="w-full p-2 border border-2 border-night-blue rounded"
-            />
-            <button 
-              type="submit" 
-              className="mt-2 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-            >
-              S'inscrire
-            </button>
-          </form>
-        </section>
+          <NewsletterForm />
 
         <section id="shop" className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="bg-white p-4 rounded shadow">
