@@ -124,13 +124,15 @@ export default async function Home() {
 
         <hr className="color-night-blue bg-night-blue h-0.5 my-10"/>
 
-          <NewsletterForm />
+        <NewsletterForm />
 
-        <section id="shop" className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="bg-white p-4 rounded shadow">
-            <h3 className="font-semibold text-gray-800">Boutique</h3>
-            <p className="text-gray-600">Découvrez nos produits.</p>
-          </div>
+        <hr className="color-night-blue bg-night-blue h-0.5 my-10"/>
+
+        <section id="shop" className="flex flex-col items-center gap-4">
+            <h3 className="font-title text-6xl text-dark-blue">Votre prochain sac Sac’Azura vous attend.</h3>
+            <p className="font-text text-lg">Vous pouvez commander directement en ligne ou me contacter pour un projet personnalisé.</p>
+            <button className="font-text font-semibold border border-orange rounded-xl p-5 bg-orange">Voir la boutique</button>
+            <button className="font-text font-semibold border border-orange rounded-xl p-5 bg-orange">Contacter l’atelier</button>
         </section>
       </main>
     </div>
