@@ -3,14 +3,14 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { SubscriberEntity } from '../../entities/subscriber.entity';
 import * as crypto from 'crypto';
-import { SubscriptionConfirmMail } from './subscriptionMail/confirmMail.service'; // Ajoute le bon chemin
+import { SubscriptionConfirmMail } from './subscriptionMail/confirmMail.service';
 
 @Injectable()
 export class NewsletterService {
   constructor(
     @InjectRepository(SubscriberEntity)
     private subscriberEntity: Repository<SubscriberEntity>,
-    private mailService: SubscriptionConfirmMail, // <-- Injection de ton service Mail
+    private mailService: SubscriptionConfirmMail,
   ) {}
 
   async subscribe(email: string): Promise<void> {
