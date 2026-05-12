@@ -1,5 +1,4 @@
 export interface Register {
-    id: number
     firstname: string
     lastname: string
     mail: string
