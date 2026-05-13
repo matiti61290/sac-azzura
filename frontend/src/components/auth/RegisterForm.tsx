@@ -2,8 +2,11 @@
 
 import { useState } from "react"
 import { AuthService } from "@/src/services/auth.service"
+import { useRouter } from "next/navigation" // 1. Import du router
 
 export default function RegisterForm(){
+
+        const router = useRouter() // 2. Initialisation du router
 
         const [formData, setFormData] = useState({
             firstname: '',
@@ -31,20 +34,27 @@ export default function RegisterForm(){
             setMessage('')
 
             try {
-                await AuthService.register(formData)
+                // 3. On récupère le token CSRF en premier !
+                const csrfToken = await AuthService.getCsrfToken()
+
+                // 4. On passe les données ET le token au service
+                await AuthService.register(formData, csrfToken)
         
                 setStatus('success')
-                setMessage('Votre compte a été créé avec succès ! Un email de confirmation vous a été envoyé.')
+                setMessage('Votre compte a été créé avec succès ! Redirection en cours...')
                 setFormData({firstname: '', lastname: '', mail: '', phoneNumber: '', password: '', confirmPassword: ''})
         
-                //faire un routing vers la page d'accueil ou de log
+                // 5. Redirection vers la page de login après un petit délai pour lire le message
+                setTimeout(() => {
+                    router.push('/login') // Change le chemin selon tes routes
+                }, 2000)
+
             } catch(error: any) {
                 setStatus('error')
                 setMessage(error.message)
             }
         }
     
-
 
 return (
         <div className="flex flex-col items-center justify-center ">
@@ -82,15 +92,13 @@ return (
                     </div>
                 </div>
                 <button 
-                    className="font-text font-semibold border border-orange rounded-xl mt-5 p-5 px-20 bg-orange" 
+                    className="font-text font-semibold border border-orange rounded-xl mt-5 p-5 px-20 bg-orange hover:bg-orange-600 transition-colors" 
                     type="submit" 
                     disabled={status === 'loading'}
                 >
                     {status === 'loading' ? 'Création en cours...' : "S'inscrire"}
                 </button>
             </form>
-
-            
 
             {status === 'success' && (
             <p className="mt-4 text-green-600 text-center font-medium">{message}</p>

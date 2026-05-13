@@ -14,7 +14,7 @@ const {
     cookieOptions: {
         sameSite: 'none',
         path: '/',
-        secure: false //a mettre en true quand en prod
+        secure: true //a mettre en true quand en prod
     }
 })
 
