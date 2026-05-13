@@ -4,6 +4,7 @@ import "../libs/globals.css";
 import Header from "../components/layout/Header";
 import Footer from "../components/layout/Footer";
 import * as dotenv from 'dotenv'
+import { AuthProvider } from "../contexts/AuthContext";
 
 const avallonFont = localFont({
   src: '../libs/fonts/avallon.ttf',
@@ -33,9 +34,11 @@ export default function RootLayout({
       className={`${avallonFont.variable} ${quicksandFont.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        <Header />
-        {children}
-        <Footer />
+        <AuthProvider>
+          <Header />
+          {children}
+          <Footer />
+        </AuthProvider>
       </body>
     </html>
   );

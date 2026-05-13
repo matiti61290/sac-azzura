@@ -1,9 +1,11 @@
 'use client'
 
 import { useState } from "react"
-import { AuthService } from "@/src/services/auth.service"
+import { useAuth } from "@/src/contexts/AuthContext"
 
 export default function LoginForm(){
+
+    const { login } = useAuth()
 
     const [formData, setFormData] = useState({
         mail: '',
@@ -27,7 +29,7 @@ export default function LoginForm(){
         setMessage('')
 
         try {
-            await AuthService.login(formData)
+            await login(formData)
     
             setStatus('success')
             setMessage('Connexion réussie !')

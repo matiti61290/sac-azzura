@@ -2,10 +2,13 @@
 
 import Link from 'next/link';
 import Image from 'next/image'
-import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/react';
-import { Bars3Icon, XMarkIcon, ShoppingBagIcon } from '@heroicons/react/24/outline';
+import { Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
+import { Bars3Icon, XMarkIcon, ShoppingBagIcon, UserCircleIcon } from '@heroicons/react/24/outline';
+import { useAuth } from '@/src/contexts/AuthContext';
 
 export default function Navbar() {
+  const { isConnected, user, logout } = useAuth();
+
   return (
     // Disclosure est le composant magique qui gère l'état ouvert/fermé
     <Disclosure as="nav" className="relative bg-white shadow-md/20 shadow-night-blue p-4">
@@ -46,16 +49,46 @@ export default function Navbar() {
               </Link>
             </div>
 
-            {/* 3. DROITE : Connexion */}
+            {/* 3. DROITE : Connexion / Compte */}
             <div className="mr-5 flex flex-1 justify-end space-x-6">
               <ShoppingBagIcon className='w-auto h-8'/>
               <div className="hidden md:flex items-center space-x-4">
-                <Link href="/register" className="font-text text-2xl text-gray-600 text-gray-600 hover:text-black">
-                  S'inscrire
-                </Link>
-                <Link href="/login" className="px-4 py-2 border-l-2 border-night-blue/50 font-text text-2xl text-gray-600">
-                  Connexion
-                </Link>
+                {isConnected ? (
+                  <Menu as="div" className="relative inline-block text-left">
+                    <div className="flex items-center">
+                      <UserCircleIcon className="h-8 w-8 text-gray-600 mr-2" />
+                      <MenuButton className="font-text text-2xl text-gray-600 hover:text-black">
+                        Votre compte
+                      </MenuButton>
+                    </div>
+                    <MenuItems className="absolute right-0 mt-2 w-48 origin-top-right bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-50">
+                      <div className="px-4 py-2 text-sm text-gray-700">
+                        Connecté en tant que <br/>
+                        <span className="font-medium">{user?.mail}</span>
+                      </div>
+                      <div className="border-t border-gray-200"></div>
+                      <MenuItem>
+                        {() => (
+                          <button
+                            onClick={logout}
+                            className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                          >
+                            Se déconnecter
+                          </button>
+                        )}
+                      </MenuItem>
+                    </MenuItems>
+                  </Menu>
+                ) : (
+                  <>
+                    <Link href="/register" className="font-text text-2xl text-gray-600 text-gray-600 hover:text-black">
+                      S'inscrire
+                    </Link>
+                    <Link href="/login" className="px-4 py-2 border-l-2 border-night-blue/50 font-text text-2xl text-gray-600">
+                      Connexion
+                    </Link>
+                  </>
+                )}
               </div>
             </div>
 
@@ -80,12 +113,29 @@ export default function Navbar() {
             </div>
             
             <div className="mt-4 flex flex-col space-y-2">
-              <DisclosureButton as={Link} href="/register" className="block py-2 text-center font-text text-2xl text-gray-600 hover:text-black">
-                S'inscrire
-              </DisclosureButton>
-              <DisclosureButton as={Link} href="/login" className="block py-2 text-center font-text text-2xl text-gray-600 hover:text-black border-t-2 border-night-blue/50 ">
-                Connexion
-              </DisclosureButton>
+              {isConnected ? (
+                <>
+                  <div className="px-4 py-2 text-sm text-gray-700">
+                    Connecté en tant que <br/>
+                    <span className="font-medium">{user?.mail}</span>
+                  </div>
+                  <DisclosureButton
+                    onClick={logout}
+                    className="block w-full text-left px-4 py-2 font-text text-2xl text-gray-600 hover:text-black border-t-2 border-night-blue/50"
+                  >
+                    Se déconnecter
+                  </DisclosureButton>
+                </>
+              ) : (
+                <>
+                  <DisclosureButton as={Link} href="/register" className="block py-2 text-center font-text text-2xl text-gray-600 hover:text-black">
+                    S'inscrire
+                  </DisclosureButton>
+                  <DisclosureButton as={Link} href="/login" className="block py-2 text-center font-text text-2xl text-gray-600 hover:text-black border-t-2 border-night-blue/50 ">
+                    Connexion
+                  </DisclosureButton>
+                </>
+              )}
             </div>
           </DisclosurePanel>
         </>

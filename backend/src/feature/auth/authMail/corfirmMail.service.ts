@@ -12,7 +12,7 @@ export class ConfirmMailService {
     })
 
     async sendVerificationMail(mail: string, token: string) {
-        const link = `http://localhost:3000/auth/validation-user?token=${token}`
+        const link = `http://localhost:3001/auth/validation-user?token=${token}`
         await this.transporter.sendMail({
             from: 'barbeymathieudev@gmail.com',
             to: mail,
