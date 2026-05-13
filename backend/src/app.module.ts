@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule, RequestMethod } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './feature/auth/auth.module';
@@ -20,6 +20,7 @@ import { PromotionModule } from './feature/promotion/promotion.module';
 import { CsrfModule } from './feature/csrf/csrf.module';
 import { ShippingModule } from './feature/shipping/shipping.module';
 import { NewsletterModule } from './feature/newsletter/newsletter.module';
+import { CsrfMiddleware } from './feature/csrf/csrf.middleware';
 
 @Module({
   imports: [
@@ -46,4 +47,14 @@ import { NewsletterModule } from './feature/newsletter/newsletter.module';
   controllers: [AppController],
   providers: [AppService, AwsS3Service],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(CsrfMiddleware)
+    .exclude(
+      {path: 'login', method: RequestMethod.POST},
+      {path: 'register', method: RequestMethod.POST},
+      {path: 'newsletter', method: RequestMethod.POST},
+      {path: 'products/', method: RequestMethod.GET}
+    ).forRoutes('*')
+  }
+}
