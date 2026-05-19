@@ -73,7 +73,7 @@ export class AuthService {
     }
 
     async login(user: any, response: Response) {
-        const payload = { mail: user.mail, sub: user.id}
+        const payload = { mail: user.mail, sub: user.id, role: user.role}
         const token = this.jwtService.sign(payload, { expiresIn: '1h' })
 
         response.cookie('jwt', token, {
