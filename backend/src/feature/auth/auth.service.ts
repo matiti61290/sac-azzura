@@ -73,9 +73,9 @@ export class AuthService {
     }
 
     async login(user: any, response: Response) {
-        const payload = { mail: user.mail, sub: user.id, isAdmin: user.isAdmin}
+        const payload = { mail: user.mail, sub: user.id, firstname: user.firstname, isAdmin: user.isAdmin}
         const token = this.jwtService.sign(payload, { expiresIn: '1h' })
-        
+        console.log(payload)
 
         response.cookie('jwt', token, {
             httpOnly: true,
