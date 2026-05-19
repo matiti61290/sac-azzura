@@ -113,7 +113,7 @@ export default function Navbar() {
             </div>
             
             <div className="mt-4 flex flex-col space-y-2">
-              {isConnected && user.role ? (
+              {isConnected ? (
                 <>
                   <div className="px-4 py-2 text-sm text-gray-700">
                     Connecté en tant que <br/>

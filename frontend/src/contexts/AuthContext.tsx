@@ -29,6 +29,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const csrfToken = await AuthService.getCsrfToken()
 
     const data = await AuthService.login(credentials, csrfToken)
+    console.log(data)
     
     // Supposons que l'API retourne un objet user et un token
     // Ajustez selon la réponse réelle de votre API

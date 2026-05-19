@@ -73,8 +73,9 @@ export class AuthService {
     }
 
     async login(user: any, response: Response) {
-        const payload = { mail: user.mail, sub: user.id, role: user.role}
+        const payload = { mail: user.mail, sub: user.id, isAdmin: user.isAdmin}
         const token = this.jwtService.sign(payload, { expiresIn: '1h' })
+        
 
         response.cookie('jwt', token, {
             httpOnly: true,
@@ -83,7 +84,7 @@ export class AuthService {
             maxAge: 60 * 60 * 1000
         })
 
-        return { message: 'Connexion réussie'}
+        return { message: 'Connexion réussie', user: payload}
     }
 
     async sendMailForgetPassword(mailDto: MailDto) {
