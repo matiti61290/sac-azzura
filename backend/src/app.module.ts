@@ -52,7 +52,8 @@ export class AppModule implements NestModule {
     consumer.apply(CsrfMiddleware)
     .exclude(
       {path: 'newsletter', method: RequestMethod.POST},
-      {path: 'products/', method: RequestMethod.GET}
+      {path: 'products/', method: RequestMethod.GET},
+      {path: 'auth/login', method: RequestMethod.POST}
     ).forRoutes('*')
   }
 }
