@@ -13,15 +13,17 @@ export class UsersService {
     ) {}
 
     async getAllUser(){
-        const users = this.userRepository.find()
+        const users = await this.userRepository.find()
         
         if(!users){
             throw new NotFoundException 
         }
+
+        return users
     }
 
     async findUserById(userId: number) {
-        const user = this.userRepository.findOne({ where: {id: userId}})
+        const user = await this.userRepository.findOne({ where: {id: userId}})
 
         if(!user) {
             throw new NotFoundException
