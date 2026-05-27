@@ -12,26 +12,28 @@ export interface User {
 
 export interface Category {
   id: number;
-  nom: string;
-  description?: string;
+  name: string;
+  sku_code: string
 }
 
 export interface SubCategory {
   id: number;
-  nom: string;
-  description?: string;
+  name: string;
+  categoryId: number;
+  sku_code: string;
+  category?: Category;
 }
 
 export interface Color {
   id: number;
-  code: string;
-  nom?: string;
+  name: string;
+  sku_code: string
 }
 
 export interface Material {
   id: number;
-  nom: string;
-  description?: string;
+  name: string;
+  sku_code: string
 }
 
 export interface Product {

@@ -19,12 +19,12 @@ export default function MaterialsSection({
   onAddMaterial,
 }: MaterialsSectionProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [formData, setFormData] = useState({ nom: '', description: '' });
+  const [formData, setFormData] = useState({ name: '', sku_code: '' });
 
   const handleSubmit = async () => {
     await onAddMaterial(formData);
     setIsOpen(false);
-    setFormData({ nom: '', description: '' });
+    setFormData({ name: '', sku_code: '' });
     onRefresh();
   };
 
@@ -49,8 +49,8 @@ export default function MaterialsSection({
           {materials.map((material) => (
             <tr key={material.id}>
               <td className="px-4 py-3 text-sm text-gray-900">{material.id}</td>
-              <td className="px-4 py-3 text-sm text-gray-900">{material.nom}</td>
-              <td className="px-4 py-3 text-sm text-gray-500">{material.description || '-'}</td>
+              <td className="px-4 py-3 text-sm text-gray-900">{material.name}</td>
+              <td className="px-4 py-3 text-sm text-gray-500">{material.sku_code || '-'}</td>
             </tr>
           ))}
         </tbody>
@@ -66,18 +66,18 @@ export default function MaterialsSection({
             <label className="block text-sm font-medium text-gray-700 mb-1">Nom</label>
             <input
               type="text"
-              value={formData.nom}
-              onChange={(e) => setFormData({ ...formData, nom: e.target.value })}
+              value={formData.name}
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
             <textarea
-              value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              value={formData.sku_code}
+              onChange={(e) => setFormData({ ...formData, sku_code: e.target.value })}
               className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              rows={3}
+              rows={1}
             />
           </div>
           <div className="flex justify-end space-x-2 pt-4">
