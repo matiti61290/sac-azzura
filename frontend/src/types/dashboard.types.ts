@@ -32,8 +32,8 @@ export interface Color {
 
 export interface Material {
   id: number;
-  nom: string;
-  description?: string;
+  name: string;
+  sku_code: string
 }
 
 export interface Product {

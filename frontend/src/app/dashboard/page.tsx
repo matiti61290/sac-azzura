@@ -64,7 +64,7 @@ export default function Dashboard() {
       }
 
       // Charger les matériaux
-      const materialsResponse: Response = await fetch(`${process.env.NEXT_PUBLIC_API}material/`, {
+      const materialsResponse: Response = await fetch(`${process.env.NEXT_PUBLIC_API}materials/`, {
         method: 'GET',
         credentials: 'include'
       });
@@ -123,9 +123,9 @@ export default function Dashboard() {
 
   const handleAddMaterial = async (material?: Partial<Material>): Promise<Material[]> => {
     const csrfToken = await AuthService.getCsrfToken()
-    const response: Response = await fetch(`${process.env.NEXT_PUBLIC_API}material/add-material`, {
+    const response: Response = await fetch(`${process.env.NEXT_PUBLIC_API}materials/add-material`, {
       method: 'POST',
-      credentials: 'include', // Ajouté
+      credentials: 'include',
       headers: { 
         'Content-Type': 'application/json',
         'x-csrf-token': csrfToken
