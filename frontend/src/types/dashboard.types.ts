@@ -18,8 +18,10 @@ export interface Category {
 
 export interface SubCategory {
   id: number;
-  nom: string;
-  description?: string;
+  name: string;
+  categoryId: number;
+  sku_code: string;
+  category?: Category;
 }
 
 export interface Color {

@@ -17,7 +17,9 @@ export class SubcategoryService {
     ) {}
 
     async getAllSubcategories(){
-        const subcategories = await this.subcategoryRepository.find()
+        const subcategories = await this.subcategoryRepository.find({
+            relations: ['category']
+        })
 
         if(!subcategories) {
             throw new NotFoundException

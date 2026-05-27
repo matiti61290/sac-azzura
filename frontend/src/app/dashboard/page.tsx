@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import type {User, Category, SubCategory, Color, Material } from '../../types/dashboard.types';
+import type { User, Category, SubCategory, Color, Material } from '../../types/dashboard.types';
 import UserSection from '@/src/components/dashboard/UserSection';
 import CategorySection from '@/src/components/dashboard/CategorySection';
 import SubcategorySection from '@/src/components/dashboard/SubcategorySection';
@@ -80,61 +80,56 @@ export default function Dashboard() {
   };
 
   const handleAddCategory = async (category?: Partial<Category>): Promise<Category[]> => {
-
     const csrfToken = await AuthService.getCsrfToken()
-
-    const jwtToken = typeof window !== 'undefined' ? localStorage.getItem('token') : null
-
-    console.log(jwtToken)
-
     const response: Response = await fetch(`${process.env.NEXT_PUBLIC_API}category/add-category`, {
       method: 'POST',
       credentials: 'include',
-      headers: { 'Content-Type': 'application/json',
+      headers: { 
+        'Content-Type': 'application/json',
         'x-csrf-token': csrfToken
-       },
+      },
       body: JSON.stringify(category),
     });
     return await response.json();
   };
 
   const handleAddSubcategory = async (subcategory?: Partial<SubCategory>): Promise<SubCategory[]> => {
-
     const csrfToken = await AuthService.getCsrfToken()
-
-    const response: Response = await fetch(`${process.env.NEXT_PUBLIC_API}/subcategory/add-subcategory`, {
+    const response: Response = await fetch(`${process.env.NEXT_PUBLIC_API}subcategory/add-subcategory`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json',
+      credentials: 'include', // Ajouté pour l'authentification par cookie
+      headers: { 
+        'Content-Type': 'application/json',
         'x-csrf-token': csrfToken
-       },
+      },
       body: JSON.stringify(subcategory),
     });
     return await response.json();
   };
 
   const handleAddColor = async (color?: Partial<Color>): Promise<Color[]> => {
-
     const csrfToken = await AuthService.getCsrfToken()
-
-    const response: Response = await fetch(`${process.env.NEXT_PUBLIC_API}/color/add-color`, {
+    const response: Response = await fetch(`${process.env.NEXT_PUBLIC_API}color/add-color`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json',
+      credentials: 'include', // Ajouté
+      headers: { 
+        'Content-Type': 'application/json',
         'x-csrf-token': csrfToken
-       },
+      },
       body: JSON.stringify(color),
     });
     return await response.json();
   };
 
   const handleAddMaterial = async (material?: Partial<Material>): Promise<Material[]> => {
-
     const csrfToken = await AuthService.getCsrfToken()
-
-    const response: Response = await fetch(`${process.env.NEXT_PUBLIC_API}/material/add-material`, {
+    const response: Response = await fetch(`${process.env.NEXT_PUBLIC_API}material/add-material`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json',
+      credentials: 'include', // Ajouté
+      headers: { 
+        'Content-Type': 'application/json',
         'x-csrf-token': csrfToken
-       },
+      },
       body: JSON.stringify(material),
     });
     return await response.json();
@@ -172,6 +167,7 @@ export default function Dashboard() {
 
           <SubcategorySection
             subCategories={subcategories}
+            categories={categories} // On passe les catégories ici !
             loading={loading}
             onRefresh={fetchAllData}
             onAddSubCategory={handleAddSubcategory}
