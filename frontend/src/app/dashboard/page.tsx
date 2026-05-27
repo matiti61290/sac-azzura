@@ -83,8 +83,13 @@ export default function Dashboard() {
 
     const csrfToken = await AuthService.getCsrfToken()
 
-    const response: Response = await fetch(`${process.env.NEXT_PUBLIC_API}/category/add-category`, {
+    const jwtToken = typeof window !== 'undefined' ? localStorage.getItem('token') : null
+
+    console.log(jwtToken)
+
+    const response: Response = await fetch(`${process.env.NEXT_PUBLIC_API}category/add-category`, {
       method: 'POST',
+      credentials: 'include',
       headers: { 'Content-Type': 'application/json',
         'x-csrf-token': csrfToken
        },

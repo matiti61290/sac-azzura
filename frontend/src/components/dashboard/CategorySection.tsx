@@ -19,12 +19,12 @@ export default function CategorySection({
   onAddCategory,
 }: CategorySectionProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [formData, setFormData] = useState({ nom: '', description: '' });
+  const [formData, setFormData] = useState({ name: '', sku_code: '' });
 
   const handleSubmit = async () => {
     await onAddCategory(formData);
     setIsOpen(false);
-    setFormData({ nom: '', description: '' });
+    setFormData({ name: '', sku_code: '' });
     onRefresh();
   };
 
@@ -42,15 +42,15 @@ export default function CategorySection({
           <tr>
             <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">ID</th>
             <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nom</th>
-            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Description</th>
+            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Code SKU</th>
           </tr>
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
           {categories.map((category) => (
             <tr key={category.id}>
               <td className="px-4 py-3 text-sm text-gray-900">{category.id}</td>
-              <td className="px-4 py-3 text-sm text-gray-900">{category.nom}</td>
-              <td className="px-4 py-3 text-sm text-gray-500">{category.description || '-'}</td>
+              <td className="px-4 py-3 text-sm text-gray-900">{category.name}</td>
+              <td className="px-4 py-3 text-sm text-gray-500">{category.sku_code || '-'}</td>
             </tr>
           ))}
         </tbody>
@@ -66,18 +66,18 @@ export default function CategorySection({
             <label className="block text-sm font-medium text-gray-700 mb-1">Nom</label>
             <input
               type="text"
-              value={formData.nom}
-              onChange={(e) => setFormData({ ...formData, nom: e.target.value })}
+              value={formData.name}
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Code SKU</label>
             <textarea
-              value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              value={formData.sku_code}
+              onChange={(e) => setFormData({ ...formData, sku_code: e.target.value })}
               className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              rows={3}
+              rows={1}
             />
           </div>
           <div className="flex justify-end space-x-2 pt-4">

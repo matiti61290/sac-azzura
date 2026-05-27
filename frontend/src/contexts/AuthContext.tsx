@@ -39,9 +39,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     
     // Sauvegarder dans localStorage pour persister la connexion
     localStorage.setItem('user', JSON.stringify(userData))
-    if (data.token) {
-      localStorage.setItem('token', data.token)
-    }
   }
 
   const logout = () => {

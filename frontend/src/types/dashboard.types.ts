@@ -12,8 +12,8 @@ export interface User {
 
 export interface Category {
   id: number;
-  nom: string;
-  description?: string;
+  name: string;
+  sku_code: string
 }
 
 export interface SubCategory {
