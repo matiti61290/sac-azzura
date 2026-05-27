@@ -54,7 +54,7 @@ export default function Dashboard() {
       }
 
       // Charger les couleurs
-      const colorsResponse: Response = await fetch(`${process.env.NEXT_PUBLIC_API}color/`, {
+      const colorsResponse: Response = await fetch(`${process.env.NEXT_PUBLIC_API}colors/`, {
         method: 'GET',
         credentials: 'include'
       });
@@ -109,7 +109,7 @@ export default function Dashboard() {
 
   const handleAddColor = async (color?: Partial<Color>): Promise<Color[]> => {
     const csrfToken = await AuthService.getCsrfToken()
-    const response: Response = await fetch(`${process.env.NEXT_PUBLIC_API}color/add-color`, {
+    const response: Response = await fetch(`${process.env.NEXT_PUBLIC_API}colors/add-color`, {
       method: 'POST',
       credentials: 'include', // Ajouté
       headers: { 

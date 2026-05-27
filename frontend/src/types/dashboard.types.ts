@@ -26,8 +26,8 @@ export interface SubCategory {
 
 export interface Color {
   id: number;
-  code: string;
-  nom?: string;
+  name: string;
+  sku_code: string
 }
 
 export interface Material {

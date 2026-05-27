@@ -19,12 +19,12 @@ export default function ColorsSection({
   onAddColor,
 }: ColorsSectionProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [formData, setFormData] = useState({ code: '', nom: '' });
+  const [formData, setFormData] = useState({ name: '', sku_code: '' });
 
   const handleSubmit = async () => {
     await onAddColor(formData);
     setIsOpen(false);
-    setFormData({ code: '', nom: '' });
+    setFormData({ name: '', sku_code: '' });
     onRefresh();
   };
 
@@ -37,20 +37,31 @@ export default function ColorsSection({
 
       {loading && <p className="text-gray-500">Chargement...</p>}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {colors.map((color) => (
-          <div key={color.id} className="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg">
-            <div
-              className="w-12 h-12 rounded-full shadow-sm border border-gray-200"
-              style={{ backgroundColor: color.code }}
-            />
-            <div>
-              <p className="font-medium text-gray-900">{color.nom || color.code}</p>
-              <p className="text-xs text-gray-500">#{color.code.toUpperCase()}</p>
-            </div>
-          </div>
-        ))}
-      </div>
+     <table className="min-w-full divide-y divide-gray-200">
+  <thead className="bg-gray-50">
+    <tr>
+      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nom</th>
+      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Code SKU</th>
+    </tr>
+  </thead>
+  <tbody className="bg-white divide-y divide-gray-200">
+    {colors.map((color) => (
+      <tr key={color.id}>
+        <td className="px-4 py-3 text-sm text-gray-900">{color.id}</td>
+        {/* J'utilise color.nom ou color.name selon ce que ton API renvoie */}
+        <td className="px-4 py-3 text-sm text-gray-900">{color.name}</td>
+        {/* Pareil pour sku_code ou code */}
+        <td className="px-4 py-3 text-sm text-gray-500">{color.sku_code || '-'}</td>
+      </tr>
+    ))}
+  </tbody>
+</table>
+
+{/* Affichage d'un message si le tableau est vide */}
+{!loading && colors.length === 0 && (
+  <p className="text-gray-500 text-center py-4">Aucune couleur trouvée</p>
+)}
 
       {!loading && colors.length === 0 && (
         <p className="text-gray-500 text-center py-4">Aucune couleur trouvée</p>
@@ -59,21 +70,20 @@ export default function ColorsSection({
       <Modal isOpen={isOpen} onClose={() => setIsOpen(false)} title="Ajouter une couleur">
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Code HEX</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Couleur</label>
             <input
               type="text"
-              placeholder="#FF5733"
-              value={formData.code}
-              onChange={(e) => setFormData({ ...formData, code: e.target.value })}
+              value={formData.name}
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Nom</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">sku_code</label>
             <input
               type="text"
-              value={formData.nom}
-              onChange={(e) => setFormData({ ...formData, nom: e.target.value })}
+              value={formData.sku_code}
+              onChange={(e) => setFormData({ ...formData, sku_code: e.target.value })}
               className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
