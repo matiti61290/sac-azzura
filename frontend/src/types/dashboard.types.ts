@@ -6,8 +6,10 @@ export interface ApiResponse<T> {
 
 export interface User {
   id: number;
+  firstname: string;
   lastname: string;
   mail?: string;
+  isVerified: boolean;
 }
 
 export interface Category {
@@ -36,14 +38,37 @@ export interface Material {
   sku_code: string
 }
 
+// --- Types existants (déjà dans ton fichier) ---
+// export interface Category { ... }
+// export interface SubCategory { ... }
+// export interface Color { ... }
+// export interface Material { ... }
+// export interface User { ... }
+
+// --- Nouveaux types à ajouter ---
+
+export interface ProductImage {
+  id: number;
+  key: string;      // Le chemin S3 (ex: "products/12345_image.jpg")
+  url: string;      // L'URL présignée temporaire renvoyée par ton AwsS3Service
+}
+
+export interface ProductStock {
+  id: number;
+  quantity: number;
+  sku: string;      // Le SKU généré (Produit_Catégorie_SousCat_Couleur_Materiau)
+  color: Color;     // L'objet Color complet renvoyé par la relation TypeORM
+  material: Material; // L'objet Material complet renvoyé par la relation TypeORM
+}
+
 export interface Product {
   id: number;
-  nom: string;
-  categorieId?: number;
-  sousCategorieId?: number;
-  couleurId?: number;
-  materiaux?: number[];
-  description?: string;
-  prix?: number;
-  quantiteStock?: number;
+  name: string;
+  description: string;
+  price: number;
+  isActive: boolean;
+  sku_code: string; // Le SKU de base du produit
+  subcategory: SubCategory; 
+  images: ProductImage[];
+  stocks: ProductStock[];
 }
