@@ -27,14 +27,18 @@ export class ProductController {
         return product
     }
 
-    @Post('add-product')
+@Post('add-product')
     @UseGuards(JwtAuthGuard, AdminGuard)
     @UseInterceptors(FilesInterceptor('files'))
     async addProduct(
         @Body() addProductDto: AddProductDto,
         @UploadedFiles() files: Express.Multer.File[]
     ) {
-        return this.productService.createProduct(addProductDto, files)
+        // On traduit la string en vrai tableau Javascript
+        const variationsArray = JSON.parse(addProductDto.variations);
+        
+        // On passe ce tableau en 3ème argument
+        return this.productService.createProduct(addProductDto, files, variationsArray);
     }
 
     @Post('update-product/:productId')

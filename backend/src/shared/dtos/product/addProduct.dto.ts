@@ -1,42 +1,32 @@
 import { Type } from "class-transformer";
-import { IsInt, IsNotEmpty, IsPositive, IsString, IsArray, Matches, isInt, IsNumber } from "class-validator";
+import { IsInt, IsNotEmpty, IsPositive, IsString, IsNumber, IsOptional } from "class-validator";
 
-export class AddProductDto{
+export class AddProductDto {
     @IsNotEmpty()
     @IsString()
-    name!: string
+    name!: string;
 
     @IsNotEmpty()
     @IsString()
-    description!: string
+    description!: string;
 
     @IsNotEmpty()
-    @IsNumber({maxDecimalPlaces: 2})
+    @IsNumber({ maxDecimalPlaces: 2 })
     @IsPositive()
-    @Type(()=> Number)
-    price!: number
+    @Type(() => Number)
+    price!: number;
 
     @IsNotEmpty()
     @IsInt()
-    @Type(()=> Number)
-    subcategoryId!: number
-
-    @IsNotEmpty()
-    @IsInt()
-    @Type(()=> Number)
-    quantity!: number
-
-    @IsNotEmpty()
-    @IsInt()
-    @Type(()=> Number)
-    colorId!: number
-
-    @IsNotEmpty()
-    @IsInt()
-    @Type(()=> Number)
-    materialId!: number
+    @Type(() => Number)
+    subcategoryId!: number;
 
     @IsNotEmpty()
     @IsString()
-    sku_code!: string
+    sku_code!: string;
+
+    // LA CLÉ EST ICI : On force NestJS à le voir uniquement comme une string !
+    @IsNotEmpty()
+    @IsString()
+    variations!: string; 
 }

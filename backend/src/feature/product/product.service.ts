@@ -28,7 +28,7 @@ export class ProductService {
     ) {}
 
     async getAllProducts(){
-        const products = await this.productRepository.find({ relations: ["images"]})
+        const products = await this.productRepository.find({ relations: ["images", "stocks"]})
 
         if(!products){
             throw new NotFoundException
@@ -61,17 +61,25 @@ export class ProductService {
         return { ...product, images: imagesWithUrls}
     }
 
-    async createProduct(addProductDto: AddProductDto, files){
-        const subcategory = await this.subCategoryRepository.findOne({ where:{ id: addProductDto.subcategoryId}})
+ // N'oublie pas d'ajouter "variations: any[]" dans les parenthèses
+    async createProduct(addProductDto: AddProductDto, files: Express.Multer.File[], variations: any[]) {
+        
+        // 1. On force l'ID en nombre entier
+        const subcategoryId = parseInt(addProductDto.subcategoryId.toString(), 10);
+        
+        const subcategory = await this.subCategoryRepository.findOne({ 
+            where: { id: subcategoryId }
+        });
 
         if(!subcategory) {
-            throw new NotFoundException()
+            throw new NotFoundException(`Sous-catégorie introuvable avec l'ID ${subcategoryId}`);
         }
 
         const product = this.productRepository.create({
             name: addProductDto.name,
             description: addProductDto.description,
-            price: addProductDto.price,
+            // 2. On force le prix en nombre décimal
+            price: parseFloat(addProductDto.price.toString()), 
             isActive: true,
             subcategory: subcategory,
             images: [],
@@ -80,23 +88,29 @@ export class ProductService {
 
         const savedProduct = await this.productRepository.save(product)
 
-        // const images: ImageEntity[] = []
-        // for (const file of files) {
-        //     const key = `products/${Date.now()}_${file.originalname}`
-        //     await this.awsS3Service.uploadFile(file, key)
-        //     const image = this.imageRepository.create({ key, product: savedProduct })
-        //     images.push(image)
-        // }
+        const images: ImageEntity[] = []
+        if (files && files.length > 0) {
+            for (const file of files) {
+                const key = `products/${Date.now()}_${file.originalname}`
+                await this.awsS3Service.uploadFile(file, key)
+                const image = this.imageRepository.create({ key, product: savedProduct })
+                images.push(image)
+            }
+            await this.imageRepository.save(images)
+        }
 
-        // await this.imageRepository.save(images)
-
-        await this.stockService.addStock(
-            addProductDto.quantity,
-            product.id,
-            addProductDto.colorId, 
-            addProductDto.materialId,
-            addProductDto.subcategoryId
-        )
+        // Boucle sur le tableau fraîchement décodé
+        for (const variation of variations) {
+            if (variation.quantity > 0) {
+                await this.stockService.addStock(
+                    variation.quantity,
+                    savedProduct.id,
+                    parseInt(variation.colorId),
+                    parseInt(variation.materialId),
+                    addProductDto.subcategoryId
+                )
+            }
+        }
 
         return this.findProduct(savedProduct.id)
     }
@@ -113,13 +127,16 @@ export class ProductService {
         const updatedProduct = await this.productRepository.save(product)
 
         const images: ImageEntity[] = []
-        for (const file of updateProductDto.files) {
-            const key = `products/${Date.now()}_${file.originalname}`
-            await this.awsS3Service.uploadFile(file, key)
-            const image = this.imageRepository.create({ key, product: updatedProduct })
-            images.push(image)
+        
+        if (updateProductDto.files && updateProductDto.files.length > 0) {
+            for (const file of updateProductDto.files) {
+                const key = `products/${Date.now()}_${file.originalname}`
+                await this.awsS3Service.uploadFile(file, key)
+                const image = this.imageRepository.create({ key, product: updatedProduct })
+                images.push(image)
+            }
+            await this.imageRepository.save(images)
         }
-        await this.imageRepository.save(images)
         
         if(updateProductDto.quantity !== undefined && updateProductDto.stock_sku !== undefined) {
             await this.stockService.updateStock(updateProductDto.quantity, updateProductDto.stock_sku)

@@ -1,13 +1,14 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import type { User, Category, SubCategory, Color, Material } from '../../types/dashboard.types';
+import type { Product, Category, SubCategory, Color, Material, User } from '@/src/types/dashboard.types';
 import UserSection from '@/src/components/dashboard/UserSection';
 import CategorySection from '@/src/components/dashboard/CategorySection';
 import SubcategorySection from '@/src/components/dashboard/SubcategorySection';
 import ColorsSection from '@/src/components/dashboard/ColorsSection';
 import MaterialsSection from '@/src/components/dashboard/MaterialsSection';
 import { AuthService } from '@/src/services/auth.service';
+import ProductSection from '@/src/components/dashboard/ProductSection';
 
 export default function Dashboard() {
   const [loading, setLoading] = useState(true);
@@ -16,6 +17,7 @@ export default function Dashboard() {
   const [subcategories, setSubcategories] = useState<SubCategory[]>([]);
   const [colors, setColors] = useState<Color[]>([]);
   const [materials, setMaterials] = useState<Material[]>([]);
+const [products, setProducts] = useState<Product[]>([]);
 
   useEffect(() => {
     fetchAllData();
@@ -62,6 +64,15 @@ export default function Dashboard() {
         const data: Color[] = await colorsResponse.json();
         setColors(data);
       }
+
+      const productsResponse: Response = await fetch(`${process.env.NEXT_PUBLIC_API}products/`, {
+            method: 'GET',
+            credentials: 'include'
+        });
+        if (productsResponse.ok) {
+            const data = await productsResponse.json();
+            setProducts(data);
+        }
 
       // Charger les matériaux
       const materialsResponse: Response = await fetch(`${process.env.NEXT_PUBLIC_API}materials/`, {
@@ -135,6 +146,35 @@ export default function Dashboard() {
     return await response.json();
   };
 
+  const handleAddProduct = async (formData: FormData): Promise<boolean> => {
+    try {
+      const csrfToken = await AuthService.getCsrfToken();
+      // Attention : l'URL doit correspondre au préfixe de ton controller ('products')
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API}products/add-product`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 
+          // ⚠️ AUCUN 'Content-Type' ici ! Le navigateur gère le multipart/form-data tout seul.
+          'x-csrf-token': csrfToken
+        },
+        body: formData, // On passe directement le FormData
+      });
+
+      if (response.ok) {
+        await fetchAllData(); // Rafraîchit la liste des produits
+        return true;
+      } else {
+        const error = await response.text();
+        console.error('Erreur lors de la création du produit:', error);
+        alert('Erreur lors de la création du produit');
+        return false;
+      }
+    } catch (error) {
+      console.error('Erreur réseau:', error);
+      return false;
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-100">
@@ -150,6 +190,20 @@ export default function Dashboard() {
     <div className="min-h-screen bg-gray-100">
       <div className="container mx-auto p-6">
         <h1 className="text-3xl font-bold text-gray-800 mb-8 text-center">Dashboard SAC AZZURA</h1>
+
+        <div className="mb-6">
+          <ProductSection 
+            products={products}
+            categories={categories}
+            subcategories={subcategories}
+            colors={colors}
+            materials={materials}
+            loading={loading}
+            onRefresh={fetchAllData}
+            onAddProduct={handleAddProduct}
+            // Tu passeras ici tes fonctions handleAddProduct, handleUpdate, handleDelete
+          />
+        </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <UserSection
