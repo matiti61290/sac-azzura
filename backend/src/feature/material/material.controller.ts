@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, ParseIntPipe, Post, UseGuards } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, UseGuards } from "@nestjs/common";
 import { MaterialService } from "./material.service";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 import { AdminGuard } from "../auth/guards/admin.guard";
@@ -31,7 +31,7 @@ export class MaterialController {
         return this.materialService.createMaterial(addMaterialDto)
     }
 
-    @Post('update-material/:materialId')
+    @Patch('update-material/:materialId')
     @UseGuards(JwtAuthGuard, AdminGuard)
     async updateMaterial(
         @Param('materialId', ParseIntPipe) materialId: number,
@@ -40,7 +40,7 @@ export class MaterialController {
         return this.materialService.updateMaterial(materialId, updateMaterialDto)
     }
 
-    @Post('delete-material/:materialId')
+    @Delete('delete-material/:materialId')
     @UseGuards(JwtAuthGuard, AdminGuard)
     async deleteMaterial(
         @Param('materialId', ParseIntPipe) materialId: number

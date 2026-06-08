@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, ParseIntPipe, Patch, Post, Req, UseGuards } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Req, UseGuards } from "@nestjs/common";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 import { AdminGuard } from "../auth/guards/admin.guard";
 import { AddressService } from "./address.service";
@@ -84,7 +84,7 @@ export class AddressController {
         return this.addressService.updateAddress(addressId, updateAddressDto, user)
     }
 
-    @Post('/user/delete-address/:addressId')
+    @Delete('/user/delete-address/:addressId')
     @UseGuards(JwtAuthGuard)
     async deleteAddress(
         @Param('addressId', ParseIntPipe) addressId,

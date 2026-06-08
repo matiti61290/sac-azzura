@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, ParseIntPipe, Patch, Post, Req, UseGuards } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Req, UseGuards } from "@nestjs/common";
 import { OrderService } from "./order.service";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 import { AdminGuard } from "../auth/guards/admin.guard";
@@ -51,7 +51,7 @@ constructor(
         return this.orderService.updateStatus(orderId, updateOrderStatusDto)
     }
 
-    @Post("delete-order/:orderId")
+    @Delete("delete-order/:orderId")
     @UseGuards(JwtAuthGuard, AdminGuard)
     async deleteMaterial(
         @Param('orderId', ParseIntPipe) orderId: number
