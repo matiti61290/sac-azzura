@@ -19,7 +19,6 @@ export function useCrud<T>(
   const [loading, setLoading] = useState(true);
 
   // === UTILITAIRE URL ===
-  // Nettoie l'URL de base et l'endpoint pour éviter les doubles slashes
   const buildUrl = (endpoint: string) => {
     const baseUrl = (process.env.NEXT_PUBLIC_API || '').replace(/\/$/, '');
     const cleanEndpoint = endpoint.replace(/^\//, '');
@@ -30,7 +29,6 @@ export function useCrud<T>(
   const refresh = useCallback(async () => {
     setLoading(true);
     try {
-      // On garde ta logique pour le slash final souvent requis par les backends sur les routes GET (ex: /category/)
       const endpoint = basePath.endsWith('/') ? basePath : `${basePath}/`;
       
       const response = await fetch(buildUrl(endpoint), {
@@ -58,7 +56,6 @@ export function useCrud<T>(
       const headers: Record<string, string> = { 'x-csrf-token': csrfToken };
       if (!isFormData) headers['Content-Type'] = 'application/json';
 
-      // Pour gérer tes conversions FormData spécifiques au backend si besoin (comme User)
       let bodyData = payload;
       if (isFormData && payload instanceof FormData && basePath === 'user') {
          const obj = Object.fromEntries(payload.entries());
@@ -76,9 +73,12 @@ export function useCrud<T>(
       });
 
       if (response.ok) {
-        await refresh(); // Ne rafraîchit QUE cette ressource !
+        await refresh();
         return true;
       }
+      
+      const errorData = await response.json().catch(() => ({}));
+      console.error(`Erreur 400 POST sur ${basePath}:`, errorData);
       return false;
     } catch (error) {
       console.error(`Erreur POST sur ${basePath}:`, error);
@@ -93,18 +93,22 @@ export function useCrud<T>(
       const headers: Record<string, string> = { 'x-csrf-token': csrfToken };
       if (!isFormData) headers['Content-Type'] = 'application/json';
 
-      let bodyData = payload;
+      let bodyData;
+      
+      // NETTOYAGE DE L'ID POUR TOUTES LES UPDATES
       if (isFormData && payload instanceof FormData) {
+          const obj = Object.fromEntries(payload.entries());
+          delete obj.id; // Nettoyage
+          
           if(basePath === 'user') {
-              const obj = Object.fromEntries(payload.entries());
               bodyData = JSON.stringify({ ...obj, isVerified: true });
-              headers['Content-Type'] = 'application/json';
           } else {
-              bodyData = JSON.stringify(Object.fromEntries(payload));
-              headers['Content-Type'] = 'application/json';
+              bodyData = JSON.stringify(obj);
           }
+          headers['Content-Type'] = 'application/json';
       } else if (!isFormData) {
-         bodyData = JSON.stringify(payload);
+         const { id: _, ...cleanPayload } = payload; // Nettoyage
+         bodyData = JSON.stringify(cleanPayload);
       }
 
       const response = await fetch(buildUrl(`${basePath}/update-${actionPath}/${id}`), {
@@ -118,6 +122,10 @@ export function useCrud<T>(
         await refresh();
         return true;
       }
+      
+      // Affiche l'erreur de validation NestJS dans la console
+      const errorData = await response.json().catch(() => ({}));
+      console.error(`Erreur 400 PATCH sur ${basePath}:`, errorData);
       return false;
     } catch (error) {
       console.error(`Erreur PATCH sur ${basePath}:`, error);
@@ -134,7 +142,6 @@ export function useCrud<T>(
         credentials: 'include',
         headers: { 'x-csrf-token': csrfToken },
       });
-      console.log(buildUrl(`${basePath}/delete-${actionPath}/${id}`))
       if (response.ok) {
         await refresh();
       }
