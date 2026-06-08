@@ -3,7 +3,16 @@
 import { useState } from 'react';
 import type { Product, Category, SubCategory, Color, Material } from '../../types/dashboard.types';
 
-// 1. Définition stricte des types attendus (C'est ça qui fait que c'est du vrai TSX)
+interface ProductEditForm {
+  id?: number;
+  name: string;
+  description: string;
+  price: number;
+  subcategoryId: string;
+  sku_code: string;
+  images: File[];
+}
+
 interface ProductSectionProps {
   products: Product[];
   categories: Category[];
@@ -11,31 +20,31 @@ interface ProductSectionProps {
   colors: Color[];
   materials: Material[];
   loading: boolean;
-  onRefresh: () => void | Promise<void>;
   onAddProduct: (formData: FormData) => Promise<boolean>;
+  onUpdateProduct: (productId: number, formData: FormData) => Promise<boolean>;
+  onDeleteProduct: (productId: number) => Promise<void>;
 }
 
-// 2. Le composant avec le typage appliqué
 export default function ProductSection({ 
   products, 
-  categories, 
   subcategories, 
   colors, 
   materials, 
   loading, 
-  onRefresh,
-  onAddProduct 
+  onAddProduct,
+  onUpdateProduct,
+  onDeleteProduct 
 }: ProductSectionProps) {
   
   const [isModalOpen, setIsModalOpen] = useState(false);
-  
-  const [formData, setFormData] = useState({
+  const [editFormData, setEditFormData] = useState<ProductEditForm>({
+    id: undefined,
     name: '',
     description: '',
     price: 0,
     subcategoryId: '',
     sku_code: '',
-    images: [] as File[],
+    images: [],
   });
 
   const [variations, setVariations] = useState([
@@ -46,31 +55,62 @@ export default function ProductSection({
     setVariations([...variations, { colorId: '', materialId: '', quantity: 0 }]);
   };
 
-  // Typage strict de l'événement de formulaire
-const submitProduct = async (e: React.FormEvent<HTMLFormElement>) => {
+  const submitProduct = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     
     const data = new FormData();
-    data.append('name', formData.name);
-    data.append('description', formData.description);
-    data.append('price', formData.price.toString());
-    data.append('subcategoryId', formData.subcategoryId);
-    data.append('sku_code', formData.sku_code);
+    data.append('name', editFormData.name);
+    data.append('description', editFormData.description);
+    data.append('price', editFormData.price.toString());
+    data.append('subcategoryId', editFormData.subcategoryId);
+    data.append('sku_code', editFormData.sku_code);
     
-    formData.images.forEach(file => data.append('files', file));
+    editFormData.images.forEach(file => data.append('files', file));
     data.append('variations', JSON.stringify(variations));
 
-    // --- NOUVEAU CODE D'ENVOI ---
-    const isSuccess = await onAddProduct(data);
-    
-    if (isSuccess) {
-      // Si c'est un succès, on ferme la fenêtre
-      setIsModalOpen(false);
-      // Et on réinitialise le formulaire pour la prochaine fois
-      setFormData({
-        name: '', description: '', price: 0, subcategoryId: '', sku_code: '', images: []
-      });
-      setVariations([{ colorId: '', materialId: '', quantity: 0 }]);
+    if (editFormData.id) {
+      const isSuccess = await onUpdateProduct(editFormData.id, data);
+      
+      if (isSuccess) {
+        setIsModalOpen(false);
+        setEditFormData({
+          id: undefined, name: '', description: '', price: 0, subcategoryId: '', sku_code: '', images: []
+        });
+        setVariations([{ colorId: '', materialId: '', quantity: 0 }]);
+      }
+    } else {
+      const isSuccess = await onAddProduct(data);
+      
+      if (isSuccess) {
+        setIsModalOpen(false);
+        setEditFormData({
+          id: undefined, name: '', description: '', price: 0, subcategoryId: '', sku_code: '', images: []
+        });
+        setVariations([{ colorId: '', materialId: '', quantity: 0 }]);
+      }
+    }
+  };
+
+  const handleEditProduct = (product: Product) => {
+    setEditFormData({
+      id: product.id,
+      name: product.name,
+      description: product.description,
+      price: product.price,
+      subcategoryId: product.subcategory?.id?.toString() || '',
+      sku_code: product.sku_code,
+      images: [],
+    });
+    setIsModalOpen(true);
+  };
+
+  const handleDeleteProduct = async (productId: number) => {
+    if (confirm('Êtes-vous sûr de vouloir supprimer ce produit ?')) {
+      try {
+        await onDeleteProduct(productId);
+      } catch (error) {
+        console.error("Erreur lors de la suppression du produit :", error);
+      }
     }
   };
 
@@ -101,13 +141,11 @@ const submitProduct = async (e: React.FormEvent<HTMLFormElement>) => {
           </thead>
           <tbody>
             {products?.map((product) => {
-              // Petit calcul rapide pour additionner les quantités de toutes les déclinaisons
               const totalStock = product.stocks?.reduce((sum, stock) => sum + stock.quantity, 0) || 0;
               
               return (
                 <tr key={product.id} className="border-b hover:bg-gray-50">
                   <td className="p-3">
-                    {/* On affiche la première image du tableau si elle existe */}
                     {product.images && product.images.length > 0 ? (
                       <img 
                         src={product.images[0].url} 
@@ -128,16 +166,24 @@ const submitProduct = async (e: React.FormEvent<HTMLFormElement>) => {
                       {totalStock} en stock
                     </span>
                   </td>
-                  <td className="p-3">
-                    {/* Boutons en attente de tes futures fonctions Update/Delete */}
-                    <button className="text-blue-600 hover:underline text-sm mr-3">Éditer</button>
-                    <button className="text-red-600 hover:underline text-sm">Supprimer</button>
+                  <td className="p-3 flex gap-2">
+                    <button 
+                      onClick={() => handleEditProduct(product)} 
+                      className="text-blue-600 hover:underline text-sm"
+                    >
+                      Éditer
+                    </button>
+                    <button 
+                      onClick={() => handleDeleteProduct(product.id)} 
+                      className="text-red-600 hover:underline text-sm"
+                    >
+                      Supprimer
+                    </button>
                   </td>
                 </tr>
               );
             })}
             
-            {/* Si la liste est vide */}
             {(!products || products.length === 0) && (
               <tr>
                 <td colSpan={6} className="p-8 text-center text-gray-500">
@@ -149,11 +195,10 @@ const submitProduct = async (e: React.FormEvent<HTMLFormElement>) => {
         </table>
       </div>
 
-      {/* MODAL DE CRÉATION */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center overflow-y-auto z-50">
           <div className="bg-white p-8 rounded-lg w-full max-w-4xl my-8">
-            <h3 className="text-2xl mb-4">Ajouter un produit</h3>
+            <h3 className="text-2xl mb-4">{editFormData.id ? 'Modifier un produit' : 'Ajouter un produit'}</h3>
             
             <form onSubmit={submitProduct} className="space-y-6">
               <div className="grid grid-cols-2 gap-4">
@@ -161,21 +206,22 @@ const submitProduct = async (e: React.FormEvent<HTMLFormElement>) => {
                   type="text"
                   placeholder="Nom du produit" 
                   className="border p-2"
-                  value={formData.name}
-                  onChange={(e) => setFormData({...formData, name: e.target.value})}
+                  value={editFormData.name}
+                  onChange={(e) => setEditFormData({...editFormData, name: e.target.value})}
+                  required
                 />
                 <input 
                   type="text"
                   placeholder="Code SKU (ex: SAC-001)" 
                   className="border p-2 rounded"
-                  value={formData.sku_code}
-                  onChange={(e) => setFormData({...formData, sku_code: e.target.value.toUpperCase()})}
+                  value={editFormData.sku_code}
+                  onChange={(e) => setEditFormData({...editFormData, sku_code: e.target.value.toUpperCase()})}
                   required
                 />
                 <select 
                   className="border p-2"
-                  value={formData.subcategoryId}
-                  onChange={(e) => setFormData({...formData, subcategoryId: e.target.value})}
+                  value={editFormData.subcategoryId}
+                  onChange={(e) => setEditFormData({...editFormData, subcategoryId: e.target.value})}
                 >
                   <option value="">Sélectionner une sous-catégorie...</option>
                   {subcategories.map(sub => (
@@ -188,8 +234,8 @@ const submitProduct = async (e: React.FormEvent<HTMLFormElement>) => {
                 <textarea 
                   placeholder="Description du produit" 
                   className="border p-2 rounded md:col-span-3 h-24"
-                  value={formData.description}
-                  onChange={(e) => setFormData({...formData, description: e.target.value})}
+                  value={editFormData.description}
+                  onChange={(e) => setEditFormData({...editFormData, description: e.target.value})}
                   required
                 />
                 <input 
@@ -197,8 +243,8 @@ const submitProduct = async (e: React.FormEvent<HTMLFormElement>) => {
                   step="0.01" 
                   placeholder="Prix (€)" 
                   className="border p-2 rounded h-12"
-                  value={formData.price || ''}
-                  onChange={(e) => setFormData({...formData, price: parseFloat(e.target.value) || 0})}
+                  value={editFormData.price || ''}
+                  onChange={(e) => setEditFormData({...editFormData, price: parseFloat(e.target.value) || 0})}
                   required
                 />
               </div>
@@ -212,7 +258,7 @@ const submitProduct = async (e: React.FormEvent<HTMLFormElement>) => {
                   className="border p-2 w-full" 
                   onChange={(e) => {
                     if (e.target.files) {
-                      setFormData({...formData, images: Array.from(e.target.files)});
+                      setEditFormData({...editFormData, images: Array.from(e.target.files)});
                     }
                   }}
                 />
@@ -268,7 +314,7 @@ const submitProduct = async (e: React.FormEvent<HTMLFormElement>) => {
 
               <div className="flex justify-end gap-4 mt-6">
                 <button type="button" onClick={() => setIsModalOpen(false)} className="px-4 py-2 text-gray-600">Annuler</button>
-                <button type="submit" className="bg-green-600 text-white px-4 py-2 rounded">Sauvegarder</button>
+                <button type="submit" className="bg-green-600 text-white px-4 py-2 rounded">{editFormData.id ? 'Mettre à jour' : 'Sauvegarder'}</button>
               </div>
             </form>
           </div>

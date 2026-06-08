@@ -1,4 +1,4 @@
-import { Controller, Get, Param, ParseIntPipe, Post, UseGuards } from "@nestjs/common";
+import { Controller, Delete, Get, Param, ParseIntPipe, UseGuards } from "@nestjs/common";
 import { StockService } from "./stock.service";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 import { AdminGuard } from "../auth/guards/admin.guard";
@@ -15,7 +15,7 @@ export class StockController {
         return this.stockService.getAllStock()
     }
 
-    @Post('delete-stock/:stockId')
+    @Delete('delete-stock/:stockId')
     @UseGuards(JwtAuthGuard, AdminGuard)
     async deleteStock(
         @Param('stockId', ParseIntPipe) stockId: number

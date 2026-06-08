@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, ParseIntPipe, Post, UseGuards } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, UseGuards } from "@nestjs/common";
 import { SubcategoryService } from "./subcategory.service";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 import { AdminGuard } from "../auth/guards/admin.guard";
@@ -31,7 +31,7 @@ export class SubcategoryController{
         return this.subcategoryService.createSubcategory(addSubcategoryDto)
     }
 
-    @Post('update-subcategory/:subcategoryId')
+    @Patch('update-subcategory/:subcategoryId')
     @UseGuards(JwtAuthGuard, AdminGuard)
     async updateSubcategory(
         @Param('subcategoryId', ParseIntPipe) subcategoryId: number,
@@ -40,7 +40,7 @@ export class SubcategoryController{
         return this.subcategoryService.updateSubcategory(subcategoryId, updateSubcategoryDto)
     }
 
-    @Post('delete-subcategory/:subcategoryId')
+    @Delete('delete-subcategory/:subcategoryId')
     @UseGuards(JwtAuthGuard, AdminGuard)
     async deleteSubcategory(
         @Param('subcategoryId', ParseIntPipe) subcategoryId: number

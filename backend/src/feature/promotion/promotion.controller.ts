@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, ParseIntPipe, Patch, Post, UseGuards } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, UseGuards } from "@nestjs/common";
 import { PromotionService } from "./promotion.service";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 import { AdminGuard } from "../auth/guards/admin.guard";
@@ -51,7 +51,7 @@ export class PromotionController {
         return this.promotionService.updatePromotion(promotionId, updatePromotionDto)
     }
 
-    @Post('Delete-promotion/:promotionId')
+    @Delete('Delete-promotion/:promotionId')
     @UseGuards(JwtAuthGuard, AdminGuard)
     async deletePromotion(
         @Param('promotionId',ParseIntPipe) promotionId: number

@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, ParseIntPipe, Post, Query, UploadedFiles, UseGuards, UseInterceptors } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query, UploadedFiles, UseGuards, UseInterceptors } from "@nestjs/common";
 import { ProductService } from "./product.service";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 import { AdminGuard } from "../auth/guards/admin.guard";
@@ -41,7 +41,7 @@ export class ProductController {
         return this.productService.createProduct(addProductDto, files, variationsArray);
     }
 
-    @Post('update-product/:productId')
+    @Patch('update-product/:productId')
     @UseGuards(JwtAuthGuard, AdminGuard)
     @UseInterceptors(FilesInterceptor('files'))
     async updateProduct(
@@ -53,7 +53,7 @@ export class ProductController {
         return this.productService.updateProduct(productId, updateProductDto)
     }
 
-    @Post('delete-product/:productId')
+    @Delete('delete-product/:productId')
     @UseGuards(JwtAuthGuard, AdminGuard)
     async deleteProduct(
         @Param('productId', ParseIntPipe) productId: number

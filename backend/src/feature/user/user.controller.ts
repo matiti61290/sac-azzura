@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, ParseIntPipe, Post, UseGuards } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, UseGuards } from "@nestjs/common";
 import { UsersService } from "./user.service";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 import { UpdateUserDto } from "../../shared/dtos/user/updateUser.dto";
@@ -21,7 +21,7 @@ export class UserController{
         return this.userService.findUserById(userId)
     }
 
-    @Post('update-user/:userId')
+    @Patch('update-user/:userId')
     @UseGuards(JwtAuthGuard)
     async updateUser(
     @Param('userId', ParseIntPipe) userId: number,
@@ -30,7 +30,7 @@ export class UserController{
         return this.userService.updateUser(userId, updateUserDto)
     }
 
-    @Post('delete-user/:userId')
+    @Delete('delete-user/:userId')
     @UseGuards(JwtAuthGuard)
     async deleteUser (
         @Param('userId', ParseIntPipe) userId: number

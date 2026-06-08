@@ -1,187 +1,30 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import type { Product, Category, SubCategory, Color, Material, User } from '@/src/types/dashboard.types';
 import UserSection from '@/src/components/dashboard/UserSection';
 import CategorySection from '@/src/components/dashboard/CategorySection';
 import SubcategorySection from '@/src/components/dashboard/SubcategorySection';
 import ColorsSection from '@/src/components/dashboard/ColorsSection';
 import MaterialsSection from '@/src/components/dashboard/MaterialsSection';
-import { AuthService } from '@/src/services/auth.service';
 import ProductSection from '@/src/components/dashboard/ProductSection';
+import { useCrud } from '@/src/hooks/useCrud';
 
 export default function Dashboard() {
-  const [loading, setLoading] = useState(true);
-  const [users, setUsers] = useState<User[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [subcategories, setSubcategories] = useState<SubCategory[]>([]);
-  const [colors, setColors] = useState<Color[]>([]);
-  const [materials, setMaterials] = useState<Material[]>([]);
-const [products, setProducts] = useState<Product[]>([]);
+  // Finies les centaines de lignes de fetch ! Tout est géré par le hook de manière isolée.
+  const users = useCrud<User>('user', 'user', true);
+  const categories = useCrud<Category>('category', 'category');
+  const subcategories = useCrud<SubCategory>('subcategory', 'subcategory');
+  const colors = useCrud<Color>('colors', 'color');
+  const materials = useCrud<Material>('materials', 'material');
+  const products = useCrud<Product>('products', 'product', true);
 
-  useEffect(() => {
-    fetchAllData();
-  }, [])
+  // On peut déduire un état global de chargement si au moins un composant principal charge
+  const globalLoading = products.loading && categories.loading;
 
-  const fetchAllData = async () => {
-    try {
-      // Charger les utilisateurs
-      const usersResponse: Response = await fetch(`${process.env.NEXT_PUBLIC_API}user`, {
-        method: 'GET',
-        credentials: 'include'
-      });
-      if (usersResponse.ok) {
-        const data: User[] = await usersResponse.json();
-        setUsers(data);
-      }
-
-      // Charger les catégories
-      const categoriesResponse: Response = await fetch(`${process.env.NEXT_PUBLIC_API}category/`, {
-        method: 'GET',
-        credentials: 'include'
-      });
-      if (categoriesResponse.ok) {
-        const data: Category[] = await categoriesResponse.json();
-        setCategories(data);
-      }
-
-      // Charger les sous-catégories
-      const subcategoriesResponse: Response = await fetch(`${process.env.NEXT_PUBLIC_API}subcategory/`, {
-        method: 'GET',
-        credentials: 'include'
-      });
-      if (subcategoriesResponse.ok) {
-        const data: SubCategory[] = await subcategoriesResponse.json();
-        setSubcategories(data);
-      }
-
-      // Charger les couleurs
-      const colorsResponse: Response = await fetch(`${process.env.NEXT_PUBLIC_API}colors/`, {
-        method: 'GET',
-        credentials: 'include'
-      });
-      if (colorsResponse.ok) {
-        const data: Color[] = await colorsResponse.json();
-        setColors(data);
-      }
-
-      const productsResponse: Response = await fetch(`${process.env.NEXT_PUBLIC_API}products/`, {
-            method: 'GET',
-            credentials: 'include'
-        });
-        if (productsResponse.ok) {
-            const data = await productsResponse.json();
-            setProducts(data);
-        }
-
-      // Charger les matériaux
-      const materialsResponse: Response = await fetch(`${process.env.NEXT_PUBLIC_API}materials/`, {
-        method: 'GET',
-        credentials: 'include'
-      });
-      if (materialsResponse.ok) {
-        const data: Material[] = await materialsResponse.json();
-        setMaterials(data);
-      }
-    } catch (error) {
-      console.error('Erreur lors du chargement des données:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleAddCategory = async (category?: Partial<Category>): Promise<Category[]> => {
-    const csrfToken = await AuthService.getCsrfToken()
-    const response: Response = await fetch(`${process.env.NEXT_PUBLIC_API}category/add-category`, {
-      method: 'POST',
-      credentials: 'include',
-      headers: { 
-        'Content-Type': 'application/json',
-        'x-csrf-token': csrfToken
-      },
-      body: JSON.stringify(category),
-    });
-    return await response.json();
-  };
-
-  const handleAddSubcategory = async (subcategory?: Partial<SubCategory>): Promise<SubCategory[]> => {
-    const csrfToken = await AuthService.getCsrfToken()
-    const response: Response = await fetch(`${process.env.NEXT_PUBLIC_API}subcategory/add-subcategory`, {
-      method: 'POST',
-      credentials: 'include', // Ajouté pour l'authentification par cookie
-      headers: { 
-        'Content-Type': 'application/json',
-        'x-csrf-token': csrfToken
-      },
-      body: JSON.stringify(subcategory),
-    });
-    return await response.json();
-  };
-
-  const handleAddColor = async (color?: Partial<Color>): Promise<Color[]> => {
-    const csrfToken = await AuthService.getCsrfToken()
-    const response: Response = await fetch(`${process.env.NEXT_PUBLIC_API}colors/add-color`, {
-      method: 'POST',
-      credentials: 'include', // Ajouté
-      headers: { 
-        'Content-Type': 'application/json',
-        'x-csrf-token': csrfToken
-      },
-      body: JSON.stringify(color),
-    });
-    return await response.json();
-  };
-
-  const handleAddMaterial = async (material?: Partial<Material>): Promise<Material[]> => {
-    const csrfToken = await AuthService.getCsrfToken()
-    const response: Response = await fetch(`${process.env.NEXT_PUBLIC_API}materials/add-material`, {
-      method: 'POST',
-      credentials: 'include',
-      headers: { 
-        'Content-Type': 'application/json',
-        'x-csrf-token': csrfToken
-      },
-      body: JSON.stringify(material),
-    });
-    return await response.json();
-  };
-
-  const handleAddProduct = async (formData: FormData): Promise<boolean> => {
-    try {
-      const csrfToken = await AuthService.getCsrfToken();
-      // Attention : l'URL doit correspondre au préfixe de ton controller ('products')
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API}products/add-product`, {
-        method: 'POST',
-        credentials: 'include',
-        headers: { 
-          // ⚠️ AUCUN 'Content-Type' ici ! Le navigateur gère le multipart/form-data tout seul.
-          'x-csrf-token': csrfToken
-        },
-        body: formData, // On passe directement le FormData
-      });
-
-      if (response.ok) {
-        await fetchAllData(); // Rafraîchit la liste des produits
-        return true;
-      } else {
-        const error = await response.text();
-        console.error('Erreur lors de la création du produit:', error);
-        alert('Erreur lors de la création du produit');
-        return false;
-      }
-    } catch (error) {
-      console.error('Erreur réseau:', error);
-      return false;
-    }
-  };
-
-  if (loading) {
+  if (globalLoading) {
     return (
-      <div className="min-h-screen bg-gray-100">
-        <div className="container mx-auto p-6">
-          <h1 className="text-3xl font-bold text-gray-800 mb-8 text-center">Dashboard SAC AZZURA</h1>
-          <p className="text-gray-500 text-center">Chargement des données...</p>
-        </div>
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <p className="text-gray-500 text-xl">Chargement du dashboard...</p>
       </div>
     );
   }
@@ -193,52 +36,60 @@ const [products, setProducts] = useState<Product[]>([]);
 
         <div className="mb-6">
           <ProductSection 
-            products={products}
-            categories={categories}
-            subcategories={subcategories}
-            colors={colors}
-            materials={materials}
-            loading={loading}
-            onRefresh={fetchAllData}
-            onAddProduct={handleAddProduct}
-            // Tu passeras ici tes fonctions handleAddProduct, handleUpdate, handleDelete
+            products={products.data}
+            categories={categories.data}
+            subcategories={subcategories.data}
+            colors={colors.data}
+            materials={materials.data}
+            loading={products.loading}
+            onAddProduct={products.add}
+            onUpdateProduct={products.update}
+            onDeleteProduct={products.remove}
           />
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <UserSection
-            users={users}
-            loading={loading}
-            onRefresh={fetchAllData}
-          />
+          <div className="lg:col-span-2">
+            <UserSection
+              users={users.data}
+              loading={users.loading}
+              onAddUser={users.add}
+              onUpdateUser={users.update}
+              onDeleteUser={users.remove}
+            />
+          </div>
 
           <CategorySection
-            categories={categories}
-            loading={loading}
-            onRefresh={fetchAllData}
-            onAddCategory={handleAddCategory}
+            categories={categories.data}
+            loading={categories.loading}
+            onAddCategory={categories.add}
+            onUpdateCategory={categories.update}
+            onDeleteCategory={categories.remove}
           />
 
           <SubcategorySection
-            subCategories={subcategories}
-            categories={categories} // On passe les catégories ici !
-            loading={loading}
-            onRefresh={fetchAllData}
-            onAddSubCategory={handleAddSubcategory}
+            subCategories={subcategories.data}
+            categories={categories.data} 
+            loading={subcategories.loading}
+            onAddSubCategory={subcategories.add}
+            onUpdateSubCategory={subcategories.update}
+            onDeleteSubCategory={subcategories.remove}
           />
 
           <ColorsSection
-            colors={colors}
-            loading={loading}
-            onRefresh={fetchAllData}
-            onAddColor={handleAddColor}
+            colors={colors.data}
+            loading={colors.loading}
+            onAddColor={colors.add}
+            onUpdateColor={colors.update}
+            onDeleteColor={colors.remove}
           />
 
           <MaterialsSection
-            materials={materials}
-            loading={loading}
-            onRefresh={fetchAllData}
-            onAddMaterial={handleAddMaterial}
+            materials={materials.data}
+            loading={materials.loading}
+            onAddMaterial={materials.add}
+            onUpdateMaterial={materials.update}
+            onDeleteMaterial={materials.remove}
           />
         </div>
       </div>
