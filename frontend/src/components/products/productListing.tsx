@@ -1,4 +1,4 @@
-"use client"; 
+"use client";
 
 import { Product, Category } from '@/src/types/product';
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
@@ -71,25 +71,25 @@ export default function ProductListing({ initialProducts }: ProductListingProps)
   };
 
   return (
-    <div className="flex flex-col md:flex-row gap-8">
+    <div className="flex flex-col gap-8">
       
       {/* SIDEBAR - Filtres */}
-      <aside className="w-full md:w-1/4">
-        <h2 className="font-semibold mb-4">Filtres</h2>
+      <aside className="w-full md:w-1/4 border-r pr-4">
+        <h2 className={`font-text text-2xl mb-6`} style={{color: 'var(--dark-blue)'}}>Filtres</h2>
         
         <div className="flex flex-col gap-4">
           {loadingCategories ? (
-            <p className="text-gray-500 text-sm">Chargement des catégories...</p>
+            <p className="text-sm">Chargement des catégories...</p>
           ) : categories && categories.length > 0 ? (
             <>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className={`block text-sm font-text font-medium`} style={{color: 'var(--foreground)'}}>
                 Catégorie
               </label>
               <select 
                 value={currentSubCategory || ''}
                 // On met à jour "subcategory" et non "category"
                 onChange={(e) => updateFilter('subcategory', e.target.value)}
-                className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full border-2 border-light-blue rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-dark-blue focus:border-transparent bg-white"
               >
                 <option value="">Toutes catégories</option>
                 
@@ -102,6 +102,7 @@ export default function ProductListing({ initialProducts }: ProductListingProps)
                       <option 
                         key={subcat.id} 
                         value={subcat.sku_code} // On stocke le slug dans l'URL (plus propre pour le SEO)
+                        style={{color: 'var(--foreground)'}}
                       >
                         {subcat.name}
                       </option>
@@ -114,61 +115,67 @@ export default function ProductListing({ initialProducts }: ProductListingProps)
               {currentSubCategory && (
                 <button 
                   onClick={() => router.push(pathname, { scroll: false })}
-                  className="mt-4 text-sm text-red-500 hover:text-red-700 underline text-left"
+                  className={`mt-4 text-sm font-text underline ${'hover:text-orange'} text-left`}
+                  style={{color: 'var(--foreground)'}}
                 >
                   Effacer les filtres
                 </button>
               )}
             </>
           ) : (
-            <p className="text-gray-500 text-sm">Aucune catégorie disponible</p>
+            <p className="text-gray-500 text-sm font-text">Aucune catégorie disponible</p>
           )}
         </div>
       </aside>
 
       {/* MAIN CONTENT - Grille de produits */}
-      <div className="w-full md:w-3/4">
-        <p className="mb-4 text-gray-500">{filteredProducts.length} produit(s) disponible(s)</p>
+      <div className="w-full">
+        <h2 className={`font-text text-2xl mb-4`} style={{color: 'var(--dark-blue)'}}>
+          {filteredProducts.length} produit{filteredProducts.length > 1 ? 's' : ''} disponible{filteredProducts.length > 1 ? 's' : ''}
+        </h2>
         
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {/* ⚠️ IMPORTANT : On map sur filteredProducts, pas initialProducts ! */}
+        <div className="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8">
+          {/* ⚠️ IMPORTANT : On map sur filteredProducts */}
           {filteredProducts.map((product) => (
             <Link 
               key={product.id} 
               href={`/products/${product.sku_code}`}
-              className="border rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow"
+              className="group" // "group" est crucial ici pour activer le hover sur l'image
             >
+              {/* Gestion de l'image avec un ratio parfaitement carré */}
               {product.images && product.images.length > 0 ? (
-                <div className="mb-3">
-                  <img 
-                    src={product.images[0].url} 
-                    alt={`${product.name}`}
-                    className="w-full h-48 object-cover rounded"
-                    loading="lazy"
-                  />
-                </div>
+                <img 
+                  src={product.images[0].url} 
+                  alt={`${product.name}`}
+                  className="aspect-square w-full rounded-lg bg-gray-200 object-cover group-hover:opacity-75 transition-opacity"
+                  loading="lazy"
+                />
               ) : (
-                <div className="mb-3 bg-gray-100 h-48 flex items-center justify-center rounded">
-                  <span className="text-gray-400 text-sm">Aucune image</span>
+                <div className="aspect-square w-full rounded-lg bg-gray-200 flex items-center justify-center group-hover:opacity-75 transition-opacity">
+                  <span className="text-gray-500 text-sm">Aucune image</span>
                 </div>
               )}
               
-              <h3 className="font-bold">{product.name}</h3>
-              <p className="text-gray-600 text-sm">{product.subcategory?.name || 'Sans catégorie'}</p> 
-              <p className="text-lg mt-2 font-semibold">{product.price} €</p>
+              {/* Informations du produit */}
+              {/* J'ai conservé ta classe "font-text" pour garder ta typographie custom */}
+              <h3 className="mt-4 text-sm text-gray-700 font-text">
+                {product.name}
+              </h3>
               
-              {product.description && (
-                <p className="text-gray-500 text-sm mt-2 line-clamp-2">
-                  {product.description}
-                </p>
-              )}
+              <p className="mt-1 text-sm text-gray-500 font-text">
+                {product.subcategory?.name || 'Sans catégorie'}
+              </p> 
+              
+              <p className="mt-1 text-lg font-medium text-gray-900 font-text">
+                {product.price} €
+              </p>
             </Link>
           ))}
         </div>
 
         {filteredProducts.length === 0 && (
           <div className="text-center py-12">
-            <p className="text-gray-500">Aucun produit trouvé pour les critères sélectionnés</p>
+            <p className="text-gray-500 font-text" style={{color: 'var(--foreground)'}}>Aucun produit trouvé pour les critères sélectionnés</p>
           </div>
         )}
       </div>

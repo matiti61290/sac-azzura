@@ -13,11 +13,8 @@ export default async function ProductsPage () {
     const products: Product[] = await res.json()
 
     return (
-        <div className="container mx-auto p-4">
-            <h1 className="text-3xl font-bold mb-6">Notre Boutique</h1>
-      
-      {/* On passe la liste complète au composant client qui gérera l'UI */}
-        <ProductListing initialProducts={products} />
+        <div className="container mx-auto p-6 md:p-12 min-h-screen bg-[var(--background)]">
+                <ProductListing initialProducts={products} />
         </div>
     )
 }

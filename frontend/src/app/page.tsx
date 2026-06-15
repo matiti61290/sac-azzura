@@ -1,6 +1,4 @@
 import Image from "next/image";
-import { ProductService } from "../services/product.service";
-import { Product } from "../types/product";
 import NewsletterForm from "../components/homepage/NewsletterForm";
 
 export default async function Home() {
@@ -14,34 +12,6 @@ export default async function Home() {
   return (
     <div className="">
       <main className="min-h-screen flex flex-col gap-12 p-6 md:p-12">
-        
-        {/* <section id="slogan" className="text-center bg-[url(../../public/static/home-background.jpg)] py-15">
-          <h1 className="text-7xl text-white  font-title mx-5 my-5 pb-10">Sacs et accessoires faits main en Normandie, personnalisables et pensés pour durer</h1>
-          <h3 className=" text-xl text-white font-bold font-text m-5">Des créations artisanales uniques, pensées pour vous accompagner au quotidien.</h3>
-          <button className="font-text font-semibold border border-orange rounded-xl p-5 bg-orange">Découvrir la boutique</button>
-        </section>
-
-        <hr className="color-night-blue bg-night-blue h-0.5 my-10"/> */}
-
-        {/* <section id="welcome" className="flex flex-col items-center gap-4">
-          <Image className="mb-10" src="/static/photo-dev.png"width={2000} height={0}  alt="Photo de la creatice, Gigi"/>
-          <div className="flex flex-col items-center gap-1">
-            <h2 className="text-6xl font-title text-center text-dark-blue mb-10">bienvenue chez Sac'Azura</h2>
-            <p className="font-text text-lg">
-              Je crois aux objets que l’on choisit avec le cœur, que 
-              l’on porte avec plaisir, et que l’on garde parce qu’ils ont du sens.
-            </p>
-            <p className="font-text text-lg">
-              Je m’appelle Gigi, et je confectionne moi-même chaque création dans mon atelier.
-            </p>
-            <p className="font-text text-lg">
-              Ici, vous trouverez des sacs pensés pour le quotidien : 
-              beaux, utiles, solides… et surtout, faits pour vous accompagner longtemps !
-            </p>
-            <button className="font-text font-semibold border border-orange rounded-xl p-5 bg-orange mt-10">Découvrir la boutique</button>
-          </div>
-        </section> */}
-
         {/*Possible changement de la section 1*/}
         <section>
           <div className="flex flex-col items-center justify-center bg-[image:var(--image-dev)] bg-cover bg-center h-200">
