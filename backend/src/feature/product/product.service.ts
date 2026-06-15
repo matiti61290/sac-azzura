@@ -28,7 +28,7 @@ export class ProductService {
     ) {}
 
     async getAllProducts(){
-        const products = await this.productRepository.find({ relations: ["images", "stocks"]})
+        const products = await this.productRepository.find({ relations: ["images", "stocks", "subcategory", "subcategory.category"]})
 
         if(!products){
             throw new NotFoundException
