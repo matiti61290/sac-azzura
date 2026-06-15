@@ -30,7 +30,7 @@ export default function Navbar() {
 
               <div className="hidden ml-5 md:flex items-center justify-center space-x-6">
                 <Link href="/" className="font-text text-2xl text-gray-600 hover:text-black">Accueil</Link>
-                <Link href="/product-list" className="font-text text-2xl text-gray-600 hover:text-black">La boutique</Link>
+                <Link href="/products" className="font-text text-2xl text-gray-600 hover:text-black">La boutique</Link>
                 <Link href="/about" className="font-text text-2xl text-gray-600 hover:text-black">Personnalisation</Link>
                 <Link href="/about" className="font-text text-2xl text-gray-600 hover:text-black">À propos</Link>
               </div>

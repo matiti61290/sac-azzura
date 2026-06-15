@@ -13,7 +13,7 @@ export class CategoryService{
     ) {}
 
     async getAllCategory(){
-        const categories = await this.categoryRepository.find()
+        const categories = await this.categoryRepository.find({ relations:['subcategories']})
 
         return categories
     }
