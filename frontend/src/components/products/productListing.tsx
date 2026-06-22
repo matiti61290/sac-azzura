@@ -139,7 +139,7 @@ export default function ProductListing({ initialProducts }: ProductListingProps)
           {filteredProducts.map((product) => (
             <Link 
               key={product.id} 
-              href={`/products/${product.sku_code}`}
+              href={`/products/${product.id}`}
               className="group" // "group" est crucial ici pour activer le hover sur l'image
             >
               {/* Gestion de l'image avec un ratio parfaitement carré */}
