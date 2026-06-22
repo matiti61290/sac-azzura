@@ -76,7 +76,7 @@ export default async function Home() {
             <h2 className="font-title text-6xl text-dark-blue text-center">Des créations artisanales, en petites séries ou en pièce unique</h2>
             
             {products.length > 0 ? (
-              <div className="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8 w-full mt-8">
+              <div className="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8 h-full mt-8">
                 {products.map((product: Product) => {
                   const mainImageUrl = product.images && product.images.length > 0 
                     ? product.images[0].url 
@@ -87,7 +87,7 @@ export default async function Home() {
                       <img 
                         alt={`Image de ${product.name}`} 
                         src={mainImageUrl} 
-                        className="aspect-square w-full rounded-lg bg-gray-200 object-cover group-hover:opacity-75 transition-opacity" 
+                        className="aspect-2/3  w-full rounded-lg bg-gray-200 object-cover group-hover:opacity-75 transition-opacity" 
                         loading="lazy"
                       />
                       <h3 className="mt-4 text-sm text-gray-700 font-text">{product.name}</h3>

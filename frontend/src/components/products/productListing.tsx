@@ -147,7 +147,7 @@ export default function ProductListing({ initialProducts }: ProductListingProps)
                 <img 
                   src={product.images[0].url} 
                   alt={`${product.name}`}
-                  className="aspect-square w-full rounded-lg bg-gray-200 object-cover group-hover:opacity-75 transition-opacity"
+                  className="aspect-2/3 w-full rounded-lg bg-gray-200 object-cover group-hover:opacity-75 transition-opacity"
                   loading="lazy"
                 />
               ) : (
