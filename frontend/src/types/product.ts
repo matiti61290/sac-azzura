@@ -21,6 +21,26 @@ export interface SubCategory {
     category: Category; // La relation vers le parent
 }
 
+export interface Color {
+    id: number;
+    name: string;
+    sku_code: string
+}
+
+export interface Material {
+    id: number;
+    name: string;
+    sku_code: string;
+}
+
+export interface Stocks {
+    id: number;
+    quantity: number;
+    sku_code: string;
+    color: Color;
+    material: Material
+}
+
 export interface Product {
     id: number;
     name: string;
@@ -29,7 +49,6 @@ export interface Product {
     sku_code: string;
     isActive: boolean;
     images: ProductImage[];
-    
-    // 👇 On ajoute la relation de ton back
-    subcategory: SubCategory; 
+    subcategory: SubCategory;
+    stocks: Stocks[] 
 }
