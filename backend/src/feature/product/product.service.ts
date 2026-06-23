@@ -46,7 +46,7 @@ export class ProductService {
     }
 
     async findProduct(productId: number){
-        const product = await this.productRepository.findOne({ where: {id: productId}, relations: ["images", 'subcategory.category', "stocks"]})
+        const product = await this.productRepository.findOne({ where: {id: productId}, relations: ["images", 'subcategory.category', "stocks", "stocks.color", "stocks.material"]})
 
         if(!product){
             throw new NotFoundException
