@@ -1,6 +1,7 @@
 import Image from "next/image";
 import NewsletterForm from "../components/homepage/NewsletterForm";
 import { Product } from "@/src/types/product"; // ⚠️ Vérifie que ce chemin est le bon pour ton projet
+import Link from "next/link";
 
 export default async function Home() {
 
@@ -83,7 +84,7 @@ export default async function Home() {
                     : '/static/placeholder.jpg';
 
                   return (
-                    <a key={product.id} href={`/products/${product.sku_code}`} className="group">
+                    <Link key={product.id} href={`/products/${product.id}`} className="group">
                       <img 
                         alt={`Image de ${product.name}`} 
                         src={mainImageUrl} 
@@ -93,7 +94,7 @@ export default async function Home() {
                       <h3 className="mt-4 text-sm text-gray-700 font-text">{product.name}</h3>
                       <p className="mt-1 text-sm text-gray-500 font-text">{product.subcategory?.name || 'Sans catégorie'}</p> 
                       <p className="mt-1 text-lg font-medium text-gray-900 font-text">{product.price} €</p>
-                    </a>
+                    </Link>
                   );
                 })}
               </div>
