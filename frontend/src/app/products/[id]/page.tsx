@@ -12,7 +12,21 @@ export default async function ProductPage({ params }: PageProps) {
 
     const res = await fetch(`${process.env.NEXT_PUBLIC_API}products/${id}`, { cache: 'no-store' })
     if (!res.ok) return <div className="text-center py-20 font-text text-night-blue">Création introuvable...</div>
-    const product: Product = await res.json()
+
+    const [productRes, relatedRes] = await Promise.all([
+        fetch(`${process.env.NEXT_PUBLIC_API}products/${id}`, { cache: 'no-store' }),
+        fetch(`${process.env.NEXT_PUBLIC_API}products?limit=4`, { cache: 'no-store' })
+    ])
+
+    if(!productRes){
+        return <div className="text-center py-20 font-text text-night-blue">Création introuvable...</div>
+    }
+
+    const product: Product = await productRes.json()
+
+    const relatedProducts: Product[] = relatedRes.ok ? await relatedRes.json() : []
+
+    const filteredSuggestions = relatedProducts.filter((p) => p.id !== Number(id)).slice(0, 4)
 
     return (
         <div className="min-h-screen bg-white font-text text-azura-night">
@@ -81,24 +95,43 @@ export default async function ProductPage({ params }: PageProps) {
             </main>
 
             {/* --- SECTION BAS DE PAGE : "VOUS AIMEREZ AUSSI" (Zonage de tes prototypes) --- */}
-            <section className="bg-gray-50 border-t border-night-blue/5 mt-20 py-16">
+           <section className="bg-gray-50 border-t border-azura-night/5 mt-20 py-16">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <h2 className="text-2xl lg:text-3xl font-title text-night-blue text-center mb-10 tracking-wide">
+                    <h2 className="text-2xl lg:text-3xl font-title text-azura-night text-center mb-10 tracking-wide">
                         Vous aimerez aussi...
                     </h2>
                     
-                    {/* Grille de suggestions (Tu pourras y mapper d'autres produits) */}
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-                        {[1, 2, 3, 4].map((item) => (
-                            <div key={item} className="group bg-white rounded-2xl p-3 border border-gray-100 shadow-sm hover:shadow-md transition-all">
-                                <div className="aspect-square w-full rounded-xl bg-gray-100 overflow-hidden mb-3">
-                                    <div className="w-full h-full bg-gray-200 animate-pulse" /> {/* Placeholder image */}
-                                </div>
-                                <h4 className="text-sm font-semibold text-night-blue truncate">Autre Sac Création</h4>
-                                <p className="text-xs text-gray-500 mt-0.5">79 €</p>
-                            </div>
-                        ))}
-                    </div>
+                    {filteredSuggestions.length > 0 ? (
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                            {/* 2. On boucle sur les vrais produits récupérés */}
+                            {filteredSuggestions.map((item) => (
+                                // 3. On utilise le composant Link de Next.js pour rendre la carte cliquable
+                                <Link 
+                                    href={`/products/${item.id}`} 
+                                    key={item.id} 
+                                    className="group bg-white rounded-2xl p-3 border border-gray-100 shadow-sm hover:shadow-md hover:border-azura-orange/30 transition-all block"
+                                >
+                                    <div className="aspect-square w-full rounded-xl bg-gray-100 overflow-hidden mb-3 relative">
+                                        <img 
+                                            src={item.images?.[0]?.url || "/placeholder.jpg"} 
+                                            alt={item.name}
+                                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                        />
+                                    </div>
+                                    <h4 className="text-sm font-semibold text-azura-night truncate group-hover:text-azura-orange transition-colors">
+                                        {item.name}
+                                    </h4>
+                                    <p className="text-xs text-gray-500 mt-0.5 font-bold">
+                                        {item.price} €
+                                    </p>
+                                </Link>
+                            ))}
+                        </div>
+                    ) : (
+                        <p className="text-center text-sm italic text-gray-500">
+                            D'autres créations seront bientôt disponibles dans l'atelier...
+                        </p>
+                    )}
                 </div>
             </section>
         </div>

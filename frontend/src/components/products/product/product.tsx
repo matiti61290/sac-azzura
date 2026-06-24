@@ -73,7 +73,7 @@ export default function ProductOptions({ stocks }: ProductOptionsProps) {
                                 className={`
                                     px-4 py-2 text-sm font-medium rounded-full transition-all duration-200 focus:outline-none
                                     ${isSelected 
-                                        ? "bg-orange text-white shadow-md ring-2 ringorange ring-offset-2 scale-105 font-bold" 
+                                        ? "bg-orange text-white shadow-md ring-2 ring-orange ring-offset-2 scale-105 font-bold" 
                                         : "bg-white text-night-blue border border-gray-200 hover:border-orange/50"
                                     }
                                     ${!isAvailable && !isSelected ? "opacity-30 cursor-not-allowed bg-gray-50 line-through decoration-night-blue" : ""}
