@@ -52,10 +52,10 @@ export default function ProductOptions({ stocks }: ProductOptionsProps) {
             {/* --- SECTION CHOIX DE LA COULEUR --- */}
             <div>
                 <div className="flex items-center justify-between mb-2">
-                    <h3 className="text-xs font-bold uppercase tracking-wider text-azura-night/60">
+                    <h3 className="text-xs font-bold uppercase tracking-wider text-night-blue/60">
                         Choisir la couleur
                     </h3>
-                    <span className="text-sm font-semibold text-azura-night">
+                    <span className="text-sm font-semibold text-night-blue">
                         {availableColors.find(c => c.id === selectedColor)?.name}
                     </span>
                 </div>
@@ -73,10 +73,10 @@ export default function ProductOptions({ stocks }: ProductOptionsProps) {
                                 className={`
                                     px-4 py-2 text-sm font-medium rounded-full transition-all duration-200 focus:outline-none
                                     ${isSelected 
-                                        ? "bg-azura-orange text-white shadow-md ring-2 ring-azura-orange ring-offset-2 scale-105 font-bold" 
-                                        : "bg-white text-azura-night border border-gray-200 hover:border-azura-orange/50"
+                                        ? "bg-orange text-white shadow-md ring-2 ringorange ring-offset-2 scale-105 font-bold" 
+                                        : "bg-white text-night-blue border border-gray-200 hover:border-orange/50"
                                     }
-                                    ${!isAvailable && !isSelected ? "opacity-30 cursor-not-allowed bg-gray-50 line-through decoration-azura-night" : ""}
+                                    ${!isAvailable && !isSelected ? "opacity-30 cursor-not-allowed bg-gray-50 line-through decoration-night-blue" : ""}
                                 `}
                             >
                                 {color.name}
@@ -89,10 +89,10 @@ export default function ProductOptions({ stocks }: ProductOptionsProps) {
             {/* --- SECTION CHOIX DU MATÉRIAU --- */}
             <div>
                 <div className="flex items-center justify-between mb-2">
-                    <h3 className="text-xs font-bold uppercase tracking-wider text-azura-night/60">
+                    <h3 className="text-xs font-bold uppercase tracking-wider text-night-blue/60">
                         Type de tissu / matériau
                     </h3>
-                    <span className="text-sm font-semibold text-azura-night">
+                    <span className="text-sm font-semibold text-night-blue">
                         {availableMaterials.find(m => m.id === selectedMaterial)?.name}
                     </span>
                 </div>
@@ -110,10 +110,10 @@ export default function ProductOptions({ stocks }: ProductOptionsProps) {
                                 className={`
                                     px-4 py-2 text-sm font-medium rounded-xl transition-all duration-200 focus:outline-none
                                     ${isSelected 
-                                        ? "bg-azura-orange text-white shadow-md ring-2 ring-azura-orange ring-offset-2 scale-105 font-bold" 
-                                        : "bg-white text-azura-night border border-gray-200 hover:border-azura-orange/50"
+                                        ? "bg-orange text-white shadow-md ring-2 ring-orange ring-offset-2 scale-105 font-bold" 
+                                        : "bg-white text-night-blue border border-gray-200 hover:border-orange/50"
                                     }
-                                    ${!isAvailable && !isSelected ? "opacity-30 cursor-not-allowed bg-gray-50 line-through decoration-azura-night" : ""}
+                                    ${!isAvailable && !isSelected ? "opacity-30 cursor-not-allowed bg-gray-50 line-through decoration-night-blue" : ""}
                                 `}
                             >
                                 {material.name}
@@ -124,7 +124,7 @@ export default function ProductOptions({ stocks }: ProductOptionsProps) {
             </div>
 
             {/* --- ZONE D'ACTION FINALE (AVEC LE TON DE GIGI) --- */}
-            <div className="pt-6 border-t border-azura-night/10 mt-6">
+            <div className="pt-6 border-t border-night-blue/10 mt-6">
                 
                 {/* Gestion des textes de statut dynamiques */}
                 <div className="mb-4">
@@ -133,7 +133,7 @@ export default function ProductOptions({ stocks }: ProductOptionsProps) {
                             Cette combinaison n'est pas réalisable pour le moment.
                         </p>
                     ) : currentStock.quantity === 0 ? (
-                        <p className="text-azura-orange text-sm font-medium italic">
+                        <p className="text-orange text-sm font-medium italic">
                             Victime de son succès ! Ce modèle est en cours de réapprovisionnement à l'atelier.
                         </p>
                     ) : (
@@ -150,22 +150,14 @@ export default function ProductOptions({ stocks }: ProductOptionsProps) {
                     onClick={handleAddToCart}
                     className="
                         w-full flex items-center justify-center py-4 px-6 rounded-2xl text-white font-semibold tracking-wide text-base
-                        bg-azura-orange hover:bg-[#e89454] active:scale-[0.98]
+                        bg-orange hover:bg-[#e89454] active:scale-[0.98]
                         disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed disabled:scale-100 disabled:shadow-none
-                        transition-all duration-150 shadow-lg shadow-azura-orange/20
+                        transition-all duration-150 shadow-lg shadow-orange/20
                     "
                 >
                     Ajouter au panier
                 </button>
-                
-                {/* Affichage du SKU unique de la table ternaire pour le suivi artisanal */}
-                {currentStock && (
-                    <p className="text-center text-[10px] text-gray-400 mt-3 tracking-widest uppercase">
-                        Identifiant unique de la pièce : {currentStock.sku_code}
-                    </p>
-                )}
             </div>
-
         </div>
     )
 }
