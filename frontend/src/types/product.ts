@@ -45,7 +45,7 @@ export interface Product {
     id: number;
     name: string;
     description: string;
-    price: string | number;
+    price: number;
     sku_code: string;
     isActive: boolean;
     images: ProductImage[];

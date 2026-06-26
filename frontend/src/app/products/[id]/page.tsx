@@ -83,7 +83,7 @@ export default async function ProductPage({ params }: PageProps) {
                     {/* INTERACTIVITÉ (Notre composant client avec les boutons oranges et la table ternaire) */}
                     <div className="pt-6 border-t border-azura-night/10">
                         {product.stocks && product.stocks.length > 0 ? (
-                            <ProductOptions stocks={product.stocks} />
+                            <ProductOptions stocks={product.stocks} product={product} />
                         ) : (
                             <p className="text-orange text-sm font-medium italic text-center p-4 bg-orange/5 rounded-xl">
                                 Je prépare actuellement de nouvelles pièces pour ce modèle. N'hésitez pas à m'envoyer un petit message !
