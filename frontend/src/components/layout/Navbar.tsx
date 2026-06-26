@@ -45,7 +45,10 @@ export default function Navbar() {
 
             {/* 3. DROITE : Connexion / Compte */}
             <div className="mr-5 flex flex-1 justify-end space-x-6">
-              <ShoppingBagIcon className='w-auto h-8'/>
+              <Link href="/cart">
+                <ShoppingBagIcon className='w-auto h-8'/>
+              </Link>
+
               <div className="hidden md:flex items-center space-x-4">
                 
                 {/* --- DÉBUT DES CONDITIONS BUREAU --- */}
