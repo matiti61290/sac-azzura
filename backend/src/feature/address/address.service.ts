@@ -69,7 +69,7 @@ export class AddressService {
             user: user
         })
 
-        await this.addressRepository.save(newAddress)
+        return await this.addressRepository.save(newAddress)
     }
 
     async updateAddress(addressId: number, updateAddressDto: UpdateAddressDto, user: any) {

@@ -62,12 +62,6 @@ export class PaymentService {
             throw new InternalServerErrorException("les adresses n'appartiennent pas a cet utilisateur")
         }
 
-        const promotionCode = await this.promotionRepository.findOne({ where: {name: cartDto.promotion_code}})
-
-        if(!promotionCode){
-            throw new InternalServerErrorException("Le code de promotion ne fonctionne pas")
-        }
-
         let totalAmount = 0
 
         const order = new OrderEntity()
@@ -77,7 +71,7 @@ export class PaymentService {
         order.delivery_address = deliveryAddress
         order.billing_address = billingAddress
 
-
+        // Calcul du prix total basé sur le stock réel
         for (const item of cartDto.items){
             const variant = await this.stockRepository.findOne({where: {sku: item.sku}, relations: ['product']})
 
@@ -105,47 +99,53 @@ export class PaymentService {
 
         console.log('total avant promo', totalAmount)
 
-        if(promotionCode.minAmount >= totalAmount){
-            throw new InternalServerErrorException("Vous n'avez pas atteint la valeur minimum pour utiliser ce code promotionnel")
-        } else {
-            if(promotionCode.promotionType === "percentage"){
-                const promotionValue = promotionCode.percentageValue
+        // 👇 LA MODIFICATION : Application du code promo SEULEMENT s'il est fourni et valide
+        if (cartDto.promotion_code && cartDto.promotion_code !== "AUCUN" && cartDto.promotion_code.trim() !== "") {
+            const promotionCode = await this.promotionRepository.findOne({ where: {name: cartDto.promotion_code}})
 
-                totalAmount = totalAmount - (totalAmount * promotionValue ) / 100
-            } else if (promotionCode.promotionType === 'fixed_amount'){
-                const promotionValue = promotionCode.fixedValue
+            if(!promotionCode){
+                throw new BadRequestException("Le code de promotion renseigné n'existe pas ou a expiré")
+            }
 
-                totalAmount = totalAmount - promotionValue
+            if(promotionCode.minAmount >= totalAmount){
+                throw new BadRequestException("Vous n'avez pas atteint la valeur minimum pour utiliser ce code promotionnel")
+            } else {
+                if(promotionCode.promotionType === "percentage"){
+                    const promotionValue = promotionCode.percentageValue
+                    totalAmount = totalAmount - (totalAmount * promotionValue ) / 100
+                } else if (promotionCode.promotionType === 'fixed_amount'){
+                    const promotionValue = promotionCode.fixedValue
+                    totalAmount = totalAmount - promotionValue
+                }
             }
         }
 
-        console.log('total apres promo',totalAmount)
+        console.log('total apres promo', totalAmount)
 
         order.totalAmount = totalAmount
 
         const savedOrder = await this.orderRepository.save(order)
 
-        return this.createCheckoutSession(savedOrder.id, user.id, order.items)
+        return this.createCheckoutSession(savedOrder.id, user.id, order.items, user.mail)
     }
 
-    async createCheckoutSession (orderId: number, userId: number, items: OrderItemEntity[]){
+    async createCheckoutSession (orderId: number, userId: number, items: OrderItemEntity[], userEmail: string){
         const line_items = items.map(item => {
             if(!item.stock.product?.name){
                 throw new InternalServerErrorException('Donnees du produit manquant')
             }
 
             return{
-                            price_data: {
-                currency: 'eur',
-                product_data: {
-                    name : item.stock.product.name,
-                    description: `Modele: ${item.stock.sku}`
+                price_data: {
+                    currency: 'eur',
+                    product_data: {
+                        name : item.stock.product.name,
+                        description: `Modele: ${item.stock.sku}`
+                    },
+                    unit_amount: Math.round(item.priceAtPurchase * 100)
                 },
-                unit_amount: Math.round(item.priceAtPurchase * 100)
-            },
-            quantity: item.quantity
+                quantity: item.quantity
             }
-
         })
 
         try{
@@ -153,6 +153,7 @@ export class PaymentService {
                 payment_method_types: ["card"],
                 line_items,
                 mode:'payment',
+                customer_email: userEmail,
                 success_url: 'http://localhost:3000/payment/payment_success',
                 cancel_url: `http://localhost:3000/payment/payment_failed/${orderId}/${userId}`,
 
@@ -169,8 +170,7 @@ export class PaymentService {
         }
     }
 
-        async paymentFailed(orderId: number, userId: number){
-
+    async paymentFailed(orderId: number, userId: number){
         const order = await this.orderRepository.findOne({where:{ id:orderId, user:{id: userId}}, relations: ['user']})
 
         if(!order){
@@ -185,10 +185,7 @@ export class PaymentService {
         console.log('la commande mise a jour est:', order)
 
         const mail = order.user.mail
-
         await this.sendMailPaymentFail(orderId, mail)
-
-        
     }
 
     async constructEventWebhook ( req: any, res: any, signature: string){
@@ -226,39 +223,39 @@ export class PaymentService {
 
             try{
                 await this.dataSource.transaction(async (transactionalEntityManager) => {
-                const order = await transactionalEntityManager.findOne(OrderEntity, {
-                    where:{id: orderId},
-                    relations: ['items', 'items.stock']
+                    const order = await transactionalEntityManager.findOne(OrderEntity, {
+                        where:{id: orderId},
+                        relations: ['items', 'items.stock']
+                    })
+
+                    if(!order || order.status !== OrderStatus.PENDING){
+                        return
+                    }
+
+                    order.status = OrderStatus.PAID
+                    await transactionalEntityManager.save(order)
+
+                    for(const line of order.items) {
+                        const currentStock = line.stock
+
+                        if(currentStock.quantity < line.quantity) {
+                            throw new InternalServerErrorException(`Stock insuffisant pour l'item ${currentStock.sku}`)
+                        }
+
+                        currentStock.quantity -= line.quantity
+                        await transactionalEntityManager.save(currentStock)
+
+                        console.log(`Transaction reussie. Commande ${orderId} payee et stock deduits.`)
+
+                        const user = await this.userRepository.findOne({ where: {id: userId}})
+
+                        if(!user){
+                            throw new InternalServerErrorException(`L'utilisateur avec l'id ${userId} n'existe pas`)
+                        }
+                        const mail = user.mail
+                        await this.sendMailPaymentSuccess(mail, orderId)
+                    }
                 })
-
-                if(!order || order.status !== OrderStatus.PENDING){
-                    return
-                }
-
-                order.status = OrderStatus.PAID
-                await transactionalEntityManager.save(order)
-
-                for(const line of order.items) {
-                    const currentStock = line.stock
-
-                    if(currentStock.quantity < line.quantity) {
-                        throw new InternalServerErrorException(`Stock insuffisant pour l'item ${currentStock.sku}`)
-                    }
-
-                    currentStock.quantity -= line.quantity
-                    await transactionalEntityManager.save(currentStock)
-
-                    console.log(`Transaction reussie. Commande ${orderId} payee et stock deduits.`)
-
-                    const user = await this.userRepository.findOne({ where: {id: userId}})
-
-                    if(!user){
-                        throw new InternalServerErrorException(`L'utilisateur avec l'id ${userId} n'existe pas`)
-                    }
-                    const mail = user.mail
-                    await this.sendMailPaymentSuccess(mail, orderId)
-                }
-            })
             } catch(error){
                 console.error('Echec de la transaction')
             }
@@ -272,7 +269,6 @@ export class PaymentService {
             }
 
             const orderId = Number(metadata.orderId)
-
             const order = await this.orderRepository.findOne({where: {id: orderId}})
 
             if(order && order.status === OrderStatus.PENDING){
