@@ -126,10 +126,10 @@ export class PaymentService {
 
         const savedOrder = await this.orderRepository.save(order)
 
-        return this.createCheckoutSession(savedOrder.id, user.id, order.items)
+        return this.createCheckoutSession(savedOrder.id, user.id, order.items, user.mail)
     }
 
-    async createCheckoutSession (orderId: number, userId: number, items: OrderItemEntity[]){
+    async createCheckoutSession (orderId: number, userId: number, items: OrderItemEntity[], userEmail: string){
         const line_items = items.map(item => {
             if(!item.stock.product?.name){
                 throw new InternalServerErrorException('Donnees du produit manquant')
@@ -153,6 +153,7 @@ export class PaymentService {
                 payment_method_types: ["card"],
                 line_items,
                 mode:'payment',
+                customer_email: userEmail,
                 success_url: 'http://localhost:3000/payment/payment_success',
                 cancel_url: `http://localhost:3000/payment/payment_failed/${orderId}/${userId}`,
 
