@@ -41,7 +41,7 @@ export default function ProductOptions({ stocks, product }: ProductOptionsProps)
             materialName: currentStock.material.name,
             imageUrl: product.images?.[0]?.url || "/placeholder.jpg",
             quantity: 1,
-            sku: currentStock.sku_code
+            sku: currentStock.sku
         });
 
         // 👇 Au lieu de l'alert(), on affiche notre notification

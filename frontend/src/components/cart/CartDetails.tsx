@@ -89,9 +89,9 @@ export default function CartDetails() {
             <span>{cartTotal} €</span>
           </div>
 
-          <button className="w-full bg-black text-white py-4 rounded-md font-bold hover:bg-gray-800 transition">
+          <Link href="/checkout" className="w-full bg-black text-white py-4 rounded-md font-bold hover:bg-gray-800 transition">
             Valider la commande
-          </button>
+          </Link>
         </div>
       </div>
     </div>

@@ -36,7 +36,7 @@ export interface Material {
 export interface Stocks {
     id: number;
     quantity: number;
-    sku_code: string;
+    sku: string;
     color: Color;
     material: Material
 }
