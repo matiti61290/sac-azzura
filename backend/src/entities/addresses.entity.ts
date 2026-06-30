@@ -3,6 +3,7 @@ import { UserEntity } from "./user.entity";
 
 import { OrderEntity } from "./order.entity";
 import { AddressType } from "../shared/enum/address.enum";
+import { Exclude } from "class-transformer";
 
 @Entity('Address')
 export class AddressEntity {
@@ -30,8 +31,9 @@ export class AddressEntity {
         {onDelete: "CASCADE"}
     )
     @Index()
+    @Exclude()
     user!: UserEntity;
 
     @OneToMany(()=> OrderEntity, (order)=> order.delivery_address)
-    orders!: []
+    orders!: OrderEntity[]
 }

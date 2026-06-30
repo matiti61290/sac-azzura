@@ -23,10 +23,24 @@ export class UsersService {
     }
 
     async findUserById(userId: number) {
-        const user = await this.userRepository.findOne({ where: {id: userId}})
+        const user = await this.userRepository.findOne({ 
+            where: { id: userId }, 
+            relations: ['orders', 'addresses'] 
+        })
 
-        if(!user) {
-            throw new NotFoundException
+        if (!user) {
+            throw new NotFoundException()
+        }
+
+        // ✂️ ON CASSE LA BOUCLE CIRCULAIRE ICI
+        // On retire la propriété 'user' de chaque adresse et chaque commande
+        // (Ne t'inquiète pas, ça ne supprime rien en base de données, ça nettoie juste le JSON envoyé !)
+        if (user.addresses) {
+            user.addresses.forEach(address => delete (address as any).user)
+        }
+        
+        if (user.orders) {
+            user.orders.forEach(order => delete (order as any).user)
         }
 
         return user
