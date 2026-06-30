@@ -10,9 +10,10 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined)
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [isConnected, setIsConnected] = useState(false)
   const [user, setUser] = useState<User | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
 
   // Vérifier au montage si un utilisateur est déjà connecté (localStorage)
-  useEffect(() => {
+useEffect(() => {
     const savedUser = localStorage.getItem('user')
     if (savedUser) {
       try {
@@ -23,6 +24,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         localStorage.removeItem('user')
       }
     }
+    setIsLoading(false) 
   }, [])
 
   const login = async (credentials: { mail: string; password: string }) => {
@@ -49,7 +51,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ isConnected, user, login, logout }}>
+    <AuthContext.Provider value={{ isConnected, user, login, logout, isLoading }}>
       {children}
     </AuthContext.Provider>
   )

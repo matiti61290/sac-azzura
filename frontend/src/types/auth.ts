@@ -5,4 +5,5 @@ export interface AuthContextType {
   user: User | null
   login: (credentials: { mail: string; password: string }) => Promise<void>
   logout: () => void
+  isLoading: boolean;
 }

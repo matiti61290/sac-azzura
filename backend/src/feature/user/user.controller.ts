@@ -2,6 +2,7 @@ import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, UseGua
 import { UsersService } from "./user.service";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 import { UpdateUserDto } from "../../shared/dtos/user/updateUser.dto";
+import { AdminGuard } from "../auth/guards/admin.guard";
 
 @Controller('user')
 export class UserController{
@@ -10,11 +11,13 @@ export class UserController{
     ) {}
 
     @Get('')
+    @UseGuards(JwtAuthGuard, AdminGuard)
     async getAllUsers () {
         return this.userService.getAllUser()
     }
 
     @Get('/:userId')
+    @UseGuards(JwtAuthGuard)
     async findUserById(
         @Param('userId', ParseIntPipe) userId: number
     ) {

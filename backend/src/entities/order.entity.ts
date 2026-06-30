@@ -6,6 +6,7 @@ import { OrderStatus } from "../shared/enum/order.enum";
 import { OrderItemEntity } from "./OrderItem.entity";
 import type { ShippingDetailsData } from "../shared/interfaces/ShippingDetailData.interface";
 import { Carrier } from "../shared/enum/carrier.enum";
+import { Exclude } from "class-transformer";
 
 @Entity('Order')
 export class OrderEntity {
@@ -13,6 +14,7 @@ export class OrderEntity {
     id!: number
 
     @ManyToOne(()=> UserEntity, (user)=> user.orders, { cascade: true})
+    @Exclude()
     user!: UserEntity
 
     @ManyToOne(()=> AddressEntity)

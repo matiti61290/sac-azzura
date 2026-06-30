@@ -7,7 +7,11 @@ import { Bars3Icon, XMarkIcon, ShoppingBagIcon, UserCircleIcon, Cog8ToothIcon } 
 import { useAuth } from '@/src/contexts/AuthContext';
 
 export default function Navbar() {
-  const { isConnected, user, logout } = useAuth();
+  const { isConnected, user, logout, isLoading } = useAuth();
+
+  if (isLoading) {
+    return <div className="h-16 w-full animate-pulse bg-gray-50" />; 
+  }
 
   return (
     <Disclosure as="nav" className="relative bg-white shadow-md/20 shadow-night-blue p-4">
@@ -76,7 +80,7 @@ export default function Navbar() {
                       <MenuItems className="absolute right-0 mt-2 w-48 origin-top-right bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-50">
                         <div className="px-4 py-2 text-sm text-gray-700">
                           Connecté en tant que <br/>
-                          <span className="font-medium">{user?.firstname}</span>
+                          <Link href='/profile' className="font-medium">{user?.firstname}</Link>
                         </div>
                         <div className="border-t border-gray-200"></div>
                         <MenuItem>
