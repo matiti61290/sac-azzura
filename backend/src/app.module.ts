@@ -53,7 +53,8 @@ export class AppModule implements NestModule {
     .exclude(
       {path: 'newsletter', method: RequestMethod.POST},
       {path: 'products/', method: RequestMethod.GET},
-      {path: 'auth/login', method: RequestMethod.POST}
+      {path: 'auth/login', method: RequestMethod.POST},
+      {path: 'payment/webhook', method: RequestMethod.POST}
     ).forRoutes('*')
   }
 }
