@@ -297,8 +297,8 @@ export default function ProfileDashboard() {
                                                                 {order.status === OrderStatus.CANCELLED && '❌ Annulée'}
                                                                 {order.status === OrderStatus.SHIPPED && '🚚 Expédiée'}
                                                                 {order.status === OrderStatus.DELIVERED && '📦 Livrée'}
-            </span>
-        </div>
+                                                            </span>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             )
