@@ -30,8 +30,10 @@ export default function ProfileDashboard() {
 
     // Formulaire d'infos personnelles
     const [accountForm, setAccountForm] = useState({
-        name: "",
+        firstname: "",
+        lastname: "",
         mail: "",
+        phoneNumber: "",
         password: ""
     })
 
@@ -75,8 +77,10 @@ export default function ProfileDashboard() {
                     
                     // On pré-remplit le formulaire avec les vraies données de la BDD
                     setAccountForm({
-                        name: userData.name || "",
+                        firstname: userData.firstname,
+                        lastname: userData.lastname || "",
                         mail: userData.mail || "",
+                        phoneNumber: userData.phoneNumber || "",
                         password: ""
                     })
 
@@ -91,39 +95,65 @@ export default function ProfileDashboard() {
         fetchProfileData()
     }, [isConnected, user?.id])
 
-    const handleUpdateAccount = async (e: React.FormEvent) => {
-        e.preventDefault()
-        setIsUpdating(true)
-        try {
-            const csrfToken = await AuthService.getCsrfToken()
-            const token = localStorage.getItem('token')
+const handleUpdateAccount = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setIsUpdating(true)
+    try {
+        const csrfToken = await AuthService.getCsrfToken()
+        const token = localStorage.getItem('token')
 
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API}auth/update-profile`, {
-                method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'x-csrf-token': csrfToken,
-                    ...(token ? { 'Authorization': `Bearer ${token}` } : {})
-                },
-                credentials: 'include',
-                body: JSON.stringify(accountForm)
-            })
-
-            if (!res.ok) throw new Error("Impossible de modifier vos informations.")
-            alert("Vos informations ont été mises à jour ! ✨")
-        } catch (err: any) {
-            alert(err.message)
-        } finally {
-            setIsUpdating(false)
+        // Construction du payload propre (sans mot de passe s'il est vide)
+        const payload: Record<string, any> = {
+            firstname: accountForm.firstname,
+            lastname: accountForm.lastname,
+            mail: accountForm.mail,
+            phoneNumber: accountForm.phoneNumber,
         }
+
+        console.log(payload)
+
+        if (accountForm.password.trim() !== "") {
+            payload.password = accountForm.password
+        }
+
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API}user/update-user/${user?.id}`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+                'x-csrf-token': csrfToken,
+                ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+            },
+            credentials: 'include',
+            body: JSON.stringify(payload)
+        })
+
+        // 🌟 LA CORRECTION STYLE "LOGIN" : On récupère le JSON quoi qu'il arrive
+        const data = await res.json()
+
+        if (!res.ok) {
+            // Si data.message est un tableau (NestJS renvoie souvent un tableau pour les 400), on le joint
+            const serverMessage = Array.isArray(data.message) 
+                ? data.message.join(', ') 
+                : data.message
+                
+            throw new Error(serverMessage || "Impossible de modifier vos informations.")
+        }
+
+        alert("Vos informations ont été mises à jour ! ✨")
+    } catch (err: any) {
+        // Grâce à la modification du dessus, cet alert va enfin afficher la VRAIE raison du 400 !
+        alert(err.message) 
+    } finally {
+        setIsUpdating(false)
     }
+}
 
     if (isConnected === null || isConnected === false) return null
 
     if (isLoading) {
         return (
             <div className="flex justify-center items-center min-h-[500px]">
-                <span className="animate-pulse text-gray-500">Chargement de votre espace...</span>
+                <span className="animate-pulse font-text text-gray-500">Chargement de votre espace...</span>
             </div>
         )
     }
@@ -134,30 +164,30 @@ export default function ProfileDashboard() {
             {/* --- PANNEAU DE NAVIGATION (GAUCHE) --- */}
             <div className="md:col-span-1 bg-white p-6 rounded-2xl shadow-sm border border-gray-100 h-fit space-y-6">
                 <div className="text-center md:text-left">
-                    <p className="text-sm font-semibold text-orange truncate">{accountForm.mail || user?.mail}</p>
+                    <p className="text-2xl font-text font-semibold text-dark-blue truncate">{accountForm.firstname || user?.firstname}</p>
                 </div>
 
                 <nav className="flex flex-row md:flex-col gap-1 overflow-x-auto md:overflow-visible pb-2 md:pb-0 border-b md:border-b-0">
                     <button 
                         type="button"
                         onClick={() => setActiveTab('account')}
-                        className={`w-full text-left px-4 py-2.5 rounded-xl text-sm font-medium transition-all whitespace-nowrap ${activeTab === 'account' ? 'bg-night-blue text-white' : 'hover:bg-gray-50 text-gray-600'}`}
+                        className={`w-full text-left px-4 py-2.5 rounded-xl text-sm font-medium transition-all whitespace-nowrap ${activeTab === 'account' ? 'bg-dark-blue text-white' : 'hover:bg-gray-50 text-gray-600'}`}
                     >
-                        👤 Mon Compte
+                        Mon Compte
                     </button>
                     <button 
                         type="button"
                         onClick={() => setActiveTab('addresses')}
-                        className={`w-full text-left px-4 py-2.5 rounded-xl text-sm font-medium transition-all whitespace-nowrap ${activeTab === 'addresses' ? 'bg-night-blue text-white' : 'hover:bg-gray-50 text-gray-600'}`}
+                        className={`w-full text-left px-4 py-2.5 rounded-xl text-sm font-medium transition-all whitespace-nowrap ${activeTab === 'addresses' ? 'bg-dark-blue text-white' : 'hover:bg-gray-50 text-gray-600'}`}
                     >
-                        📍 Mes Adresses ({isLoadingData ? '...' : addresses.length})
+                        Mes Adresses ({isLoadingData ? '...' : addresses.length})
                     </button>
                     <button 
                         type="button"
                         onClick={() => setActiveTab('orders')}
-                        className={`w-full text-left px-4 py-2.5 rounded-xl text-sm font-medium transition-all whitespace-nowrap ${activeTab === 'orders' ? 'bg-night-blue text-white' : 'hover:bg-gray-50 text-gray-600'}`}
+                        className={`w-full text-left px-4 py-2.5 rounded-xl text-sm font-medium transition-all whitespace-nowrap ${activeTab === 'orders' ? 'bg-dark-blue text-white' : 'hover:bg-gray-50 text-gray-600'}`}
                     >
-                        📜 Mes Commandes ({isLoadingData ? '...' : orders.length})
+                        Mes Commandes ({isLoadingData ? '...' : orders.length})
                     </button>
                 </nav>
 
@@ -166,7 +196,7 @@ export default function ProfileDashboard() {
                     onClick={() => logout()}
                     className="w-full text-left px-4 py-2.5 text-sm font-medium text-red-500 hover:bg-red-50 rounded-xl transition-colors hidden md:block"
                 >
-                    🚪 Déconnexion
+                    Déconnexion
                 </button>
             </div>
 
@@ -177,7 +207,7 @@ export default function ProfileDashboard() {
                 {isLoadingData ? (
                     <div className="flex-1 flex flex-col items-center justify-center text-gray-400 italic gap-2 py-12">
                         <span className="w-8 h-8 border-2 border-orange border-t-transparent rounded-full animate-spin"></span>
-                        Récupération de vos données à l'atelier...
+                        Récupération de vos données...
                     </div>
                 ) : (
                     <div className="flex-1">
@@ -186,16 +216,25 @@ export default function ProfileDashboard() {
                         {activeTab === 'account' && (
                             <div className="space-y-6">
                                 <div>
-                                    <h3 className="text-xl font-title">Mes informations personnelles</h3>
+                                    <h3 className="text-xl font-text">Mes informations personnelles</h3>
                                     <p className="text-xs text-gray-400 mt-1">Modifiez les identifiants de votre compte Sac'Azura.</p>
                                 </div>
                                 <form onSubmit={handleUpdateAccount} className="space-y-4 max-w-md">
                                     <div>
-                                        <label className="block text-xs font-semibold mb-1">Nom complet / Pseudo</label>
+                                        <label className="block text-xs font-semibold mb-1">Prénom</label>
                                         <input 
                                             type="text" 
-                                            value={accountForm.name}
-                                            onChange={(e) => setAccountForm({...accountForm, name: e.target.value})}
+                                            value={accountForm.firstname}
+                                            onChange={(e) => setAccountForm({...accountForm, firstname: e.target.value})}
+                                            className="w-full px-4 py-2 text-sm rounded-lg border border-gray-200 outline-none focus:ring-2 focus:ring-orange" 
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs font-semibold mb-1">Nom</label>
+                                        <input 
+                                            type="text" 
+                                            value={accountForm.lastname}
+                                            onChange={(e) => setAccountForm({...accountForm, lastname: e.target.value})}
                                             className="w-full px-4 py-2 text-sm rounded-lg border border-gray-200 outline-none focus:ring-2 focus:ring-orange" 
                                         />
                                     </div>
@@ -205,6 +244,15 @@ export default function ProfileDashboard() {
                                             type="email" 
                                             value={accountForm.mail}
                                             onChange={(e) => setAccountForm({...accountForm, mail: e.target.value})}
+                                            className="w-full px-4 py-2 text-sm rounded-lg border border-gray-200 outline-none focus:ring-2 focus:ring-orange" 
+                                        />
+                                    </div>
+                                  <div>
+                                        <label className="block text-xs font-semibold mb-1">Numéro de téléphone</label>
+                                        <input 
+                                            type="tel" 
+                                            value={accountForm.phoneNumber}
+                                            onChange={(e) => setAccountForm({...accountForm, phoneNumber: e.target.value})}
                                             className="w-full px-4 py-2 text-sm rounded-lg border border-gray-200 outline-none focus:ring-2 focus:ring-orange" 
                                         />
                                     </div>
@@ -233,7 +281,7 @@ export default function ProfileDashboard() {
                         {activeTab === 'addresses' && (
                             <div className="space-y-6">
                                 <div>
-                                    <h3 className="text-xl font-title">Le carnet d'adresses</h3>
+                                    <h3 className="text-xl font-text">Le carnet d'adresses</h3>
                                     <p className="text-xs text-gray-400 mt-1">Retrouvez vos adresses enregistrées pour vos futures commandes.</p>
                                 </div>
                                 {addresses.length === 0 ? (
@@ -259,7 +307,7 @@ export default function ProfileDashboard() {
                         {activeTab === 'orders' && (
                             <div className="space-y-6">
                                 <div>
-                                    <h3 className="text-xl font-title">Suivi des commandes</h3>
+                                    <h3 className="text-xl font-text">Suivi des commandes</h3>
                                     <p className="text-xs text-gray-400 mt-1">Consultez l'état de vos créations, de l'atelier jusqu'à chez vous.</p>
                                 </div>
 
@@ -273,15 +321,15 @@ export default function ProfileDashboard() {
                                                     <div className="bg-gray-50/70 p-4 border-b border-gray-100 flex flex-wrap justify-between items-center gap-4 text-xs">
                                                         <div>
                                                             <p className="text-gray-400 uppercase tracking-wider text-[10px] font-bold mb-0.5">Commande</p>
-                                                            <p className="font-bold text-night-blue text-sm">#AZ-{order.id}</p>
+                                                            <p className="font-bold text-sm">#AZ-{order.id}</p>
                                                         </div>
                                                         <div>
                                                             <p className="text-gray-400 uppercase tracking-wider text-[10px] font-bold mb-0.5">Date</p>
-                                                            <p className="font-semibold text-night-blue">{new Date(order.createdAt).toLocaleDateString('fr-FR')}</p>
+                                                            <p className="font-semibold">{new Date(order.createdAt).toLocaleDateString('fr-FR')}</p>
                                                         </div>
                                                         <div>
                                                             <p className="text-gray-400 uppercase tracking-wider text-[10px] font-bold mb-0.5">Total</p>
-                                                            <p className="font-bold text-orange text-sm">{order.totalAmount} €</p>
+                                                            <p className="font-bold text-sm">{order.totalAmount} €</p>
                                                         </div>
                                                         <div>
                                                             <span className={`px-3 py-1.5 rounded-md font-bold text-[11px] border flex items-center gap-1.5 ${
@@ -292,13 +340,13 @@ export default function ProfileDashboard() {
                                                                         : 'bg-gray-50 text-gray-500 border-gray-200'
                                                             }`}>
                                                                 {/* Traduction logique de l'enum vers le texte affiché */}
-                                                                {order.status === OrderStatus.PAID && '✨ En préparation'}
-                                                                {order.status === OrderStatus.PENDING && '⏳ En attente'}
-                                                                {order.status === OrderStatus.CANCELLED && '❌ Annulée'}
-                                                                {order.status === OrderStatus.SHIPPED && '🚚 Expédiée'}
-                                                                {order.status === OrderStatus.DELIVERED && '📦 Livrée'}
-            </span>
-        </div>
+                                                                {order.status === OrderStatus.PAID && 'En préparation'}
+                                                                {order.status === OrderStatus.PENDING && 'En attente'}
+                                                                {order.status === OrderStatus.CANCELLED && 'Annulée'}
+                                                                {order.status === OrderStatus.SHIPPED && 'Expédiée'}
+                                                                {order.status === OrderStatus.DELIVERED && 'Livrée'}
+                                                            </span>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             )

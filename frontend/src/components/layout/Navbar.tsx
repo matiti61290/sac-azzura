@@ -70,31 +70,9 @@ export default function Navbar() {
                     </div>
                   ) : (
                     /* CAS 2 : CONNECTÉ MAIS UTILISATEUR NORMAL */
-                    <Menu as="div" className="relative inline-block text-left">
-                      <div className="flex items-center">
-                        <UserCircleIcon className="h-8 w-8 text-gray-600 mr-2" />
-                        <MenuButton className="font-text text-2xl text-gray-600 hover:text-black">
-                          Votre compte
-                        </MenuButton>
-                      </div>
-                      <MenuItems className="absolute right-0 mt-2 w-48 origin-top-right bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-50">
-                        <div className="px-4 py-2 text-sm text-gray-700">
-                          Connecté en tant que <br/>
-                          <Link href='/profile' className="font-medium">{user?.firstname}</Link>
-                        </div>
-                        <div className="border-t border-gray-200"></div>
-                        <MenuItem>
-                          {() => (
-                            <button
-                              onClick={logout}
-                              className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                            >
-                              Se déconnecter
-                            </button>
-                          )}
-                        </MenuItem>
-                      </MenuItems>
-                    </Menu>
+                    <Link href="/profile" className="font-text font-medium text-2xl text-gray-600 hover:text-black">
+                      Votre compte
+                    </Link>
                   )
                 ) : (
                   /* CAS 3 : NON CONNECTÉ (VISITEUR) */
