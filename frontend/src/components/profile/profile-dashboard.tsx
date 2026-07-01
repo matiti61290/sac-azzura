@@ -110,6 +110,8 @@ const handleUpdateAccount = async (e: React.FormEvent) => {
             phoneNumber: accountForm.phoneNumber,
         }
 
+        console.log(payload)
+
         if (accountForm.password.trim() !== "") {
             payload.password = accountForm.password
         }
