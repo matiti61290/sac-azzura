@@ -3,7 +3,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { UserEntity } from "../../entities/user.entity";
 import { UpdateUserDto } from "../../shared/dtos/user/updateUser.dto";
-
+import * as bcrypt from 'bcrypt'
 
 @Injectable()
 export class UsersService {
@@ -47,10 +47,24 @@ export class UsersService {
     }
 
     async updateUser(userId: number, updateUserdto: UpdateUserDto) {
+        console.log("Le service est appele")
         const user = await this.userRepository.findOne({ where: {id: userId}})
 
         if(!user){
             throw new NotFoundException
+        }
+
+        const { password, ...updateData } = updateUserdto
+
+        // 🔐 GESTION DU MOT DE PASSE
+        if (password && password.trim() !== "") {
+            const salt = await bcrypt.genSalt()
+            user.password = await bcrypt.hash(password, salt)
+        }
+
+        if (password && password.trim() !== "") {
+            const salt = await bcrypt.genSalt()
+            user.password = await bcrypt.hash(password, salt)
         }
 
         Object.assign(user, updateUserdto)

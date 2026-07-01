@@ -21,6 +21,7 @@ export class UserController{
     async findUserById(
         @Param('userId', ParseIntPipe) userId: number
     ) {
+        console.log("le controller est appele")
         return this.userService.findUserById(userId)
     }
 

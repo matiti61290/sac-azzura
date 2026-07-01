@@ -95,32 +95,56 @@ export default function ProfileDashboard() {
         fetchProfileData()
     }, [isConnected, user?.id])
 
-    const handleUpdateAccount = async (e: React.FormEvent) => {
-        e.preventDefault()
-        setIsUpdating(true)
-        try {
-            const csrfToken = await AuthService.getCsrfToken()
-            const token = localStorage.getItem('token')
+const handleUpdateAccount = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setIsUpdating(true)
+    try {
+        const csrfToken = await AuthService.getCsrfToken()
+        const token = localStorage.getItem('token')
 
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API}auth/update-profile`, {
-                method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'x-csrf-token': csrfToken,
-                    ...(token ? { 'Authorization': `Bearer ${token}` } : {})
-                },
-                credentials: 'include',
-                body: JSON.stringify(accountForm)
-            })
-
-            if (!res.ok) throw new Error("Impossible de modifier vos informations.")
-            alert("Vos informations ont été mises à jour ! ✨")
-        } catch (err: any) {
-            alert(err.message)
-        } finally {
-            setIsUpdating(false)
+        // Construction du payload propre (sans mot de passe s'il est vide)
+        const payload: Record<string, any> = {
+            firstname: accountForm.firstname,
+            lastname: accountForm.lastname,
+            mail: accountForm.mail,
+            phoneNumber: accountForm.phoneNumber,
         }
+
+        if (accountForm.password.trim() !== "") {
+            payload.password = accountForm.password
+        }
+
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API}user/update-user/${user?.id}`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+                'x-csrf-token': csrfToken,
+                ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+            },
+            credentials: 'include',
+            body: JSON.stringify(payload)
+        })
+
+        // 🌟 LA CORRECTION STYLE "LOGIN" : On récupère le JSON quoi qu'il arrive
+        const data = await res.json()
+
+        if (!res.ok) {
+            // Si data.message est un tableau (NestJS renvoie souvent un tableau pour les 400), on le joint
+            const serverMessage = Array.isArray(data.message) 
+                ? data.message.join(', ') 
+                : data.message
+                
+            throw new Error(serverMessage || "Impossible de modifier vos informations.")
+        }
+
+        alert("Vos informations ont été mises à jour ! ✨")
+    } catch (err: any) {
+        // Grâce à la modification du dessus, cet alert va enfin afficher la VRAIE raison du 400 !
+        alert(err.message) 
+    } finally {
+        setIsUpdating(false)
     }
+}
 
     if (isConnected === null || isConnected === false) return null
 
@@ -224,7 +248,7 @@ export default function ProfileDashboard() {
                                   <div>
                                         <label className="block text-xs font-semibold mb-1">Numéro de téléphone</label>
                                         <input 
-                                            type="phone" 
+                                            type="tel" 
                                             value={accountForm.phoneNumber}
                                             onChange={(e) => setAccountForm({...accountForm, phoneNumber: e.target.value})}
                                             className="w-full px-4 py-2 text-sm rounded-lg border border-gray-200 outline-none focus:ring-2 focus:ring-orange" 
