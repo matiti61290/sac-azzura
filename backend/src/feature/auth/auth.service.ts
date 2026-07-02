@@ -51,16 +51,33 @@ export class AuthService {
         return newUser
     }
 
-    async validateAccount(token: string) {
-        const payload = this.jwtService.verify(token)
-        const user = await this.userRepository.findOne({ where: { id: payload.id }})
+async validateAccount(token: string) {
+        try {
+            // 🔐 On tente de vérifier le jeton
+            const payload = this.jwtService.verify(token)
+            
+            const user = await this.userRepository.findOne({ where: { id: payload.id }})
 
-        if(!user){
-            throw new NotFoundException('Utilisateur introuvable')
+            if(!user){
+                throw new NotFoundException('Utilisateur introuvable')
+            }
+
+            user.isVerified = true
+            await this.userRepository.save(user)
+            
+            return { message: 'Utilisateur validé avec succès' }
+
+        } catch (error: any) {
+            // ⏱️ Si le jeton a expiré, on lève une exception NestJS propre (400 Bad Request)
+            if (error.name === 'TokenExpiredError') {
+                throw new BadRequestException(
+                    "Le lien de validation a expiré. Veuillez vous connecter sur le site pour demander un nouveau lien."
+                )
+            }
+            
+            // 🛑 Si le jeton est falsifié ou corrompu
+            throw new BadRequestException("Le lien de validation est invalide.")
         }
-
-        user.isVerified = true
-        await this.userRepository.save(user)
     }
 
     async validateUser(mail: string, password: string): Promise<any> {
@@ -124,4 +141,25 @@ export class AuthService {
 
         return
     }
+
+    async resendVerification(payload: any) {
+    // On récupère l'utilisateur complet en BDD grâce à l'ID extrait du Guard JWT
+    const user = await this.userRepository.findOne({ where: { id: payload.id } });
+
+    if (!user) {
+        throw new NotFoundException('Utilisateur introuvable');
+    }
+
+    if (user.isVerified) {
+        throw new BadRequestException('Votre compte est déjà vérifié.');
+    }
+
+    // On génère un nouveau token de 1h
+    const token = this.jwtService.sign({ id: user.id }, { expiresIn: '1h' });
+    
+    // On réutilise ton ConfirmMailService existant !
+    await this.confirmMailService.sendVerificationMail(user.mail, token);
+
+    return { message: 'Mail de vérification renvoyé avec succès.' };
+}
 }
