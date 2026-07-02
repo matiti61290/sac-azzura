@@ -1,4 +1,3 @@
-// src/components/profil/ProfileDashboard.tsx
 'use client'
 
 import { useState, useEffect } from "react"
@@ -30,10 +29,14 @@ export default function ProfileDashboard() {
     const [isLoadingData, setIsLoadingData] = useState(true) 
     const [isUpdating, setIsUpdating] = useState(false)
     const [isDeleting, setIsDeleting] = useState(false) 
+    
+    // 🌟 ÉTATS POUR LA VÉRIFICATION DU COMPTE ET LE RENVOI DU MAIL
+    const [isVerified, setIsVerified] = useState<boolean>(true) // Géré dynamiquement par la BDD
+    const [isResendingEmail, setIsResendingEmail] = useState(false)
 
     // 🌟 ÉTATS POUR LES MODALS SUR MESURE
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
-    const [isAccountDeleted, setIsAccountDeleted] = useState(false) // Flag pour savoir si on doit déconnecter à la fermeture
+    const [isAccountDeleted, setIsAccountDeleted] = useState(false) 
     const [notification, setNotification] = useState<{
         isOpen: boolean
         type: 'success' | 'error'
@@ -84,6 +87,7 @@ export default function ProfileDashboard() {
                     
                     setAddresses(userData.addresses || [])
                     setOrders(userData.orders || [])
+                    setIsVerified(userData.isVerified) // 🌟 On extrait le vrai statut de la BDD
                     
                     setAccountForm({
                         firstname: userData.firstname,
@@ -102,6 +106,45 @@ export default function ProfileDashboard() {
 
         fetchProfileData()
     }, [isConnected, user?.id])
+
+    // 🌟 ENVOI DU MAIL DE VÉRIFICATION DEPUIS LE PROFIL
+    const handleResendVerificationMail = async () => {
+        setIsResendingEmail(true)
+        try {
+            const csrfToken = await AuthService.getCsrfToken()
+            const token = localStorage.getItem('token')
+
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API}auth/resend-verification`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-csrf-token': csrfToken,
+                    ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+                },
+                credentials: 'include'
+            })
+
+            const data = await res.json()
+
+            if (!res.ok) {
+                throw new Error(data.message || "Une erreur est survenue lors de l'envoi.")
+            }
+
+            setNotification({
+                isOpen: true,
+                type: 'success',
+                message: "Un nouveau lien d'activation vient d'être envoyé sur votre boîte mail ! ✨"
+            })
+        } catch (err: any) {
+            setNotification({
+                isOpen: true,
+                type: 'error',
+                message: err.message
+            })
+        } finally {
+            setIsResendingEmail(false)
+        }
+    }
 
     // ✨ MODIFICATION DES INFOS PERSONNELLES
     const handleUpdateAccount = async (e: React.FormEvent) => {
@@ -142,7 +185,6 @@ export default function ProfileDashboard() {
                 throw new Error(serverMessage || "Impossible de modifier vos informations.")
             }
 
-            // 🌟 Finies les alertes natives, on ouvre notre superbe modal de succès !
             setNotification({
                 isOpen: true,
                 type: 'success',
@@ -161,7 +203,7 @@ export default function ProfileDashboard() {
 
     // 🗑️ EXÉCUTION RÉELLE DE LA SUPPRESSION DE COMPTE
     const executeDeleteAccount = async () => {
-        setIsDeleteModalOpen(false) // On ferme la modal de confirmation
+        setIsDeleteModalOpen(false) 
         setIsDeleting(true)
         try {
             const csrfToken = await AuthService.getCsrfToken()
@@ -181,7 +223,7 @@ export default function ProfileDashboard() {
                 throw new Error(data.message || "Une erreur est survenue lors de la suppression de votre compte.")
             }
 
-            setIsAccountDeleted(true) // On lève le flag pour déconnecter après la fermeture de la modal
+            setIsAccountDeleted(true) 
             setNotification({
                 isOpen: true,
                 type: 'success',
@@ -198,10 +240,8 @@ export default function ProfileDashboard() {
         }
     }
 
-    // 🌟 GESTION DE LA FERMETURE DES NOTIFICATIONS
     const handleCloseNotification = () => {
         setNotification(prev => ({ ...prev, isOpen: false }))
-        // Si le compte venait d'être supprimé, on lance le logout une fois que l'utilisateur a lu le message
         if (isAccountDeleted) {
             logout()
         }
@@ -273,6 +313,29 @@ export default function ProfileDashboard() {
                         {/* 👤 ONGLET 1 : INFORMATIONS DU COMPTE */}
                         {activeTab === 'account' && (
                             <div className="space-y-6">
+                                
+                                {/* 🌟 NOUVELLE BANNIÈRE DE VÉRIFICATION D'E-MAIL */}
+                                {!isVerified && (
+                                    <div className="p-4 bg-amber-50 border border-amber-200 rounded-2xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 max-w-md animate-fade-in">
+                                        <div className="space-y-0.5">
+                                            <p className="text-sm font-semibold text-amber-800 flex items-center gap-1.5">
+                                                ⚠️ Votre compte n'est pas vérifié
+                                            </p>
+                                            <p className="text-xs text-amber-700/80 leading-relaxed">
+                                                Activez votre profil Sac'Azura pour valider vos paniers d'achats.
+                                            </p>
+                                        </div>
+                                        <button
+                                            type="button"
+                                            disabled={isResendingEmail}
+                                            onClick={handleResendVerificationMail}
+                                            className="w-full sm:w-auto px-4 py-2 text-xs font-semibold text-amber-900 bg-amber-200/60 hover:bg-amber-200 rounded-xl transition-all whitespace-nowrap disabled:opacity-50"
+                                        >
+                                            {isResendingEmail ? "Envoi..." : "Renvoyer le lien"}
+                                        </button>
+                                    </div>
+                                )}
+
                                 <div>
                                     <h3 className="text-xl font-text">Mes informations personnelles</h3>
                                     <p className="text-xs text-gray-400 mt-1">Modifiez les identifiants de votre compte Sac'Azura.</p>
@@ -342,7 +405,7 @@ export default function ProfileDashboard() {
                                     <button
                                         type="button"
                                         disabled={isDeleting || isUpdating}
-                                        onClick={() => setIsDeleteModalOpen(true)} // 🌟 Ouvre la modal au lieu du prompt natif
+                                        onClick={() => setIsDeleteModalOpen(true)} 
                                         className="px-4 py-2 text-xs font-semibold text-red-600 border border-red-200 rounded-xl hover:bg-red-50 transition-colors disabled:opacity-50"
                                     >
                                         {isDeleting ? "Suppression en cours..." : "Supprimer définitivement mon compte"}
@@ -442,12 +505,7 @@ export default function ProfileDashboard() {
                 </button>
             </div>
 
-            {/* ========================================================================= */}
-            {/* 🌟 COUCHE GRAPHIK : LES MODALS COMPOSÉES DE SAC'AZURA                   */}
-            {/* ========================================================================= */}
-
-            {/* 1. MODAL DE CONFIRMATION DE SUPPRESSION */}
-            {/* 1. Modal Confirmation Suppression */}
+            {/* --- MODALS DE COMMISSIONS GRAPHIK --- */}
             <ConfirmationModal
                 isOpen={isDeleteModalOpen}
                 onClose={() => setIsDeleteModalOpen(false)}
@@ -459,7 +517,6 @@ export default function ProfileDashboard() {
                 variant="danger"
             />
 
-            {/* 2. Modal Notification Global */}
             <NotificationModal
                 isOpen={notification.isOpen}
                 onClose={handleCloseNotification}
