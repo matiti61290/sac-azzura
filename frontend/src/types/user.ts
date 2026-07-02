@@ -3,4 +3,5 @@ export interface User {
   mail: string
   firstname: string
   isAdmin: boolean
+  isVerified: boolean
 }

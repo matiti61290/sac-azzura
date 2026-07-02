@@ -54,4 +54,10 @@ export class AuthController {
     @Body() newPasswordDto: NewPasswordDto){
         return this.authService.changePassword(newPasswordDto, token)
     }
+
+    @Post('resend-verification')
+    @UseGuards(JwtAuthGuard) // 🔒 Sécurisé : Seul l'utilisateur connecté peut demander le renvoi pour son compte
+    async resendVerification(@Req() req: Request) {
+        return this.authService.resendVerification(req.user);
+    }
 }

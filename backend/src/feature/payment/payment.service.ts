@@ -48,6 +48,19 @@ export class PaymentService {
     }
 
     async verificationOrder(cartDto: CartDto, user: UserEntity){
+
+        const currentUser = await this.userRepository.findOneBy({ id: user.id });
+        console.log("Le user id est:", user.id)
+        console.log(currentUser)
+    
+        if (!currentUser) {
+            throw new NotFoundException("Utilisateur introuvable");
+        }
+
+        // Remplace '.isVerified' par le nom exact de ton booléen en BDD (ex: is_verified)
+        if (!currentUser.isVerified) {
+            throw new ForbiddenException("Votre compte doit être vérifié pour effectuer un achat.");
+        }
         const deliveryAddress = await this.addressRepository.findOneBy({
             id: cartDto.delivery_address_id,
             user: {id: user.id}
@@ -126,7 +139,7 @@ export class PaymentService {
 
         const savedOrder = await this.orderRepository.save(order)
 
-        return this.createCheckoutSession(savedOrder.id, user.id, order.items, user.mail)
+        return this.createCheckoutSession(savedOrder.id, currentUser.id, order.items, currentUser.mail)
     }
 
     async createCheckoutSession (orderId: number, userId: number, items: OrderItemEntity[], userEmail: string){
@@ -247,14 +260,15 @@ export class PaymentService {
 
                         console.log(`Transaction reussie. Commande ${orderId} payee et stock deduits.`)
 
-                        const user = await this.userRepository.findOne({ where: {id: userId}})
-
-                        if(!user){
-                            throw new InternalServerErrorException(`L'utilisateur avec l'id ${userId} n'existe pas`)
-                        }
-                        const mail = user.mail
-                        await this.sendMailPaymentSuccess(mail, orderId)
+                       
                     }
+                    const user = await this.userRepository.findOne({ where: {id: userId}})
+
+                    if(!user){
+                        throw new InternalServerErrorException(`L'utilisateur avec l'id ${userId} n'existe pas`)
+                    }
+                    const mail = user.mail
+                    await this.sendMailPaymentSuccess(mail, orderId)
                 })
             } catch(error){
                 console.error('Echec de la transaction')

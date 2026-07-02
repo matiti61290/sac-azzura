@@ -1,4 +1,5 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, Index, OneToMany } from "typeorm";
+// order.entity.ts
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany } from "typeorm";
 import { UserEntity } from "./user.entity";
 import { PromotionEntity } from "./promotion.entity";
 import { AddressEntity } from "./addresses.entity";
@@ -13,49 +14,49 @@ export class OrderEntity {
     @PrimaryGeneratedColumn()
     id!: number
 
-    @ManyToOne(()=> UserEntity, (user)=> user.orders, { cascade: true})
+    @ManyToOne(() => UserEntity, (user) => user.orders, { onDelete: "CASCADE" })
     @Exclude()
     user!: UserEntity
 
-    @ManyToOne(()=> AddressEntity)
-    delivery_address!: AddressEntity
+    @ManyToOne(() => AddressEntity, { onDelete: 'SET NULL', nullable: true })
+    delivery_address!: AddressEntity | null
 
-    @ManyToOne(()=> AddressEntity)
-    billing_address!: AddressEntity
-
-    @OneToMany(()=> OrderItemEntity, (item)=> item.order, {cascade: true})
+    @ManyToOne(() => AddressEntity, { onDelete: 'SET NULL', nullable: true })
+    billing_address!: AddressEntity | null
+    
+    @OneToMany(() => OrderItemEntity, (item) => item.order, { cascade: true })
     items!: OrderItemEntity[]
 
-    @Column({ type: "enum", enum: OrderStatus, default: OrderStatus.PENDING})
+    @Column({ type: "enum", enum: OrderStatus, default: OrderStatus.PENDING })
     status!: OrderStatus
 
-    @Column({ type: 'decimal', precision: 10, scale:2})
+    @Column({ type: 'decimal', precision: 10, scale: 2 })
     totalAmount!: number
 
-    @Column({ nullable: true})
+    @Column({ nullable: true })
     stripeSessionId!: string
 
-    @ManyToOne(()=> PromotionEntity, {nullable: true})
+    @ManyToOne(() => PromotionEntity, { nullable: true })
     promotion!: PromotionEntity
 
     @Column({ 
         type: 'timestamp', 
-        default: ()=> "CURRENT_TIMESTAMP"
+        default: () => "CURRENT_TIMESTAMP"
     })
     createdAt!: Date
 
-    @Column({type: "enum", enum: Carrier, nullable: true})
+    @Column({ type: "enum", enum: Carrier, nullable: true })
     carrier!: Carrier
     
-    @Column({nullable: true})
+    @Column({ nullable: true })
     trackingNumber!: string
 
-    @Column({ nullable: true})
+    @Column({ nullable: true })
     lastTrackingUpdate!: Date
 
-    @Column({ type: 'json', nullable: true})
+    @Column({ type: 'json', nullable: true })
     shippingDetails!: ShippingDetailsData
 
-    @Column({nullable: true})
+    @Column({ nullable: true })
     shippedAt!: Date
 }

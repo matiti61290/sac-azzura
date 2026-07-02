@@ -1,4 +1,3 @@
-// src/components/profil/ProfileDashboard.tsx
 'use client'
 
 import { useState, useEffect } from "react"
@@ -7,6 +6,8 @@ import { AuthService } from "@/src/services/auth.service"
 import { useRouter } from "next/navigation"
 import { Order } from "@/src/types/order"
 import { OrderStatus } from "@/src/libs/enum/order-status"
+import ConfirmationModal from "@/src/components/ui/ConfirmationModal"
+import NotificationModal from "@/src/components/ui/NotificationModal"
 
 interface Address {
     id: number
@@ -25,8 +26,26 @@ export default function ProfileDashboard() {
     // States pour centraliser les données issues du Back-end
     const [orders, setOrders] = useState<Order[]>([])
     const [addresses, setAddresses] = useState<Address[]>([])
-    const [isLoadingData, setIsLoadingData] = useState(true) // ⏳ Évite les flashs de contenu vide
+    const [isLoadingData, setIsLoadingData] = useState(true) 
     const [isUpdating, setIsUpdating] = useState(false)
+    const [isDeleting, setIsDeleting] = useState(false) 
+    
+    // 🌟 ÉTATS POUR LA VÉRIFICATION DU COMPTE ET LE RENVOI DU MAIL
+    const [isVerified, setIsVerified] = useState<boolean>(true) // Géré dynamiquement par la BDD
+    const [isResendingEmail, setIsResendingEmail] = useState(false)
+
+    // 🌟 ÉTATS POUR LES MODALS SUR MESURE
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
+    const [isAccountDeleted, setIsAccountDeleted] = useState(false) 
+    const [notification, setNotification] = useState<{
+        isOpen: boolean
+        type: 'success' | 'error'
+        message: string
+    }>({
+        isOpen: false,
+        type: 'success',
+        message: ""
+    })
 
     // Formulaire d'infos personnelles
     const [accountForm, setAccountForm] = useState({
@@ -39,10 +58,6 @@ export default function ProfileDashboard() {
 
     // Redirection si l'utilisateur n'est pas connecté
     useEffect(() => {
-        console.log("DEBUG: Début du useEffect");
-        console.log("DEBUG: isConnected =", isConnected);
-        console.log("DEBUG: user ID =", user?.id);
-        // On n'agit que si le chargement est FINI (isLoading === false)
         if (!isLoading && !isConnected) {
             router.push('/login')
         }
@@ -62,7 +77,6 @@ export default function ProfileDashboard() {
                 headers['Authorization'] = `Bearer ${token}`
             }
             try {
-                // Route NestJS faisant appel à ton findUserById avec ses relations
                 const res = await fetch(`${process.env.NEXT_PUBLIC_API}user/${user.id}`, { 
                     headers,
                     credentials: 'include' 
@@ -71,11 +85,10 @@ export default function ProfileDashboard() {
                 if (res.ok) {
                     const userData = await res.json()
                     
-                    // On distribue les données des relations TypeORM directement dans nos states
                     setAddresses(userData.addresses || [])
                     setOrders(userData.orders || [])
+                    setIsVerified(userData.isVerified) // 🌟 On extrait le vrai statut de la BDD
                     
-                    // On pré-remplit le formulaire avec les vraies données de la BDD
                     setAccountForm({
                         firstname: userData.firstname,
                         lastname: userData.lastname || "",
@@ -83,70 +96,156 @@ export default function ProfileDashboard() {
                         phoneNumber: userData.phoneNumber || "",
                         password: ""
                     })
-
                 }
             } catch (err) {
                 console.error("Erreur de chargement du profil", err)
             } finally {
-                setIsLoadingData(false) // Le chargement est terminé
+                setIsLoadingData(false)
             }
         }
 
         fetchProfileData()
     }, [isConnected, user?.id])
 
-const handleUpdateAccount = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsUpdating(true)
-    try {
-        const csrfToken = await AuthService.getCsrfToken()
-        const token = localStorage.getItem('token')
+    // 🌟 ENVOI DU MAIL DE VÉRIFICATION DEPUIS LE PROFIL
+    const handleResendVerificationMail = async () => {
+        setIsResendingEmail(true)
+        try {
+            const csrfToken = await AuthService.getCsrfToken()
+            const token = localStorage.getItem('token')
 
-        // Construction du payload propre (sans mot de passe s'il est vide)
-        const payload: Record<string, any> = {
-            firstname: accountForm.firstname,
-            lastname: accountForm.lastname,
-            mail: accountForm.mail,
-            phoneNumber: accountForm.phoneNumber,
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API}auth/resend-verification`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-csrf-token': csrfToken,
+                    ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+                },
+                credentials: 'include'
+            })
+
+            const data = await res.json()
+
+            if (!res.ok) {
+                throw new Error(data.message || "Une erreur est survenue lors de l'envoi.")
+            }
+
+            setNotification({
+                isOpen: true,
+                type: 'success',
+                message: "Un nouveau lien d'activation vient d'être envoyé sur votre boîte mail ! ✨"
+            })
+        } catch (err: any) {
+            setNotification({
+                isOpen: true,
+                type: 'error',
+                message: err.message
+            })
+        } finally {
+            setIsResendingEmail(false)
         }
-
-        console.log(payload)
-
-        if (accountForm.password.trim() !== "") {
-            payload.password = accountForm.password
-        }
-
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API}user/update-user/${user?.id}`, {
-            method: 'PATCH',
-            headers: {
-                'Content-Type': 'application/json',
-                'x-csrf-token': csrfToken,
-                ...(token ? { 'Authorization': `Bearer ${token}` } : {})
-            },
-            credentials: 'include',
-            body: JSON.stringify(payload)
-        })
-
-        // 🌟 LA CORRECTION STYLE "LOGIN" : On récupère le JSON quoi qu'il arrive
-        const data = await res.json()
-
-        if (!res.ok) {
-            // Si data.message est un tableau (NestJS renvoie souvent un tableau pour les 400), on le joint
-            const serverMessage = Array.isArray(data.message) 
-                ? data.message.join(', ') 
-                : data.message
-                
-            throw new Error(serverMessage || "Impossible de modifier vos informations.")
-        }
-
-        alert("Vos informations ont été mises à jour ! ✨")
-    } catch (err: any) {
-        // Grâce à la modification du dessus, cet alert va enfin afficher la VRAIE raison du 400 !
-        alert(err.message) 
-    } finally {
-        setIsUpdating(false)
     }
-}
+
+    // ✨ MODIFICATION DES INFOS PERSONNELLES
+    const handleUpdateAccount = async (e: React.FormEvent) => {
+        e.preventDefault()
+        setIsUpdating(true)
+        try {
+            const csrfToken = await AuthService.getCsrfToken()
+            const token = localStorage.getItem('token')
+
+            const payload: Record<string, any> = {
+                firstname: accountForm.firstname,
+                lastname: accountForm.lastname,
+                mail: accountForm.mail,
+                phoneNumber: accountForm.phoneNumber,
+            }
+
+            if (accountForm.password.trim() !== "") {
+                payload.password = accountForm.password
+            }
+
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API}user/update-user/${user?.id}`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-csrf-token': csrfToken,
+                    ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+                },
+                credentials: 'include',
+                body: JSON.stringify(payload)
+            })
+
+            const data = await res.json()
+
+            if (!res.ok) {
+                const serverMessage = Array.isArray(data.message) 
+                    ? data.message.join(', ') 
+                    : data.message
+                throw new Error(serverMessage || "Impossible de modifier vos informations.")
+            }
+
+            setNotification({
+                isOpen: true,
+                type: 'success',
+                message: "Vos informations personnelles ont été mises à jour avec succès ! ✨"
+            })
+        } catch (err: any) {
+            setNotification({
+                isOpen: true,
+                type: 'error',
+                message: err.message
+            })
+        } finally {
+            setIsUpdating(false)
+        }
+    }
+
+    // 🗑️ EXÉCUTION RÉELLE DE LA SUPPRESSION DE COMPTE
+    const executeDeleteAccount = async () => {
+        setIsDeleteModalOpen(false) 
+        setIsDeleting(true)
+        try {
+            const csrfToken = await AuthService.getCsrfToken()
+            const token = localStorage.getItem('token')
+
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API}user/delete-user/${user?.id}`, {
+                method: 'DELETE',
+                headers: {
+                    'x-csrf-token': csrfToken,
+                    ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+                },
+                credentials: 'include'
+            })
+
+            if (!res.ok) {
+                const data = await res.json()
+                throw new Error(data.message || "Une erreur est survenue lors de la suppression de votre compte.")
+            }
+
+            setIsAccountDeleted(true) 
+            setNotification({
+                isOpen: true,
+                type: 'success',
+                message: "Votre compte a été supprimé avec succès. Nous sommes désolés de vous voir partir de l'atelier ! 👋"
+            })
+        } catch (err: any) {
+            setNotification({
+                isOpen: true,
+                type: 'error',
+                message: err.message
+            })
+        } finally {
+            setIsDeleting(false)
+        }
+    }
+
+    const handleCloseNotification = () => {
+        setNotification(prev => ({ ...prev, isOpen: false }))
+        if (isAccountDeleted) {
+            logout()
+        }
+    }
 
     if (isConnected === null || isConnected === false) return null
 
@@ -203,7 +302,6 @@ const handleUpdateAccount = async (e: React.FormEvent) => {
             {/* --- CONTENU DE L'ONGLET ACTIF (DROITE) --- */}
             <div className="md:col-span-3 bg-white p-6 sm:p-8 rounded-2xl shadow-sm border border-gray-100 min-h-[500px] flex flex-col justify-between">
                 
-                {/* ⏳ ÉCRAN DE CHARGEMENT GLOBAL DE L'ATELIER */}
                 {isLoadingData ? (
                     <div className="flex-1 flex flex-col items-center justify-center text-gray-400 italic gap-2 py-12">
                         <span className="w-8 h-8 border-2 border-orange border-t-transparent rounded-full animate-spin"></span>
@@ -215,6 +313,29 @@ const handleUpdateAccount = async (e: React.FormEvent) => {
                         {/* 👤 ONGLET 1 : INFORMATIONS DU COMPTE */}
                         {activeTab === 'account' && (
                             <div className="space-y-6">
+                                
+                                {/* 🌟 NOUVELLE BANNIÈRE DE VÉRIFICATION D'E-MAIL */}
+                                {!isVerified && (
+                                    <div className="p-4 bg-amber-50 border border-amber-200 rounded-2xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 max-w-md animate-fade-in">
+                                        <div className="space-y-0.5">
+                                            <p className="text-sm font-semibold text-amber-800 flex items-center gap-1.5">
+                                                ⚠️ Votre compte n'est pas vérifié
+                                            </p>
+                                            <p className="text-xs text-amber-700/80 leading-relaxed">
+                                                Activez votre profil Sac'Azura pour valider vos paniers d'achats.
+                                            </p>
+                                        </div>
+                                        <button
+                                            type="button"
+                                            disabled={isResendingEmail}
+                                            onClick={handleResendVerificationMail}
+                                            className="w-full sm:w-auto px-4 py-2 text-xs font-semibold text-amber-900 bg-amber-200/60 hover:bg-amber-200 rounded-xl transition-all whitespace-nowrap disabled:opacity-50"
+                                        >
+                                            {isResendingEmail ? "Envoi..." : "Renvoyer le lien"}
+                                        </button>
+                                    </div>
+                                )}
+
                                 <div>
                                     <h3 className="text-xl font-text">Mes informations personnelles</h3>
                                     <p className="text-xs text-gray-400 mt-1">Modifiez les identifiants de votre compte Sac'Azura.</p>
@@ -247,7 +368,7 @@ const handleUpdateAccount = async (e: React.FormEvent) => {
                                             className="w-full px-4 py-2 text-sm rounded-lg border border-gray-200 outline-none focus:ring-2 focus:ring-orange" 
                                         />
                                     </div>
-                                  <div>
+                                    <div>
                                         <label className="block text-xs font-semibold mb-1">Numéro de téléphone</label>
                                         <input 
                                             type="tel" 
@@ -268,16 +389,32 @@ const handleUpdateAccount = async (e: React.FormEvent) => {
                                     </div>
                                     <button 
                                         type="submit"
-                                        disabled={isUpdating}
-                                        className="bg-orange text-white text-sm font-semibold px-6 py-2.5 rounded-xl hover:bg-[#e89454] transition-colors shadow-sm shadow-orange/20"
+                                        disabled={isUpdating || isDeleting}
+                                        className="bg-orange text-white text-sm font-semibold px-6 py-2.5 rounded-xl hover:bg-[#e89454] transition-colors shadow-sm shadow-orange/20 disabled:opacity-50"
                                     >
                                         {isUpdating ? "Enregistrement..." : "Sauvegarder les modifications"}
                                     </button>
                                 </form>
+
+                                {/* 🚨 ZONE DE DANGER : SUPPRESSION DE COMPTE */}
+                                <div className="mt-12 pt-6 border-t border-red-100 max-w-md space-y-3">
+                                    <div>
+                                        <h4 className="text-sm font-semibold text-red-600">Zone de danger</h4>
+                                        <p className="text-xs text-gray-400 mt-0.5">Ces actions sont définitives et impacteront l'accès à votre compte.</p>
+                                    </div>
+                                    <button
+                                        type="button"
+                                        disabled={isDeleting || isUpdating}
+                                        onClick={() => setIsDeleteModalOpen(true)} 
+                                        className="px-4 py-2 text-xs font-semibold text-red-600 border border-red-200 rounded-xl hover:bg-red-50 transition-colors disabled:opacity-50"
+                                    >
+                                        {isDeleting ? "Suppression en cours..." : "Supprimer définitivement mon compte"}
+                                    </button>
+                                </div>
                             </div>
                         )}
 
-                        {/* 📍 ONGLET 2 : MES ADRESSES (REDUIT VIA RELATION UNIQUE) */}
+                        {/* 📍 ONGLET 2 : MES ADRESSES */}
                         {activeTab === 'addresses' && (
                             <div className="space-y-6">
                                 <div>
@@ -303,7 +440,7 @@ const handleUpdateAccount = async (e: React.FormEvent) => {
                             </div>
                         )}
 
-                        {/* 📜 ONGLET 3 : MES COMMANDES (REDUIT VIA RELATION UNIQUE) */}
+                        {/* 📜 ONGLET 3 : MES COMMANDES */}
                         {activeTab === 'orders' && (
                             <div className="space-y-6">
                                 <div>
@@ -339,7 +476,6 @@ const handleUpdateAccount = async (e: React.FormEvent) => {
                                                                         ? 'bg-amber-50 text-amber-600 border-amber-100' 
                                                                         : 'bg-gray-50 text-gray-500 border-gray-200'
                                                             }`}>
-                                                                {/* Traduction logique de l'enum vers le texte affiché */}
                                                                 {order.status === OrderStatus.PAID && 'En préparation'}
                                                                 {order.status === OrderStatus.PENDING && 'En attente'}
                                                                 {order.status === OrderStatus.CANCELLED && 'Annulée'}
@@ -359,7 +495,7 @@ const handleUpdateAccount = async (e: React.FormEvent) => {
                     </div>
                 )}
 
-                {/* Petit bouton déconnexion pour la version mobile tout en bas */}
+                {/* Petit bouton déconnexion pour la version mobile */}
                 <button 
                     type="button" 
                     onClick={() => logout()}
@@ -368,6 +504,26 @@ const handleUpdateAccount = async (e: React.FormEvent) => {
                     🚪 Déconnexion du compte
                 </button>
             </div>
+
+            {/* --- MODALS DE COMMISSIONS GRAPHIK --- */}
+            <ConfirmationModal
+                isOpen={isDeleteModalOpen}
+                onClose={() => setIsDeleteModalOpen(false)}
+                onConfirm={executeDeleteAccount}
+                title="Supprimer définitivement le compte ?"
+                message="Êtes-vous absolument sûr de vouloir supprimer votre compte Sac'Azura ? Cette action effacera toutes vos données ainsi que votre historique de commande. C'est irréversible."
+                confirmLabel="Supprimer"
+                cancelLabel="Annuler"
+                variant="danger"
+            />
+
+            <NotificationModal
+                isOpen={notification.isOpen}
+                onClose={handleCloseNotification}
+                type={notification.type}
+                message={notification.message}
+            />
+
         </div>
     )
 }
