@@ -13,7 +13,7 @@ interface ProductOptionsProps {
 export default function ProductOptions({ stocks, product }: ProductOptionsProps) {
     const { addToCart } = useCart();
 
-    // --- LOGIQUE DE STOCK (Inchangée) ---
+    //stock management
     const availableColors = useMemo(() => Array.from(new Map(stocks.map(s => [s.color.id, s.color])).values()), [stocks]);
     const availableMaterials = useMemo(() => Array.from(new Map(stocks.map(s => [s.material.id, s.material])).values()), [stocks]);
 
@@ -25,10 +25,8 @@ export default function ProductOptions({ stocks, product }: ProductOptionsProps)
     const isColorAvailable = (colorId: number) => stocks.some(s => s.material.id === selectedMaterial && s.color.id === colorId && s.quantity > 0);
     const isMaterialAvailable = (materialId: number) => stocks.some(s => s.color.id === selectedColor && s.material.id === materialId && s.quantity > 0);
 
-    // 👇 NOUVEAU : État pour gérer l'affichage de notre notification
     const [showNotification, setShowNotification] = useState(false);
 
-    // Action d'ajout au panier
     const handleAddToCart = () => {
         if (!currentStock) return;
         
@@ -44,10 +42,8 @@ export default function ProductOptions({ stocks, product }: ProductOptionsProps)
             sku: currentStock.sku
         });
 
-        // 👇 Au lieu de l'alert(), on affiche notre notification
         setShowNotification(true);
 
-        // On la fait disparaître automatiquement après 4 secondes
         setTimeout(() => {
             setShowNotification(false);
         }, 4000);
@@ -56,7 +52,7 @@ export default function ProductOptions({ stocks, product }: ProductOptionsProps)
     return (
         <div className="space-y-6 font-text relative">
             
-            {/* --- SECTION CHOIX DE LA COULEUR --- */}
+            {/* Choix couleur */}
             <div>
                 <div className="flex items-center justify-between mb-2">
                     <h3 className="text-xs font-bold uppercase tracking-wider text-night-blue/60">Choisir la couleur</h3>
@@ -85,7 +81,7 @@ export default function ProductOptions({ stocks, product }: ProductOptionsProps)
                 </div>
             </div>
 
-            {/* --- SECTION CHOIX DU MATÉRIAU --- */}
+            {/* Choix matériau */}
             <div>
                 <div className="flex items-center justify-between mb-2">
                     <h3 className="text-xs font-bold uppercase tracking-wider text-night-blue/60">Type de tissu / matériau</h3>
@@ -114,7 +110,7 @@ export default function ProductOptions({ stocks, product }: ProductOptionsProps)
                 </div>
             </div>
 
-            {/* --- ZONE D'ACTION FINALE --- */}
+            {/* Disponibilité */}
             <div className="pt-6 border-t border-night-blue/10 mt-6">
                 <div className="mb-4">
                     {!currentStock ? (
@@ -138,7 +134,7 @@ export default function ProductOptions({ stocks, product }: ProductOptionsProps)
                 </button>
             </div>
 
-            {/* 👇 NOUVEAU : LA NOTIFICATION (TOAST) */}
+            {/* Notification */}
             <div 
                 className={`
                     fixed bottom-6 right-6 md:bottom-10 md:right-10 z-50 

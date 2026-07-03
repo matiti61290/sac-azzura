@@ -10,9 +10,8 @@ import { UserEntity } from "../../entities/user.entity";
 import { RegisterDto } from "../../shared/dtos/auth/register.dto";
 import { MailDto } from "../../shared/dtos/auth/mail.dtos";
 import { NewPasswordDto } from "../../shared/dtos/auth/newPassword.dto";
-/**
- * Service s'occupant des fonctions liées à l'authentification comme l'inscription ou la connexion d'un utilisateur.
- */
+
+
 @Injectable()
 export class AuthService {
     constructor(
@@ -53,7 +52,6 @@ export class AuthService {
 
 async validateAccount(token: string) {
         try {
-            // 🔐 On tente de vérifier le jeton
             const payload = this.jwtService.verify(token)
             
             const user = await this.userRepository.findOne({ where: { id: payload.id }})
@@ -68,14 +66,12 @@ async validateAccount(token: string) {
             return { message: 'Utilisateur validé avec succès' }
 
         } catch (error: any) {
-            // ⏱️ Si le jeton a expiré, on lève une exception NestJS propre (400 Bad Request)
             if (error.name === 'TokenExpiredError') {
                 throw new BadRequestException(
                     "Le lien de validation a expiré. Veuillez vous connecter sur le site pour demander un nouveau lien."
                 )
             }
             
-            // 🛑 Si le jeton est falsifié ou corrompu
             throw new BadRequestException("Le lien de validation est invalide.")
         }
     }
@@ -92,7 +88,6 @@ async validateAccount(token: string) {
     async login(user: any, response: Response) {
         const payload = { mail: user.mail, id: user.id, firstname: user.firstname, isAdmin: user.isAdmin}
         const token = this.jwtService.sign(payload, { expiresIn: '1h' })
-        console.log(payload)
 
         response.cookie('jwt', token, {
             httpOnly: true,
@@ -111,6 +106,7 @@ async validateAccount(token: string) {
         await this.newPasswordMailService.sendNewPasswordMail(payload.mail, token)
     }
 
+    //Not yet implemented
     async forgetPassword(token: string){
         const payload = this.jwtService.verify(token)
         return payload
@@ -143,7 +139,6 @@ async validateAccount(token: string) {
     }
 
     async resendVerification(payload: any) {
-    // On récupère l'utilisateur complet en BDD grâce à l'ID extrait du Guard JWT
     const user = await this.userRepository.findOne({ where: { id: payload.id } });
 
     if (!user) {
@@ -154,10 +149,8 @@ async validateAccount(token: string) {
         throw new BadRequestException('Votre compte est déjà vérifié.');
     }
 
-    // On génère un nouveau token de 1h
     const token = this.jwtService.sign({ id: user.id }, { expiresIn: '1h' });
     
-    // On réutilise ton ConfirmMailService existant !
     await this.confirmMailService.sendVerificationMail(user.mail, token);
 
     return { message: 'Mail de vérification renvoyé avec succès.' };

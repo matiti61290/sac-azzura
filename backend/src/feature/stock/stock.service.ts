@@ -66,8 +66,6 @@ export class StockService {
             throw new NotFoundException
         }
 
-        
-
         const colorSkuCode = color.sku_code
         const materialSkuCode = material.sku_code
         const productSkuCode = product.sku_code
@@ -75,8 +73,6 @@ export class StockService {
         const categorySkuCode = subcategory.category.sku_code
 
         const stockSkuCode = productSkuCode + "_" + categorySkuCode + "_" + subcategorySkuCode + "_" + colorSkuCode + "_" + materialSkuCode
-
-        console.log(stockSkuCode)
 
         const stock = this.stockRepository.create({
            quantity: quantity,

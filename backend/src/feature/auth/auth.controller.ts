@@ -43,12 +43,13 @@ export class AuthController {
         return this.authService.sendMailForgetPassword(mailDto)
     }
 
+    //Not yet implemented
     @Get('forget-password')
     async forgetPassword(@Query('token') token: string) {
         return this.authService.forgetPassword(token)
     }
 
-    //A tester avec un template
+    //Not yet implemented
     @Post('change-password')
     async changePassword(@Query('token') token: string ,
     @Body() newPasswordDto: NewPasswordDto){
@@ -56,7 +57,7 @@ export class AuthController {
     }
 
     @Post('resend-verification')
-    @UseGuards(JwtAuthGuard) // 🔒 Sécurisé : Seul l'utilisateur connecté peut demander le renvoi pour son compte
+    @UseGuards(JwtAuthGuard)
     async resendVerification(@Req() req: Request) {
         return this.authService.resendVerification(req.user);
     }

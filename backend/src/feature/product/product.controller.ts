@@ -21,7 +21,6 @@ export class ProductController {
     async findProduct(
         @Param('productId', ParseIntPipe) productId: number)
     {
-        // return this.productService.findProduct(productId)
         let product = await this.productService.findProduct(productId)
 
         return product
@@ -34,10 +33,9 @@ export class ProductController {
         @Body() addProductDto: AddProductDto,
         @UploadedFiles() files: Express.Multer.File[]
     ) {
-        // On traduit la string en vrai tableau Javascript
+        // string turned into JS table
         const variationsArray = JSON.parse(addProductDto.variations);
         
-        // On passe ce tableau en 3ème argument
         return this.productService.createProduct(addProductDto, files, variationsArray);
     }
 
@@ -58,8 +56,7 @@ export class ProductController {
     async deleteProduct(
         @Param('productId', ParseIntPipe) productId: number
     ) {
-        console.log("le controleur est appele")
         this.productService.deleteProduct(productId)
-        return "Produit supprime"
+        return "Produit supprimé"
     }
 }

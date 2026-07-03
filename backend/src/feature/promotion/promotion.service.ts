@@ -6,6 +6,10 @@ import { AddPromotionDto } from "../../shared/dtos/promotion/addPromotion.dto";
 import { CheckPromotionCodeDto } from "../../shared/dtos/promotion/checkPromotionCode.dto";
 import { UpdatePromotionDto } from "../../shared/dtos/promotion/updatePromotion.dto";
 
+/*
+Promotions aren't integrated in the frondent
+*/
+
 @Injectable()
 export class PromotionService{
     constructor(
@@ -33,7 +37,7 @@ export class PromotionService{
         } else if(promotionCode.minAmount > checkPromotionCodeDto.totalAmount) {
             return "La valeur minimale n'est pas atteinte"
         } else {
-            return "C'est good"
+            return
         }
     }
 

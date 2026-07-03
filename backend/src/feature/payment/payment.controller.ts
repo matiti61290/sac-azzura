@@ -22,11 +22,7 @@ export class PaymentController {
         return this.paymentService.verificationOrder(cartDto, user)
     }
 
-    @Get('payment_success')
-    async paymentSuccess(){
-        return "Youhou. Ca marche"
-    }
-
+    //Rework planned with frontend
     @Get('payment_failed/:orderId/:userId')
     async paymentFailed(
         @Param('orderId', ParseIntPipe) orderId: number,
@@ -34,7 +30,7 @@ export class PaymentController {
     ) {
         await this.paymentService.paymentFailed(orderId, userId)
 
-        return "la commande a echoue"
+        return "la commande a echoué"
     }
 
     @Post('webhook')
@@ -44,7 +40,6 @@ export class PaymentController {
         @Res() res: Response,
         @Headers('stripe-signature') signature: string
     ){
-        console.log("le controller webhook est appele")
         return this.paymentService.constructEventWebhook(req, res, signature)
     }
 }

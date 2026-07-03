@@ -10,7 +10,6 @@ export default function CartDetails() {
     return (
       <div className="text-center py-20">
         <h2 className="text-2xl font-bold mb-4">Votre panier est vide</h2>
-        <p className="text-gray-600 mb-8">L'atelier de Gigi a plein de belles créations qui n'attendent que vous !</p>
         <Link 
           href="/products" 
           className="bg-black text-white px-8 py-3 rounded-md hover:bg-gray-800 transition"
@@ -23,7 +22,6 @@ export default function CartDetails() {
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
-      {/* Liste des articles (Prend 8 colonnes) */}
       <div className="lg:col-span-8 space-y-6">
         {cart.map((item) => (
           <div key={item.stockId} className="flex gap-6 border-b pb-6">
@@ -68,7 +66,6 @@ export default function CartDetails() {
         ))}
       </div>
 
-      {/* Résumé de la commande (Prend 4 colonnes) */}
       <div className="lg:col-span-4">
         <div className="bg-gray-50 p-6 rounded-lg border">
           <h2 className="text-lg font-bold mb-4 border-b pb-4">Résumé de votre commande</h2>

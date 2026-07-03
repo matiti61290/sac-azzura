@@ -7,7 +7,7 @@ export default async function ProductsPage () {
     })
 
     if(!res.ok) {
-        throw new Error('Erreur lors de la recuperation des produits')
+        throw new Error('Erreur lors de la récuperation des produits')
     }
 
     const products: Product[] = await res.json()

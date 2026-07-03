@@ -13,7 +13,6 @@ export default function CheckoutAddressPage() {
         <main className="min-h-screen bg-gray-50/50 font-text text-night-blue py-12">
             <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
                 
-                {/* --- ÉTAPE 1 : LE FIL D'ARIANE (TUNNEL DE COMMANDE) --- */}
                 <nav className="flex items-center justify-center gap-2 md:gap-4 mb-12 text-sm font-medium">
                     <Link href="/cart" className="text-gray-400 hover:text-orange transition-colors">
                         Mon Panier
@@ -28,10 +27,8 @@ export default function CheckoutAddressPage() {
                     </span>
                 </nav>
 
-                {/* --- ÉTAPE 2 : LE FORMULAIRE INTERACTIF (CLIENT) --- */}
                 <AddressForm />
 
-                {/* --- ÉTAPE 3 : RASSURANCE CLIENT & SÉCURITÉ --- */}
                 <div className="max-w-2xl mx-auto mt-8 grid grid-cols-1 sm:grid-cols-3 gap-6 text-center border-t border-gray-100 pt-8">
                     <div className="space-y-1">
                         <span className="text-xl">🇫🇷</span>

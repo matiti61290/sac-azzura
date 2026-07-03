@@ -24,15 +24,12 @@ export default function AddressForm() {
     const [sameAsBilling, setSameAsBilling] = useState(true)
     const [isUnverifiedModalOpen, setIsUnverifiedModalOpen] = useState(false)
 
-    // Stockage des adresses déjà existantes en BDD
     const [savedDeliveries, setSavedDeliveries] = useState<SavedAddress[]>([])
     const [savedBillings, setSavedBillings] = useState<SavedAddress[]>([])
     
-    // IDs des adresses sélectionnées (si l'utilisateur choisit une adresse existante)
     const [selectedDeliveryId, setSelectedDeliveryId] = useState<number | null>(null)
     const [selectedBillingId, setSelectedBillingId] = useState<number | null>(null)
 
-    // Toggle pour forcer la saisie d'une nouvelle adresse
     const [showNewDeliveryForm, setShowNewDeliveryForm] = useState(false)
     const [showNewBillingForm, setShowNewBillingForm] = useState(false)
     
@@ -40,7 +37,6 @@ export default function AddressForm() {
         street: "", additional: "", zipcode: "", city: ""
     })
 
-    // 🔄 1. Charger les adresses enregistrées au montage du composant
     useEffect(() => {
         if (!isConnected) return
 
@@ -55,7 +51,6 @@ export default function AddressForm() {
             }
 
             try {
-                // 🔑 AJOUT : credentials: 'include' pour envoyer le cookie de session/jwt
                 const resDel = await fetch(`${process.env.NEXT_PUBLIC_API}addresses/user/delivery_addresses`, { 
                     headers,
                     credentials: 'include' 
@@ -67,7 +62,6 @@ export default function AddressForm() {
                     else setShowNewDeliveryForm(true)
                 }
 
-                // 🔑 AJOUT : credentials: 'include' ici aussi
                 const resBill = await fetch(`${process.env.NEXT_PUBLIC_API}addresses/user/billing_addresses`, { 
                     headers,
                     credentials: 'include' 
@@ -117,7 +111,7 @@ export default function AddressForm() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
-        setIsLoading(true) // On lance le chargement du bouton
+        setIsLoading(true)
 
         try {
             let finalDeliveryId = selectedDeliveryId
@@ -163,18 +157,14 @@ export default function AddressForm() {
             const paymentData = await paymentResponse.json()
 
             if (!paymentResponse.ok) {
-                // 🌟 L'INTERCEPTION MAGIQUE : 
-                // Si le serveur répond 403, c'est que le ForbiddenException du compte non vérifié s'est activé !
                 if (paymentResponse.status === 403) {
-                    setIsUnverifiedModalOpen(true) // On ouvre ta jolie modal
-                    return // On stoppe l'exécution ici (sans passer par le catch)
+                    setIsUnverifiedModalOpen(true)
+                    return
                 }
 
-                // Pour toutes les autres erreurs (ex: 400, 500), on lève l'erreur classique
                 throw new Error(paymentData.message || "Erreur lors de la préparation du paiement.")
             }
 
-            // Si tout est OK, redirection vers Stripe
             if (paymentData.url) {
                 window.location.href = paymentData.url 
             }
@@ -183,7 +173,7 @@ export default function AddressForm() {
             console.error(error)
             alert(error.message || "Une erreur est survenue.")
         } finally {
-            setIsLoading(false) // Libère le bouton dans tous les cas
+            setIsLoading(false)
         }
     }
 
@@ -196,7 +186,6 @@ return (
 
         <form onSubmit={handleSubmit} className="space-y-6">
             
-            {/* --- SECTION 1 : ADRESSES DE LIVRAISON ENREGISTRÉES --- */}
             {savedDeliveries.length > 0 && !showNewDeliveryForm && (
                 <div>
                     <label className="block text-sm font-bold uppercase tracking-wider text-night-blue/60 mb-3">
@@ -224,7 +213,6 @@ return (
                 </div>
             )}
 
-            {/* --- FORMULAIRE ADRESSE DE LIVRAISON (S'affiche si demandé ou si aucune adresse en BDD) --- */}
             {showNewDeliveryForm && (
                 <div className="space-y-4 bg-gray-50/50 p-4 rounded-xl border border-gray-150">
                     <div className="flex justify-between items-center">
@@ -254,7 +242,6 @@ return (
                 </div>
             )}
 
-            {/* --- SELECTION FACTURATION --- */}
             <div className="pt-4 border-t border-gray-100">
                 <label className="flex items-center gap-3 cursor-pointer group">
                     <input type="checkbox" checked={sameAsBilling} onChange={(e) => setSameAsBilling(e.target.checked)} className="peer appearance-none w-5 h-5 border-2 border-gray-300 rounded-md checked:bg-orange checked:border-orange transition-all" />
@@ -262,7 +249,6 @@ return (
                 </label>
             </div>
 
-            {/* --- OPTIONNEL : ADRESSE FACTURATION SÉPARÉE --- */}
             {!sameAsBilling && savedBillings.length > 0 && !showNewBillingForm && (
                 <div className="pt-4 border-t">
                     <label className="block text-sm font-bold uppercase tracking-wider text-night-blue/60 mb-3">Adresse de facturation</label>
@@ -282,14 +268,12 @@ return (
             )}
 
             <div className="pt-6 space-y-3">
-                {/* 💡 1. Message informatif discret au lieu du blocage rouge */}
                 {isConnected && user?.isVerified === false && (
                     <div className="p-3.5 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-700 text-center">
                         💡 Votre compte n'est pas encore vérifié. Vous pouvez cliquer sur le bouton de paiement ci-dessous pour finaliser l'activation.
                     </div>
                 )}
 
-                {/* 🔒 2. Bouton de paiement libéré du verrou de vérification */}
                 <button
                     type="submit"
                     disabled={isLoading}
@@ -299,12 +283,11 @@ return (
                             : "bg-night-blue hover:bg-[#06089e] shadow-night-blue/20"
                         }`}
                 >
-                    {isLoading ? "Préparation de la page Stripe..." : "🔒 Passer au paiement sécurisé"}
+                    {isLoading ? "Préparation de la page Stripe..." : "Passer au paiement sécurisé"}
                 </button>
             </div>
         </form>
 
-        {/* 🌟 3. Inclusion de la modal sur mesure à la racine du composant */}
         <UnverifiedAccountModal
             isOpen={isUnverifiedModalOpen}
             onClose={() => setIsUnverifiedModalOpen(false)}

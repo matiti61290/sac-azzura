@@ -16,11 +16,11 @@ export class SubscriptionConfirmMail {
             await this.transporter.sendMail({
                             from: 'barbeymathieudev@gmail.com',
             to: mail,
-            subject: 'Validation de votre compte',
+            subject: 'Inscription à la Newsletter',
             text: `Cliquez ici pour valider l'activation du compte : ${link}`,
             html: `
                 <div>
-                    <h1>Merci de votre inscription a la newsletter!</h1>
+                    <h1>Merci de votre inscription à la newsletter!</h1>
                     <p>Cliquez sur ce <a href="${link}">lien</a> pour confirmer l'abonnement</p>
                 </div>
             `

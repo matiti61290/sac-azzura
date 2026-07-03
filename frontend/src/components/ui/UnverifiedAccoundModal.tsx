@@ -59,11 +59,11 @@ export default function UnverifiedAccountModal({ isOpen, onClose }: UnverifiedAc
           <div className="text-4xl">📧</div>
           <h3 className="text-lg font-semibold text-gray-900">Vérification de compte requise</h3>
           <p className="text-sm text-gray-500 leading-relaxed">
-            Pour valider votre commande et permettre à Gigi de préparer votre colis, vous devez obligatoirement valider votre adresse e-mail.
+            Pour valider votre commande, vous devez obligatoirement valider votre adresse e-mail.
           </p>
         </div>
 
-        {/* --- ZONE DE FEEDBACK (SUCCÈS / ERREUR) --- */}
+        {/* Feedback */}
         {status && (
           <div className={`mt-4 p-3.5 rounded-xl text-xs font-medium text-center ${
             status.type === 'success' ? 'bg-emerald-50 text-emerald-700 border border-emerald-100' : 'bg-red-50 text-red-700 border border-red-100'

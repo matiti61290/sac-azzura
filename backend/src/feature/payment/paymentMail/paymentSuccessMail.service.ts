@@ -26,10 +26,10 @@ export class PaymentSuccessMailService {
         from: 'barbeymathieudev@gmail.com',
         to: mail,
         subject: 'Confirmation de paiement',
-        text: 'Votre paiement a ete valide',
+        text: 'Votre paiement a été validé',
         html: `
             <div>
-                <h3>Votre paiement pour la commande ${orderId} a ete valide</h3>
+                <h3>Votre paiement pour la commande ${orderId} a été validé</h3>
                 <p>Liste de la commande a implementer</p>
             </div>
         `

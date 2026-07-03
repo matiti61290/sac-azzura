@@ -14,8 +14,6 @@ export default function ProfilPage() {
                 <div className="mb-8 text-center md:text-left">
                     <h1 className="text-3xl font-text text-night-blue mb-2">Mon compte</h1>
                 </div>
-
-                {/* Appel du composant Client interactif */}
                 <ProfileDashboard />
             </div>
         </main>

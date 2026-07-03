@@ -20,13 +20,6 @@ export default function PaymentSuccessComponent(){
                     <p className="text-sm text-gray-500 font-medium">Votre paiement a été validé avec succès.</p>
                 </div>
 
-                {/* Petit mot personnalisé de Gigi */}
-                <div className="bg-orange/5 border border-orange/15 rounded-xl p-4 text-sm text-gray-600 italic leading-relaxed">
-                    "Un grand merci pour votre commande ! Je prépare mes outils, coupe le cuir et assemble votre création dès demain matin dans mon atelier normand. Vous recevrez un e-mail de confirmation dans quelques instants." <br />
-                    <span className="font-semibold text-orange not-italic mt-1 block">— Gigi</span>
-                </div>
-
-                {/* --- LES DEUX BOUTONS DE REDIRECTION --- */}
                 <div className="pt-4 flex flex-col sm:flex-row gap-3">
                     <Link
                         href="/"
@@ -36,7 +29,7 @@ export default function PaymentSuccessComponent(){
                     </Link>
                     
                     <Link 
-                        href="/profile" // Prêt pour ton futur espace membre / historique de commandes
+                        href="/profile"
                         className="flex-1 py-3 px-4 rounded-xl bg-orange hover:bg-[#e89454] text-white font-semibold text-sm shadow-md shadow-orange/10 transition-all duration-150 text-center"
                     >
                         Suivre ma commande

@@ -10,7 +10,6 @@ import ProductSection from '@/src/components/dashboard/ProductSection';
 import { useCrud } from '@/src/hooks/useCrud';
 
 export default function Dashboard() {
-  // Finies les centaines de lignes de fetch ! Tout est géré par le hook de manière isolée.
   const users = useCrud<User>('user', 'user', true);
   const categories = useCrud<Category>('category', 'category');
   const subcategories = useCrud<SubCategory>('subcategory', 'subcategory');
@@ -18,7 +17,6 @@ export default function Dashboard() {
   const materials = useCrud<Material>('materials', 'material');
   const products = useCrud<Product>('products', 'product', true);
 
-  // On peut déduire un état global de chargement si au moins un composant principal charge
   const globalLoading = products.loading && categories.loading;
 
   if (globalLoading) {
