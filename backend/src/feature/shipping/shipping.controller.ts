@@ -4,6 +4,9 @@ import { ColissimoService } from './service/colissimo.service';
 import { FindRelayPointDto } from '../../shared/dtos/mondial_relai/findRelayPoint.dto';
 import { CreateLabelDto } from '../../shared/dtos/mondial_relai/createLabelDto.dto';
 
+/*
+Shipping parts don't work for the moment
+*/
 @Controller('shipping')
 export class ShippingController {
   constructor(

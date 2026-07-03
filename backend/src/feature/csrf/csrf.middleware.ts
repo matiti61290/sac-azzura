@@ -6,7 +6,7 @@ const {
     doubleCsrfProtection,
     generateCsrfToken
 } = doubleCsrf({
-    getSecret: () => "OneKey", //a changer en prod
+    getSecret: () => "OneKey", //Need to be changed for a secret key in prod
     getSessionIdentifier: (req: Request) => {
         return req.cookies['session-id'] || 'anonymous'
     },
@@ -14,7 +14,7 @@ const {
     cookieOptions: {
         sameSite: 'none',
         path: '/',
-        secure: true //a mettre en true quand en prod
+        secure: true
     }
 })
 

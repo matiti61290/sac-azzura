@@ -20,6 +20,7 @@ interface CartContextType {
   addToCart: (item: CartItem) => void;
   removeFromCart: (stockId: number) => void;
   updateQuantity: (stockId: number, quantity: number) => void;
+  cleanCart: () => void
   cartTotal: number;
 }
 
@@ -29,7 +30,6 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
 
-  // Charger le panier depuis le localStorage au démarrage
   useEffect(() => {
     const savedCart = localStorage.getItem('sacAzura_cart');
     if (savedCart) {
@@ -38,7 +38,6 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     setIsLoaded(true);
   }, []);
 
-  // Sauvegarder dans le localStorage à chaque modification
   useEffect(() => {
     if (isLoaded) {
       localStorage.setItem('sacAzura_cart', JSON.stringify(cart));
@@ -70,16 +69,22 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     );
   };
 
+  const cleanCart = () => {
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('sacAzura_cart')
+    }
+    setCart([])
+  }
+
   const cartTotal = cart.reduce((total, item) => total + item.price * item.quantity, 0);
 
   return (
-    <CartContext.Provider value={{ cart, addToCart, removeFromCart, updateQuantity, cartTotal }}>
+    <CartContext.Provider value={{ cart, addToCart, removeFromCart, updateQuantity, cleanCart, cartTotal }}>
       {children}
     </CartContext.Provider>
   );
 }
 
-// Hook personnalisé pour utiliser le panier facilement partout
 export function useCart() {
   const context = useContext(CartContext);
   if (context === undefined) {

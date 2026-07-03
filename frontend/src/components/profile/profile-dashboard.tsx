@@ -23,18 +23,16 @@ export default function ProfileDashboard() {
     const router = useRouter()
     const [activeTab, setActiveTab] = useState<'account' | 'addresses' | 'orders'>('account')
     
-    // States pour centraliser les données issues du Back-end
+    // States for data from the backend
     const [orders, setOrders] = useState<Order[]>([])
     const [addresses, setAddresses] = useState<Address[]>([])
     const [isLoadingData, setIsLoadingData] = useState(true) 
     const [isUpdating, setIsUpdating] = useState(false)
     const [isDeleting, setIsDeleting] = useState(false) 
     
-    // 🌟 ÉTATS POUR LA VÉRIFICATION DU COMPTE ET LE RENVOI DU MAIL
-    const [isVerified, setIsVerified] = useState<boolean>(true) // Géré dynamiquement par la BDD
+    const [isVerified, setIsVerified] = useState<boolean>(true)
     const [isResendingEmail, setIsResendingEmail] = useState(false)
 
-    // 🌟 ÉTATS POUR LES MODALS SUR MESURE
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
     const [isAccountDeleted, setIsAccountDeleted] = useState(false) 
     const [notification, setNotification] = useState<{
@@ -47,7 +45,6 @@ export default function ProfileDashboard() {
         message: ""
     })
 
-    // Formulaire d'infos personnelles
     const [accountForm, setAccountForm] = useState({
         firstname: "",
         lastname: "",
@@ -56,14 +53,12 @@ export default function ProfileDashboard() {
         password: ""
     })
 
-    // Redirection si l'utilisateur n'est pas connecté
     useEffect(() => {
         if (!isLoading && !isConnected) {
             router.push('/login')
         }
     }, [isLoading, isConnected, router])
 
-    // 🚀 L'unique appel API pour récupérer l'utilisateur et ses relations
     useEffect(() => {
         if (!isConnected || !user?.id) return
 
@@ -87,7 +82,7 @@ export default function ProfileDashboard() {
                     
                     setAddresses(userData.addresses || [])
                     setOrders(userData.orders || [])
-                    setIsVerified(userData.isVerified) // 🌟 On extrait le vrai statut de la BDD
+                    setIsVerified(userData.isVerified)
                     
                     setAccountForm({
                         firstname: userData.firstname,
@@ -107,7 +102,6 @@ export default function ProfileDashboard() {
         fetchProfileData()
     }, [isConnected, user?.id])
 
-    // 🌟 ENVOI DU MAIL DE VÉRIFICATION DEPUIS LE PROFIL
     const handleResendVerificationMail = async () => {
         setIsResendingEmail(true)
         try {
@@ -146,7 +140,6 @@ export default function ProfileDashboard() {
         }
     }
 
-    // ✨ MODIFICATION DES INFOS PERSONNELLES
     const handleUpdateAccount = async (e: React.FormEvent) => {
         e.preventDefault()
         setIsUpdating(true)
@@ -201,7 +194,6 @@ export default function ProfileDashboard() {
         }
     }
 
-    // 🗑️ EXÉCUTION RÉELLE DE LA SUPPRESSION DE COMPTE
     const executeDeleteAccount = async () => {
         setIsDeleteModalOpen(false) 
         setIsDeleting(true)
@@ -260,7 +252,7 @@ export default function ProfileDashboard() {
     return (
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             
-            {/* --- PANNEAU DE NAVIGATION (GAUCHE) --- */}
+            {/* Panneau latéral */}
             <div className="md:col-span-1 bg-white p-6 rounded-2xl shadow-sm border border-gray-100 h-fit space-y-6">
                 <div className="text-center md:text-left">
                     <p className="text-2xl font-text font-semibold text-dark-blue truncate">{accountForm.firstname || user?.firstname}</p>
@@ -299,7 +291,7 @@ export default function ProfileDashboard() {
                 </button>
             </div>
 
-            {/* --- CONTENU DE L'ONGLET ACTIF (DROITE) --- */}
+            {/* Contenu de l'onglet actif */}
             <div className="md:col-span-3 bg-white p-6 sm:p-8 rounded-2xl shadow-sm border border-gray-100 min-h-[500px] flex flex-col justify-between">
                 
                 {isLoadingData ? (
@@ -310,19 +302,19 @@ export default function ProfileDashboard() {
                 ) : (
                     <div className="flex-1">
                         
-                        {/* 👤 ONGLET 1 : INFORMATIONS DU COMPTE */}
+                        {/* information du compte */}
                         {activeTab === 'account' && (
                             <div className="space-y-6">
                                 
-                                {/* 🌟 NOUVELLE BANNIÈRE DE VÉRIFICATION D'E-MAIL */}
+                                {/* Banniere de verification du mail */}
                                 {!isVerified && (
                                     <div className="p-4 bg-amber-50 border border-amber-200 rounded-2xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 max-w-md animate-fade-in">
                                         <div className="space-y-0.5">
                                             <p className="text-sm font-semibold text-amber-800 flex items-center gap-1.5">
-                                                ⚠️ Votre compte n'est pas vérifié
+                                                Votre compte n'est pas vérifié
                                             </p>
                                             <p className="text-xs text-amber-700/80 leading-relaxed">
-                                                Activez votre profil Sac'Azura pour valider vos paniers d'achats.
+                                                Activez votre profil Sac'Azura pour valider vos achats.
                                             </p>
                                         </div>
                                         <button
@@ -396,7 +388,7 @@ export default function ProfileDashboard() {
                                     </button>
                                 </form>
 
-                                {/* 🚨 ZONE DE DANGER : SUPPRESSION DE COMPTE */}
+                                {/* Suppression du compte*/}
                                 <div className="mt-12 pt-6 border-t border-red-100 max-w-md space-y-3">
                                     <div>
                                         <h4 className="text-sm font-semibold text-red-600">Zone de danger</h4>
@@ -414,7 +406,7 @@ export default function ProfileDashboard() {
                             </div>
                         )}
 
-                        {/* 📍 ONGLET 2 : MES ADRESSES */}
+                        {/* Adresses */}
                         {activeTab === 'addresses' && (
                             <div className="space-y-6">
                                 <div>
@@ -440,7 +432,7 @@ export default function ProfileDashboard() {
                             </div>
                         )}
 
-                        {/* 📜 ONGLET 3 : MES COMMANDES */}
+                        {/* Commandes */}
                         {activeTab === 'orders' && (
                             <div className="space-y-6">
                                 <div>
@@ -495,17 +487,17 @@ export default function ProfileDashboard() {
                     </div>
                 )}
 
-                {/* Petit bouton déconnexion pour la version mobile */}
+                {/* Deconnexion */}
                 <button 
                     type="button" 
                     onClick={() => logout()}
                     className="w-full text-center mt-8 pt-4 border-t border-gray-150 text-sm font-semibold text-red-500 md:hidden"
                 >
-                    🚪 Déconnexion du compte
+                    Déconnexion du compte
                 </button>
             </div>
 
-            {/* --- MODALS DE COMMISSIONS GRAPHIK --- */}
+            {/* Modals */}
             <ConfirmationModal
                 isOpen={isDeleteModalOpen}
                 onClose={() => setIsDeleteModalOpen(false)}

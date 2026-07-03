@@ -21,9 +21,7 @@ export class ProductService {
         @InjectRepository(ImageEntity)
         private readonly imageRepository: Repository<ImageEntity>,
 
-
         private readonly awsS3Service: AwsS3Service,
-
         private readonly stockService: StockService
     ) {}
 
@@ -60,11 +58,8 @@ export class ProductService {
         )
         return { ...product, images: imagesWithUrls}
     }
-
- // N'oublie pas d'ajouter "variations: any[]" dans les parenthèses
     async createProduct(addProductDto: AddProductDto, files: Express.Multer.File[], variations: any[]) {
-        
-        // 1. On force l'ID en nombre entier
+
         const subcategoryId = parseInt(addProductDto.subcategoryId.toString(), 10);
         
         const subcategory = await this.subCategoryRepository.findOne({ 
@@ -78,7 +73,6 @@ export class ProductService {
         const product = this.productRepository.create({
             name: addProductDto.name,
             description: addProductDto.description,
-            // 2. On force le prix en nombre décimal
             price: parseFloat(addProductDto.price.toString()), 
             isActive: true,
             subcategory: subcategory,
@@ -99,7 +93,6 @@ export class ProductService {
             await this.imageRepository.save(images)
         }
 
-        // Boucle sur le tableau fraîchement décodé
         for (const variation of variations) {
             if (variation.quantity > 0) {
                 await this.stockService.addStock(
@@ -117,13 +110,11 @@ export class ProductService {
 
     async updateProduct(productId: number, updateProductDto: UpdateProductDto){
         const product = await this.productRepository.findOne({ where: {id: productId}, relations: ['subcategory', 'images', 'stocks'] })
-        console.log(product)
         if(!product){
             throw new NotFoundException
         }
         
         Object.assign(product, updateProductDto)
-        console.log("Produit mis a jour:", product)
         const updatedProduct = await this.productRepository.save(product)
 
         const images: ImageEntity[] = []
@@ -146,9 +137,7 @@ export class ProductService {
     }
 
     async deleteProduct(productId: number) {
-        console.log("Le service est appele")
         const product = await this.productRepository.findOne({ where: {id: productId}, relations: ["images", "stocks"]})
-        console.log("Le produit est le suivant:", product)
         if(!product) {
             throw new NotFoundException
         }

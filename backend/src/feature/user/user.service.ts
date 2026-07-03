@@ -50,19 +50,15 @@ export class UsersService {
             throw new NotFoundException("Utilisateur non trouvé")
         }
 
-        // 1. On extrait le password pour le traiter à part, le reste va dans 'updateData'
         const { password, ...updateData } = updateUserdto
 
-        // 2. On applique d'abord les changements textuels (firstname, lastname, mail, phoneNumber)
         Object.assign(user, updateData)
 
-        // 3. Si un nouveau mot de passe est fourni, on le hache et on l'assigne DIRECTEMENT à l'entité
         if (password && password.trim() !== "") {
-            const salt = await bcrypt.genSalt(10) // 10 est le nombre de rounds standard
+            const salt = await bcrypt.genSalt(10)
             user.password = await bcrypt.hash(password, salt)
         }
 
-        // 4. On sauvegarde l'entité qui contient maintenant le mot de passe haché
         return this.userRepository.save(user)
     }
 

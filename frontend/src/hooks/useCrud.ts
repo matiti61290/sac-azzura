@@ -18,14 +18,13 @@ export function useCrud<T>(
   const [data, setData] = useState<T[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // === UTILITAIRE URL ===
   const buildUrl = (endpoint: string) => {
     const baseUrl = (process.env.NEXT_PUBLIC_API || '').replace(/\/$/, '');
     const cleanEndpoint = endpoint.replace(/^\//, '');
     return `${baseUrl}/${cleanEndpoint}`;
   };
 
-  // === READ ===
+  // Get
   const refresh = useCallback(async () => {
     setLoading(true);
     try {
@@ -49,7 +48,7 @@ export function useCrud<T>(
     refresh();
   }, [refresh]);
 
-  // === CREATE ===
+  // Create
   const add = async (payload: any): Promise<boolean> => {
     try {
       const csrfToken = await AuthService.getCsrfToken();
@@ -86,7 +85,7 @@ export function useCrud<T>(
     }
   };
 
-  // === UPDATE ===
+  // Update
   const update = async (id: number, payload: any): Promise<boolean> => {
     try {
       const csrfToken = await AuthService.getCsrfToken();
@@ -123,7 +122,6 @@ export function useCrud<T>(
         return true;
       }
       
-      // Affiche l'erreur de validation NestJS dans la console
       const errorData = await response.json().catch(() => ({}));
       console.error(`Erreur 400 PATCH sur ${basePath}:`, errorData);
       return false;
@@ -133,7 +131,7 @@ export function useCrud<T>(
     }
   };
 
-  // === DELETE ===
+  // Delete
   const remove = async (id: number): Promise<void> => {
     try {
       const csrfToken = await AuthService.getCsrfToken();

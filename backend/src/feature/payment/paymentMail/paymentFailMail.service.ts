@@ -16,11 +16,11 @@ export class paymentFailMailService {
             from: 'barbeymathieudev@gmail.com',
             to: mail,
             subject: 'Erreur de paiement',
-            text: 'Le paiement a echoue',
+            text: 'Le paiement a echoué',
             html: `
             <div>
                 <h1>Error lors du paiement</h1>
-                <p> Votre commande ${orderId} n'a pas pu etre validee. Veuillez verifier votre moyen de paiement</p>
+                <p> Votre commande ${orderId} n'a pas pu etre validée. Veuillez verifier votre moyen de paiement</p>
             </div>`
         })
     }

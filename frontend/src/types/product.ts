@@ -6,19 +6,19 @@ export interface ProductImage {
     url: string;
 }
 
-// On ajoute les interfaces pour les catégories
+
 export interface Category {
     id: number;
     name: string;
-    sku_code: string; // Identifier unique par la backend
-    subcategories?: Category[]; // Relation pour afficher la structure hiérarchique
+    sku_code: string;
+    subcategories?: Category[];
 }
 
 export interface SubCategory {
     id: number;
     name: string;
     sku_code: string;
-    category: Category; // La relation vers le parent
+    category: Category;
 }
 
 export interface Color {

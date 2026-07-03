@@ -6,6 +6,10 @@ import { Repository } from "typeorm";
 import { AwsS3Service } from "../aws-s3/aws-s3.service";
 import { OrderEntity } from "../../entities/order.entity";
 
+/*
+Shipping parts don't work for the moment
+*/
+
 @Injectable()
 export class ShippingService {
     constructor(

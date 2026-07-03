@@ -12,5 +12,3 @@ import { SubscriptionConfirmMail } from "./subscriptionMail/confirmMail.service"
 })
 
 export class NewsletterModule {}
-
-console.log("Forcer la compilation de :", SubscriberEntity.name);

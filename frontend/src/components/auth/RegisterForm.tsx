@@ -2,11 +2,11 @@
 
 import { useState } from "react"
 import { AuthService } from "@/src/services/auth.service"
-import { useRouter } from "next/navigation" // 1. Import du router
+import { useRouter } from "next/navigation"
 
 export default function RegisterForm(){
 
-        const router = useRouter() // 2. Initialisation du router
+        const router = useRouter()
 
         const [formData, setFormData] = useState({
             firstname: '',
@@ -34,19 +34,16 @@ export default function RegisterForm(){
             setMessage('')
 
             try {
-                // 3. On récupère le token CSRF en premier !
                 const csrfToken = await AuthService.getCsrfToken()
 
-                // 4. On passe les données ET le token au service
                 await AuthService.register(formData, csrfToken)
         
                 setStatus('success')
                 setMessage('Votre compte a été créé avec succès ! Redirection en cours...')
                 setFormData({firstname: '', lastname: '', mail: '', phoneNumber: '', password: '', confirmPassword: ''})
         
-                // 5. Redirection vers la page de login après un petit délai pour lire le message
                 setTimeout(() => {
-                    router.push('/login') // Change le chemin selon tes routes
+                    router.push('/login')
                 }, 2000)
 
             } catch(error: any) {

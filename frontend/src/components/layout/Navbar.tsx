@@ -2,8 +2,8 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
-import { Bars3Icon, XMarkIcon, ShoppingBagIcon, UserCircleIcon, Cog8ToothIcon } from '@heroicons/react/24/outline';
+import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/react';
+import { Bars3Icon, XMarkIcon, ShoppingBagIcon, Cog8ToothIcon } from '@heroicons/react/24/outline';
 import { useAuth } from '@/src/contexts/AuthContext';
 
 export default function Navbar() {
@@ -19,7 +19,7 @@ export default function Navbar() {
         <>
           <div className="flex items-center justify-between">
             
-            {/* 1. GAUCHE : Menu Burger (Mobile) & Pages (Bureau) */}
+            {/* GAUCHE : Menu Burger (Mobile) & Pages (Bureau) */}
             <div className="flex flex-1 justify-start">
               <div className="md:hidden">
                 <DisclosureButton className="inline-flex items-center justify-center rounded-md p-2 text-gray-600 hover:bg-gray-100 hover:text-gray-900 focus:outline-none">
@@ -40,14 +40,13 @@ export default function Navbar() {
               </div>
             </div>
 
-            {/* 2. CENTRE : Le Logo */}
             <div className="flex flex-shrink-0 justify-center">
               <Link href="/" className="text-2xl tracking-widest text-indigo-600">
                   <Image src='/static/logo.png' width={150} height={150} alt="Logo de la marque Sac'Azura" />
               </Link>
             </div>
 
-            {/* 3. DROITE : Connexion / Compte */}
+            {/* DROITE : Connexion / Compte */}
             <div className="mr-5 flex flex-1 justify-end space-x-6">
               <Link href="/cart">
                 <ShoppingBagIcon className='w-auto h-8'/>
@@ -55,10 +54,10 @@ export default function Navbar() {
 
               <div className="hidden md:flex items-center space-x-4">
                 
-                {/* --- DÉBUT DES CONDITIONS BUREAU --- */}
+                {/* Gestion admin client */}
                 {isConnected ? (
                   user?.isAdmin ? (
-                    /* CAS 1 : CONNECTÉ ET ADMIN */
+                    /* Admin*/
                     <div className="flex items-center space-x-4">
                       <Link href="/dashboard" className="flex items-center hover:text-indigo-800 font-text text-2xl">
                         <Cog8ToothIcon className="h-6 w-6 mr-1" />
@@ -69,13 +68,13 @@ export default function Navbar() {
                       </button>
                     </div>
                   ) : (
-                    /* CAS 2 : CONNECTÉ MAIS UTILISATEUR NORMAL */
+                    /* ClientL */
                     <Link href="/profile" className="font-text font-medium text-2xl text-gray-600 hover:text-black">
                       Votre compte
                     </Link>
                   )
                 ) : (
-                  /* CAS 3 : NON CONNECTÉ (VISITEUR) */
+                  /* Non connecté */
                   <>
                     <Link href="/register" className="font-text text-2xl text-gray-600 hover:text-black">
                       S'inscrire
@@ -85,14 +84,13 @@ export default function Navbar() {
                     </Link>
                   </>
                 )}
-                {/* --- FIN DES CONDITIONS BUREAU --- */}
 
               </div>
             </div>
 
           </div>
 
-          {/* 4. LE MENU MOBILE (Déroulant) */}
+          {/* Menu burger */}
           <DisclosurePanel className="md:hidden absolute left-0 top-full w-full bg-white px-4 pt-2 pb-4 shadow-lg z-10">
             <div className="space-y-1">
               <DisclosureButton as={Link} href="/" className="block py-3 font-text text-2xl text-gray-600 hover:text-black">Accueil</DisclosureButton>
@@ -103,10 +101,10 @@ export default function Navbar() {
             
             <div className="mt-4 flex flex-col space-y-2">
               
-              {/* --- DÉBUT DES CONDITIONS MOBILE --- */}
+              {/* Gestion admin client */}
               {isConnected ? (
                 user?.isAdmin ? (
-                   /* CAS 1 : CONNECTÉ ET ADMIN (Mobile) */
+                   /* Admin */
                    <>
                      <DisclosureButton as={Link} href="/dashboard" className="block py-2 text-center font-text text-2xl text-indigo-600 font-bold hover:text-indigo-800 border-t-2 border-night-blue/50">
                        Accéder au Dashboard
@@ -116,7 +114,7 @@ export default function Navbar() {
                      </DisclosureButton>
                    </>
                 ) : (
-                  /* CAS 2 : CONNECTÉ MAIS UTILISATEUR NORMAL (Mobile) */
+                  /* Client */
                   <>
                     <div className="px-4 py-2 text-center text-sm text-gray-700 border-t-2 border-night-blue/50 pt-4">
                       Connecté en tant que <br/>
@@ -131,7 +129,7 @@ export default function Navbar() {
                   </>
                 )
               ) : (
-                /* CAS 3 : NON CONNECTÉ (VISITEUR) (Mobile) */
+                /* Non connecté */
                 <>
                   <DisclosureButton as={Link} href="/register" className="block py-2 text-center font-text text-2xl text-gray-600 hover:text-black border-t-2 border-night-blue/50 pt-4">
                     S'inscrire
@@ -141,7 +139,6 @@ export default function Navbar() {
                   </DisclosureButton>
                 </>
               )}
-              {/* --- FIN DES CONDITIONS MOBILE --- */}
 
             </div>
           </DisclosurePanel>

@@ -14,7 +14,6 @@ interface ParamsProps {
 }
 
 export default async function PaymentFailedPage({ params }: ParamsProps) {
-    // Récupération des paramètres au cas où tu en aurais besoin (ex: journalisation ou affichage)
     const { orderId } = await params
 
     return (
@@ -42,10 +41,9 @@ export default async function PaymentFailedPage({ params }: ParamsProps) {
                     {orderId && <p className="pt-2 text-[10px] text-gray-400">Référence de l'incident : #{orderId}</p>}
                 </div>
 
-                {/* Actions de récupération */}
                 <div className="pt-2 space-y-3">
                     <Link 
-                        href="/cart" // On renvoie la cliente vers son panier pour qu'elle puisse réessayer
+                        href="/cart"
                         className="block w-full py-4 px-6 rounded-xl bg-night-blue hover:bg-[#06089e] text-white font-semibold text-base transition-all duration-150 shadow-lg shadow-night-blue/10 text-center"
                     >
                         🛒 Retourner au panier & réessayer

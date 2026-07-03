@@ -4,7 +4,7 @@ export const AuthService = {
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API}csrf/token`, {
         method: 'GET',
-        credentials: 'include', // INDISPENSABLE pour recevoir le cookie 'session-id'
+        credentials: 'include',
       });
 
       if (!res.ok) {
@@ -12,7 +12,7 @@ export const AuthService = {
       }
 
       const data = await res.json();
-      return data.csrfToken; // On retourne le jeton (string)
+      return data.csrfToken;
     } catch (error: any) {
       throw new Error(error.message);
     }
@@ -25,9 +25,9 @@ export const AuthService = {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-csrf-token': csrfToken, // On place le token dans les headers !
+          'x-csrf-token': csrfToken,
         },
-        credentials: 'include', // INDISPENSABLE pour renvoyer le cookie 'session-id' au back
+        credentials: 'include',
         body: JSON.stringify(credentials),
       });
 
@@ -43,16 +43,15 @@ export const AuthService = {
     }
   },
 
-  // (N'oublie pas de faire pareil pour register !)
   async register(userData: any, csrfToken: string) {
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API}auth/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-csrf-token': csrfToken, // Pareil ici
+          'x-csrf-token': csrfToken,
         },
-        credentials: 'include', // Et ici
+        credentials: 'include',
         body: JSON.stringify(userData),
       });
 

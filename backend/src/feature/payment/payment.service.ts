@@ -57,7 +57,6 @@ export class PaymentService {
             throw new NotFoundException("Utilisateur introuvable");
         }
 
-        // Remplace '.isVerified' par le nom exact de ton booléen en BDD (ex: is_verified)
         if (!currentUser.isVerified) {
             throw new ForbiddenException("Votre compte doit être vérifié pour effectuer un achat.");
         }
@@ -84,7 +83,7 @@ export class PaymentService {
         order.delivery_address = deliveryAddress
         order.billing_address = billingAddress
 
-        // Calcul du prix total basé sur le stock réel
+
         for (const item of cartDto.items){
             const variant = await this.stockRepository.findOne({where: {sku: item.sku}, relations: ['product']})
 
@@ -110,9 +109,7 @@ export class PaymentService {
             totalAmount += variant.product.price * item.quantity
         }
 
-        console.log('total avant promo', totalAmount)
-
-        // 👇 LA MODIFICATION : Application du code promo SEULEMENT s'il est fourni et valide
+        //promotion code management ready to be implemented in the frontend
         if (cartDto.promotion_code && cartDto.promotion_code !== "AUCUN" && cartDto.promotion_code.trim() !== "") {
             const promotionCode = await this.promotionRepository.findOne({ where: {name: cartDto.promotion_code}})
 
@@ -133,8 +130,6 @@ export class PaymentService {
             }
         }
 
-        console.log('total apres promo', totalAmount)
-
         order.totalAmount = totalAmount
 
         const savedOrder = await this.orderRepository.save(order)
@@ -145,7 +140,7 @@ export class PaymentService {
     async createCheckoutSession (orderId: number, userId: number, items: OrderItemEntity[], userEmail: string){
         const line_items = items.map(item => {
             if(!item.stock.product?.name){
-                throw new InternalServerErrorException('Donnees du produit manquant')
+                throw new InternalServerErrorException('Données du produit manquant')
             }
 
             return{
@@ -153,7 +148,7 @@ export class PaymentService {
                     currency: 'eur',
                     product_data: {
                         name : item.stock.product.name,
-                        description: `Modele: ${item.stock.sku}`
+                        description: `Modèle: ${item.stock.sku}`
                     },
                     unit_amount: Math.round(item.priceAtPurchase * 100)
                 },
@@ -206,7 +201,6 @@ export class PaymentService {
         if(!endpointSecret){
             throw new NotFoundException("Le webhook ne fonctionne pas")
         }
-        console.log('le webhook a ete call!!!')
         
         let event: Stripe.Event
         try{
@@ -258,7 +252,7 @@ export class PaymentService {
                         currentStock.quantity -= line.quantity
                         await transactionalEntityManager.save(currentStock)
 
-                        console.log(`Transaction reussie. Commande ${orderId} payee et stock deduits.`)
+                        console.log(`Transaction reussie. Commande ${orderId} payée et stock déduits.`)
 
                        
                     }

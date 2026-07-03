@@ -25,7 +25,6 @@ export class AddProductDto {
     @IsString()
     sku_code!: string;
 
-    // LA CLÉ EST ICI : On force NestJS à le voir uniquement comme une string !
     @IsNotEmpty()
     @IsString()
     variations!: string; 

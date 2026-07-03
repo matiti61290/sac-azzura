@@ -1,25 +1,22 @@
 import Image from "next/image";
 import NewsletterForm from "../components/homepage/NewsletterForm";
-import { Product } from "@/src/types/product"; // ⚠️ Vérifie que ce chemin est le bon pour ton projet
+import { Product } from "@/src/types/product";
 import Link from "next/link";
 
 export default async function Home() {
 
-  // 1. Appel API pour récupérer les produits
   let products: Product[] = [];
   try {
     const res = await fetch(`${process.env.NEXT_PUBLIC_API}products/`, {
-      cache: 'no-store' // Permet d'avoir les produits à jour. Tu pourras passer en 'force-cache' avec revalidation plus tard pour la prod.
+      cache: 'no-store'
     });
 
     if (res.ok) {
       products = await res.json();
       
-      // 2. Tri par ID (du plus petit au plus grand)
-      // Pour inverser (du plus récent au plus ancien) : (a, b) => b.id - a.id
       products.sort((a, b) => a.id - b.id);
 
-      // 3. Limite à 4 ou 8 produits pour la page d'accueil (pour ne pas surcharger)
+      // Limit products on the homepage
       products = products.slice(0, 4); 
     } else {
       console.error("Erreur lors de la récupération des produits pour l'accueil");
@@ -32,7 +29,6 @@ export default async function Home() {
     <div className="">
       <main className="min-h-screen flex flex-col gap-12 p-6 md:p-12">
         
-        {/* --- SECTION HERO --- */}
         <section>
           <div className="flex flex-col items-center justify-center bg-[image:var(--image-dev)] bg-cover bg-center h-200">
             <h1 className="text-7xl text-center text-white font-title mx-5 my-5 pb-10">Sacs et accessoires faits main en Normandie, personnalisables et pensés pour durer</h1>
@@ -57,7 +53,7 @@ export default async function Home() {
 
         <hr className="color-night-blue bg-night-blue h-0.5 my-10"/>
 
-        {/* --- SECTION SUR MESURE --- */}
+        {/* Not implemented yet */}
         <section id="personalization" className="flex flex-col items-center">
           <Image src="/static/bag-personalized-temporary.png" width={750} height={0} alt="Sac personnalisé"/>
           <div className="flex flex-col items-center gap-1">
@@ -71,7 +67,6 @@ export default async function Home() {
 
         <hr className="color-night-blue bg-night-blue h-0.5 my-10"/>
 
-        {/* --- SECTION PRODUITS (Décommentée et Dynamique) --- */}
         <section id="creations" className="flex flex-col md:flex-row gap-6">
           <div className="flex flex-col items-center gap-6 mx-auto max-w-2xl px-4 py-16 sm:px-6 sm:py-24 lg:max-w-7xl lg:px-8">
             <h2 className="font-title text-6xl text-dark-blue text-center">Des créations artisanales, en petites séries ou en pièce unique</h2>
@@ -102,9 +97,8 @@ export default async function Home() {
               <p className="text-gray-500 mt-8">Les créations arrivent très bientôt !</p>
             )}
             
-            {/* Bouton optionnel pour voir tout le catalogue */}
             <a href="/products" className="mt-10 font-text font-semibold border-b-2 border-orange pb-1 hover:text-orange transition-colors">
-              Voir toute la collection &rarr;
+              Voir toute la collection
             </a>
 
           </div>
@@ -112,7 +106,7 @@ export default async function Home() {
 
         <hr className="color-night-blue bg-night-blue h-0.5 my-10"/>
 
-        {/* --- SECTION AVIS --- */}
+        {/* Not implemented yet */}
         <section id="review" className="flex flex-col items-center">
           <h3 className="font-title text-dark-blue text-6xl">Elles en parlent mieux que moi</h3>
           {/*Voir pour trouver comment importer des avis*/}
@@ -120,7 +114,6 @@ export default async function Home() {
 
         <hr className="color-night-blue bg-night-blue h-0.5 my-10"/>
 
-        {/* --- SECTION UPCYCLING --- */}
         <section id="upcycling" className="flex flex-col items-center gap-4 text-center">
           <h3 className="font-title text-6xl text-dark-blue">Donner une seconde vie aux matières</h3>
           <p className="font-text text-lg">J’aime travailler avec des matières qui ont déjà vécu, comme les jeans, que je transforme pour leur offrir une nouvelle histoire.</p>
@@ -134,7 +127,6 @@ export default async function Home() {
 
         <hr className="color-night-blue bg-night-blue h-0.5 my-10"/>
 
-        {/* --- SECTION FOOTER / CALL TO ACTION --- */}
         <section id="shop" className="flex flex-col items-center gap-4 text-center">
             <h3 className="font-title text-6xl text-dark-blue">Votre prochain sac Sac’Azura vous attend.</h3>
             <p className="font-text text-lg">Vous pouvez commander directement en ligne ou me contacter pour un projet personnalisé.</p>

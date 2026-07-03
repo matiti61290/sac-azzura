@@ -2,13 +2,11 @@
 
 import { useState } from "react"
 import { useAuth } from "@/src/contexts/AuthContext"
-// 1. On importe le hook useRouter
 import { useRouter } from "next/navigation"
 
 export default function LoginForm(){
 
     const { login } = useAuth()
-    // 2. On initialise le router
     const router = useRouter() 
 
     const [formData, setFormData] = useState({
@@ -39,7 +37,6 @@ export default function LoginForm(){
             setMessage('Connexion réussie !')
             setFormData({mail: '', password: ''})
     
-            // 3. On fait le routing vers la page d'accueil
             router.push('/')
             
         } catch(error: any) {
