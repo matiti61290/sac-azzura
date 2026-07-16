@@ -19,7 +19,7 @@ export class CategoryService{
     }
 
     async findCategoryById(categoryId: number) {
-        const category =  this.categoryRepository.findOne({ where:{ id: categoryId}})
+        const category = await this.categoryRepository.findOne({ where:{ id: categoryId}})
 
         if(!category) {
             throw new NotFoundException
@@ -29,7 +29,7 @@ export class CategoryService{
     }
 
     async addCategory(addCategoryDto: AddCategoryDto){
-        const newCategory = this.categoryRepository.create({
+        const newCategory = await this.categoryRepository.create({
             ...addCategoryDto
         })
 

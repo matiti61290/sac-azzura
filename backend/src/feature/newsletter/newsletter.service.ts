@@ -23,7 +23,6 @@ export class NewsletterService {
       existing.verifyToken = crypto.randomBytes(32).toString('hex');
       await this.subscriberEntity.save(existing);
       
-      // <-- Appel de ton service Mail
       await this.mailService.sendSubscriptionConfirmMail(existing.email, existing.verifyToken);
       return;
     }

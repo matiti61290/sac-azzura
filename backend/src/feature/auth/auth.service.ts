@@ -50,30 +50,32 @@ export class AuthService {
         return newUser
     }
 
-async validateAccount(token: string) {
+    async validateAccount(token: string) {
+        let payload: any;
+
+        // 1. On isole uniquement la vérification du token dans le try/catch
         try {
-            const payload = this.jwtService.verify(token)
-            
-            const user = await this.userRepository.findOne({ where: { id: payload.id }})
-
-            if(!user){
-                throw new NotFoundException('Utilisateur introuvable')
-            }
-
-            user.isVerified = true
-            await this.userRepository.save(user)
-            
-            return { message: 'Utilisateur validé avec succès' }
-
+            payload = this.jwtService.verify(token);
         } catch (error: any) {
             if (error.name === 'TokenExpiredError') {
                 throw new BadRequestException(
                     "Le lien de validation a expiré. Veuillez vous connecter sur le site pour demander un nouveau lien."
-                )
+                );
             }
-            
-            throw new BadRequestException("Le lien de validation est invalide.")
+            throw new BadRequestException("Le lien de validation est invalide.");
         }
+
+        // 2. La logique utilisateur est en dehors, les exceptions remonteront correctement
+        const user = await this.userRepository.findOne({ where: { id: payload.id } });
+
+        if (!user) {
+            throw new NotFoundException('Utilisateur introuvable');
+        }
+
+        user.isVerified = true;
+        await this.userRepository.save(user);
+
+        return { message: 'Utilisateur validé avec succès' };
     }
 
     async validateUser(mail: string, password: string): Promise<any> {
