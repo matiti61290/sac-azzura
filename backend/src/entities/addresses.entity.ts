@@ -1,6 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, Index, OneToMany } from "typeorm";
 import { UserEntity } from "./user.entity";
-
 import { OrderEntity } from "./order.entity";
 import { AddressType } from "../shared/enum/address.enum";
 import { Exclude } from "class-transformer";

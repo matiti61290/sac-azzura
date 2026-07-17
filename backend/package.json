@@ -22,7 +22,7 @@
     "migration:generate": "npm run typeorm -- migration:generate",
     "migration:run": "npm run typeorm -- migration:run",
     "migration:revert": "npm run typeorm -- migration:revert",
-    "doc": "npx typedoc --emit docs"
+    "doc": "npx typedoc --entryPointStrategy expand ./src --out docs"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.893.0",
