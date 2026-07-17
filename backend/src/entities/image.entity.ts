@@ -11,4 +11,7 @@ export class ImageEntity {
 
     @ManyToOne(()=> ProductEntity, (product) => product.images)
     product!: ProductEntity
+
+    //A virtual entity ignored by the DB
+    url?: string
 }

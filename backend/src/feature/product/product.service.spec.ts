@@ -2,15 +2,12 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { ProductService } from './product.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { NotFoundException } from '@nestjs/common';
-
-// Ajuste ces chemins vers tes entités, DTOs et services
 import { ProductEntity } from '../../entities/product.entity';
 import { SubcategoryEntity } from '../../entities/subcategory.entity';
 import { ImageEntity } from '../../entities/image.entity';
 import { AwsS3Service } from '../aws-s3/aws-s3.service';
 import { StockService } from '../stock/stock.service';
 import { AddProductDto } from '../../shared/dtos/product/addProduct.dto';
-import { UpdateProductDto } from '../../shared/dtos/product/updateProduct.dto';
 
 describe('ProductService', () => {
   let productService: ProductService;
@@ -20,7 +17,6 @@ describe('ProductService', () => {
   let awsS3Service: any;
   let stockService: any;
 
-  // Création des mocks
   const mockProductRepository = {
     find: jest.fn(),
     findOne: jest.fn(),
@@ -90,9 +86,7 @@ describe('ProductService', () => {
     jest.clearAllMocks();
   });
 
-  // ==========================================
   // GET ALL PRODUCTS
-  // ==========================================
   describe('getAllProducts', () => {
     it('devrait retourner une liste de produits avec les URLs d’images signées', async () => {
       const mockProducts = [
@@ -123,9 +117,7 @@ describe('ProductService', () => {
     });
   });
 
-  // ==========================================
   // FIND PRODUCT
-  // ==========================================
   describe('findProduct', () => {
     it('devrait retourner un produit avec ses images signées', async () => {
       const mockProduct = {
@@ -153,17 +145,14 @@ describe('ProductService', () => {
     });
   });
 
-  // ==========================================
   // CREATE PRODUCT
-  // ==========================================
   describe('createProduct', () => {
-    // Le mock respecte maintenant strictement ton AddProductDto
     const mockAddProductDto: AddProductDto = {
       name: 'Nouveau Sac',
       description: 'Super sac',
-      price: 50.50, // Type number
+      price: 50.50,
       sku_code: 'SAC-123',
-      subcategoryId: 2, // Type number
+      subcategoryId: 2,
       variations: JSON.stringify([{ quantity: 10, colorId: '1', materialId: '1' }]), // Ajout de la propriété manquante
     };
 
@@ -219,9 +208,7 @@ describe('ProductService', () => {
     });
   });
 
-  // ==========================================
   // UPDATE PRODUCT
-  // ==========================================
   describe('updateProduct', () => {
     const mockUpdateDto = {
       name: 'Sac Modifié',
@@ -229,7 +216,7 @@ describe('ProductService', () => {
       quantity: 5,
       stock_sku: 'STOCK-123',
       files: [{ originalname: 'new.jpg', buffer: Buffer.from('test') }] as Express.Multer.File[],
-    } as any; // Casté en "any" pour accepter "files" qui est présent dans ton code.
+    } as any; 
 
     it('devrait jeter une NotFoundException si le produit n’existe pas', async () => {
       productRepository.findOne.mockResolvedValue(null);
@@ -246,12 +233,10 @@ describe('ProductService', () => {
       awsS3Service.uploadFile.mockResolvedValue(true);
       imageRepository.create.mockReturnValue({ key: 'mocked-key' });
       
-      // On espionne findProduct pour la fin de la méthode
       jest.spyOn(productService, 'findProduct').mockResolvedValue(mockSavedProduct as any);
 
       const result = await productService.updateProduct(1, mockUpdateDto);
 
-      // Le produit initial a bien été muté par Object.assign
       expect(mockProduct.name).toBe('Sac Modifié');
       expect(productRepository.save).toHaveBeenCalledWith(mockProduct);
       
@@ -264,9 +249,7 @@ describe('ProductService', () => {
     });
   });
 
-  // ==========================================
   // DELETE PRODUCT
-  // ==========================================
   describe('deleteProduct', () => {
     it('devrait jeter une NotFoundException si le produit n’existe pas', async () => {
       productRepository.findOne.mockResolvedValue(null);
@@ -285,16 +268,13 @@ describe('ProductService', () => {
 
       const result = await productService.deleteProduct(1);
 
-      // Vérification des suppressions S3 et Image BDD
       expect(awsS3Service.deleteFile).toHaveBeenCalledTimes(2);
       expect(awsS3Service.deleteFile).toHaveBeenCalledWith('image1.jpg');
       expect(imageRepository.remove).toHaveBeenCalledTimes(2);
 
-      // Vérification de la suppression des stocks
       expect(stockService.deleteStockByProductId).toHaveBeenCalledTimes(2);
       expect(stockService.deleteStockByProductId).toHaveBeenCalledWith('SKU-1');
 
-      // Vérification de la suppression finale du produit
       expect(productRepository.remove).toHaveBeenCalledWith(mockProduct);
       
       expect(result).toEqual({ deleted: true });

@@ -5,8 +5,6 @@ import { JwtService } from '@nestjs/jwt';
 import { BadRequestException, ConflictException, NotFoundException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { Response } from 'express';
-
-// Importations de tes entités, DTOs et services annexes
 import { UserEntity } from '../../entities/user.entity';
 import { ConfirmMailService } from './authMail/corfirmMail.service';
 import { newPasswordMailService } from './authMail/newPasswordMail.service';
@@ -14,7 +12,6 @@ import { RegisterDto } from '../../shared/dtos/auth/register.dto';
 import { MailDto } from '../../shared/dtos/auth/mail.dtos';
 import { NewPasswordDto } from '../../shared/dtos/auth/newPassword.dto';
 
-// On mock entièrement bcrypt pour ne pas ralentir les tests unitaires
 jest.mock('bcrypt');
 
 describe('AuthService', () => {
@@ -24,7 +21,6 @@ describe('AuthService', () => {
   let confirmMailService: any;
   let mockNewPasswordMailServiceInstance: any;
 
-  // Création des objets simulés (Mocks)
   const mockUserRepository = {
     findOne: jest.fn(),
     create: jest.fn(),
@@ -61,7 +57,6 @@ describe('AuthService', () => {
           useValue: mockConfirmMailService,
         },
         {
-          // Utilise le même nom de classe (avec le "n" minuscule) utilisé dans ton import/service
           provide: newPasswordMailService,
           useValue: mockNewPasswordMailService,
         },
@@ -76,12 +71,11 @@ describe('AuthService', () => {
   });
 
   afterEach(() => {
-    jest.clearAllMocks(); // Réinitialise les appels pour chaque test
+    jest.clearAllMocks();
   });
 
-  // ==========================================
+
   // REGISTRATION
-  // ==========================================
   describe('registration', () => {
     const registerDto: RegisterDto = {
       firstname: 'Jean',
@@ -122,9 +116,7 @@ describe('AuthService', () => {
     });
   });
 
-  // ==========================================
   // VALIDATE ACCOUNT
-  // ==========================================
   describe('validateAccount', () => {
     it('devrait valider le compte de l’utilisateur avec succès', async () => {
       jwtService.verify.mockReturnValue({ id: 42 });
@@ -170,9 +162,7 @@ describe('AuthService', () => {
     });
   });
 
-  // ==========================================
   // VALIDATE USER
-  // ==========================================
   describe('validateUser', () => {
     const mockUser = {
       id: 1,
@@ -209,9 +199,7 @@ describe('AuthService', () => {
     });
   });
 
-  // ==========================================
   // LOGIN
-  // ==========================================
   describe('login', () => {
     it('devrait signer un token, configurer le cookie et renvoyer le payload', async () => {
       const mockUser = { id: 1, mail: 'test@example.com', firstname: 'Jean', isAdmin: false };
@@ -238,9 +226,7 @@ describe('AuthService', () => {
     });
   });
 
-  // ==========================================
   // SEND MAIL FORGET PASSWORD
-  // ==========================================
   describe('sendMailForgetPassword', () => {
     it('devrait signer un token et appeler le service d’envoi de mail', async () => {
       const mailDto: MailDto = { mail: 'test@example.com' };
@@ -256,9 +242,7 @@ describe('AuthService', () => {
     });
   });
 
-  // ==========================================
   // FORGET PASSWORD
-  // ==========================================
   describe('forgetPassword', () => {
     it('devrait vérifier le token et renvoyer le payload', async () => {
       const mockPayload = { mail: 'test@example.com' };
@@ -271,9 +255,7 @@ describe('AuthService', () => {
     });
   });
 
-  // ==========================================
   // CHANGE PASSWORD
-  // ==========================================
   describe('changePassword', () => {
     const newPasswordDto: NewPasswordDto = {
       password: 'NewSecurePassword1!',
@@ -321,9 +303,7 @@ describe('AuthService', () => {
     });
   });
 
-  // ==========================================
   // RESEND VERIFICATION
-  // ==========================================
   describe('resendVerification', () => {
     const payload = { id: 123 };
 

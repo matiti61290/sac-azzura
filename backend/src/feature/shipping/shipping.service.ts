@@ -10,6 +10,9 @@ import { OrderEntity } from "../../entities/order.entity";
 Shipping parts don't work for the moment
 */
 
+/**
+ * Service for managing shipping labels and tracking for orders.
+ */
 @Injectable()
 export class ShippingService {
     constructor(

@@ -9,7 +9,7 @@ import { CreateLabelDto } from '../../../shared/dtos/mondial_relai/createLabelDt
 import { OrderEntity } from '../../../entities/order.entity';
 import { OrderStatus } from '../../../shared/enum/order.enum';
 import { Carrier } from '../../../shared/enum/carrier.enum';
-import { ServiceError } from '../../../shared/interfaces/serviceError.interface';
+import { ServiceError } from '../../../shared/interfaces/serviceError.interface.ts';
 
 @Injectable()
 export class MondialRelayService implements OnModuleInit {

@@ -2,8 +2,6 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { StockService } from './stock.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { NotFoundException } from '@nestjs/common';
-
-// Ajuste les chemins d'importation vers tes entités
 import { StockEntity } from '../../entities/stock.entity';
 import { ProductEntity } from '../../entities/product.entity';
 import { ColorEntity } from '../../entities/color.entity';
@@ -19,7 +17,6 @@ describe('StockService', () => {
   let materialRepository: any;
   let subcategoryRepository: any;
 
-  // Création des mocks pour les repositories
   const mockStockRepository = {
     find: jest.fn(),
     findOne: jest.fn(),
@@ -73,9 +70,7 @@ describe('StockService', () => {
     jest.clearAllMocks();
   });
 
-  // ==========================================
   // GET ALL STOCK
-  // ==========================================
   describe('getAllStock', () => {
     it('devrait retourner tout le stock avec les relations', async () => {
       const mockStocks = [{ id: 1, quantity: 10 }, { id: 2, quantity: 5 }];
@@ -95,9 +90,7 @@ describe('StockService', () => {
     });
   });
 
-  // ==========================================
   // GET STOCK BY SKU
-  // ==========================================
   describe('getStockBySku', () => {
     it('devrait retourner le stock correspondant au SKU', async () => {
       const mockStock = { id: 1, sku: 'TEST-SKU' };
@@ -118,9 +111,7 @@ describe('StockService', () => {
     });
   });
 
-  // ==========================================
   // GET STOCK BY ID
-  // ==========================================
   describe('getStockById', () => {
     it('devrait retourner le stock correspondant à l’ID', async () => {
       const mockStock = { id: 1, sku: 'TEST-SKU' };
@@ -141,9 +132,7 @@ describe('StockService', () => {
     });
   });
 
-  // ==========================================
   // ADD STOCK
-  // ==========================================
   describe('addStock', () => {
     const mockColor = { id: 1, sku_code: 'COL1' };
     const mockMaterial = { id: 1, sku_code: 'MAT1' };
@@ -151,7 +140,6 @@ describe('StockService', () => {
     const mockSubcategory = { id: 1, sku_code: 'SUB1', category: { sku_code: 'CAT1' } };
 
     beforeEach(() => {
-      // Configuration par défaut de succès
       colorRepository.findOne.mockResolvedValue(mockColor);
       materialRepository.findOne.mockResolvedValue(mockMaterial);
       productRepository.findOne.mockResolvedValue(mockProduct);
@@ -165,7 +153,6 @@ describe('StockService', () => {
     });
 
     it('devrait générer le bon SKU, créer le stock, le sauvegarder et le retourner', async () => {
-      // SKU attendu: productSku_categorySku_subcategorySku_colorSku_materialSku
       const expectedSku = 'PROD1_CAT1_SUB1_COL1_MAT1';
       
       const mockCreatedStock = { quantity: 10, sku: expectedSku };
@@ -174,7 +161,6 @@ describe('StockService', () => {
       stockRepository.create.mockReturnValue(mockCreatedStock);
       stockRepository.save.mockResolvedValue(mockSavedStock);
 
-      // On espionne l'appel final à this.getStockBySku
       jest.spyOn(stockService, 'getStockBySku').mockResolvedValue(mockSavedStock as any);
 
       const result = await stockService.addStock(10, 1, 1, 1, 1);
@@ -196,9 +182,7 @@ describe('StockService', () => {
     });
   });
 
-  // ==========================================
   // UPDATE STOCK
-  // ==========================================
   describe('updateStock', () => {
     it('devrait jeter une NotFoundException si le stock n’existe pas', async () => {
       stockRepository.findOne.mockResolvedValue(null);
@@ -212,7 +196,6 @@ describe('StockService', () => {
       stockRepository.findOne.mockResolvedValue(mockExistingStock);
       stockRepository.save.mockResolvedValue(mockUpdatedStock);
       
-      // On espionne l'appel final à this.getStockBySku
       jest.spyOn(stockService, 'getStockBySku').mockResolvedValue(mockUpdatedStock as any);
 
       const result = await stockService.updateStock(50, 'TEST-SKU');
@@ -228,9 +211,7 @@ describe('StockService', () => {
     });
   });
 
-  // ==========================================
   // DELETE STOCK BY PRODUCT ID (Actually by SKU)
-  // ==========================================
   describe('deleteStockByProductId', () => {
     it('devrait jeter une NotFoundException si le stock n’existe pas', async () => {
       stockRepository.findOne.mockResolvedValue(null);

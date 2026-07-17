@@ -3,8 +3,6 @@ import { PaymentService } from './payment.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { BadRequestException, ForbiddenException, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { DataSource } from 'typeorm';
-
-// Importations des entités et DTOs
 import { StockEntity } from '../../entities/stock.entity';
 import { OrderEntity } from '../../entities/order.entity';
 import { UserEntity } from '../../entities/user.entity';
@@ -15,7 +13,6 @@ import { paymentFailMailService } from './paymentMail/paymentFailMail.service';
 import { CartDto } from '../../shared/dtos/payment/cart.dto';
 import { OrderStatus } from '../../shared/enum/order.enum';
 
-// Mock de la librairie Stripe
 jest.mock('stripe', () => {
   return {
     Stripe: jest.fn().mockImplementation(() => ({
@@ -84,9 +81,7 @@ describe('PaymentService', () => {
     process.env = originalEnv;
   });
 
-  // ==========================================
   // VERIFICATION ORDER
-  // ==========================================
   describe('verificationOrder', () => {
     const mockUser = { id: 1, mail: 'test@example.com', isVerified: true } as UserEntity;
     const mockCartDto: CartDto = {
@@ -126,9 +121,7 @@ describe('PaymentService', () => {
     });
   });
 
-  // ==========================================
   // CREATE CHECKOUT SESSION
-  // ==========================================
   describe('createCheckoutSession', () => {
     const mockItems = [
       { stock: { sku: 'ITEM-1', product: { name: 'T-shirt' } }, quantity: 2, priceAtPurchase: 50 },
@@ -158,9 +151,7 @@ describe('PaymentService', () => {
     });
   });
 
-  // ==========================================
   // PAYMENT FAILED
-  // ==========================================
   describe('paymentFailed', () => {
     it('devrait jeter une ForbiddenException si la commande n’existe pas', async () => {
       orderRepository.findOne.mockResolvedValue(null);
@@ -180,9 +171,7 @@ describe('PaymentService', () => {
     });
   });
 
-  // ==========================================
   // WEBHOOK STRIPE
-  // ==========================================
   describe('constructEventWebhook', () => {
     let mockReq: any;
     let mockRes: any;
@@ -253,12 +242,9 @@ describe('PaymentService', () => {
     });
   });
 
-  // ==========================================
   // MAIL SERVICES
-  // ==========================================
 describe('Mail Sending Wrappers', () => {
     it('devrait appeler paymentSuccessMail', async () => {
-      // Pas de spyOn ici ! On laisse le vrai code de la méthode s'exécuter
       await paymentService.sendMailPaymentSuccess('test@test.com', 999);
       
       expect(mockPaymentSuccessMail.sendPaymentSuccessMail).toHaveBeenCalledWith('test@test.com', 999);
