@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from "typeorm";
 
-export class Database1783001894760 implements MigrationInterface {
-    name = 'Database1783001894760'
+export class Database1784545882944 implements MigrationInterface {
+    name = 'Database1784545882944'
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.query(`CREATE TABLE \`Promotion\` (\`id\` int NOT NULL AUTO_INCREMENT, \`name\` varchar(255) NOT NULL, \`promotionType\` enum ('percentage', 'fixed_amount') NOT NULL DEFAULT 'percentage', \`percentageValue\` int NULL, \`fixedValue\` int NULL, \`startdate\` datetime NOT NULL, \`enddate\` datetime NOT NULL, \`minAmount\` int NULL, \`categories\` json NULL, \`isActive\` tinyint NOT NULL, UNIQUE INDEX \`IDX_9786eb4269fd8acfdd69620a65\` (\`name\`), PRIMARY KEY (\`id\`)) ENGINE=InnoDB`);

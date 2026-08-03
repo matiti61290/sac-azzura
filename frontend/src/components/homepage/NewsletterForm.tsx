@@ -17,7 +17,6 @@ export default function NewsletterForm() {
             headers:  { 'Content-Type': 'application/json'},
             body: JSON.stringify({ email })
         })
-        console.log(process.env.NEXT_PUBLIC_API)
         const data = await res.json()
 
         if (!res.ok){

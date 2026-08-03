@@ -334,10 +334,8 @@ export class MondialRelayService implements OnModuleInit {
   }
 
   async handleWebhook(payload: any, token: string) {
-    // 1. SÉCURITÉ : On vérifie que la requête vient bien de quelqu'un qui connaît le secret
     if (!this.webhookSecret || token !== this.webhookSecret) {
       this.logger.error("Tentative d'accès non autorisé au webhook Mondial Relay");
-      // On jette une 401. La requête est rejetée.
       throw new UnauthorizedException('Token invalide ou manquant'); 
     }
 
@@ -348,19 +346,15 @@ export class MondialRelayService implements OnModuleInit {
 
     if(!trackingNumber) {
       this.logger.warn('Webhook reçu mais aucun numéro de tracking trouvé.');
-      return; // On utilise "return" pour envoyer un 200 OK et stopper l'exécution
+      return;
     }
 
     const order = await this.orderRepository.findOne({ where: { trackingNumber } });
 
     if(!order) {
-      // On logue l'info, MAIS ON NE JETTE PLUS D'ERREUR 500 !
-      // Cela évite que Mondial Relay ne relance la requête en boucle.
       this.logger.warn(`Webhook ignoré : Le colis avec le tracking number ${trackingNumber} n'existe pas en BDD`);
       return; 
     }
-
-    // --- À partir d'ici, ton code était déjà très bon, je l'ai juste ajusté pour l'interface ---
     
     order.lastTrackingUpdate = new Date();
 

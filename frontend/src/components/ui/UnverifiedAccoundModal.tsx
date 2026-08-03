@@ -39,7 +39,7 @@ export default function UnverifiedAccountModal({ isOpen, onClose }: UnverifiedAc
 
       setStatus({
         type: 'success',
-        message: "Un nouveau lien d'activation vient d'être envoyé sur votre boîte mail ! ✨"
+        message: "Un nouveau lien d'activation vient d'être envoyé sur votre boîte mail."
       })
     } catch (err: any) {
       setStatus({
